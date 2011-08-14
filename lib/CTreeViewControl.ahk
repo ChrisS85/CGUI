@@ -160,6 +160,7 @@ Class CTreeViewControl Extends CControl
 			ID := TV_Add(Text, this.ID, Options)
 			Item := new CTreeViewControl.CItem(ID, this._.GUINum, this._.ControlName)
 			Item.Icon := ""
+			this.Insert(Item)
 			return Item
 		}
 		/*
@@ -180,6 +181,15 @@ Class CTreeViewControl Extends CControl
 			Gui, TreeView, % Control.ClassNN
 			if(!IsObject(ObjectOrIndex)) ;If index, get object and then handle
 				ObjectOrIndex := this[ObjectOrIndex]
+			if(ObjectOrIndex.ID = 0) ;Don't delete root node
+				return
+			p := ObjectOrIndex.Parent
+			for Index, Item in ObjectOrIndex.Parent
+				if(Item = ObjectOrIndex)
+				{
+					ObjectOrIndex.Parent._Remove(A_Index)
+					break
+				}
 			TV_Delete(ObjectOrIndex.ID)
 			if(TV_GetCount() = 0) ;If all TreeView items are deleted, fire a selection changed event
 				if(IsFunc(GUI[Control.Name "_ItemSelected"]))
@@ -208,21 +218,47 @@ Class CTreeViewControl Extends CControl
 			Control := GUI[this._.ControlName]
 			Gui, % this._.GUINum ":Default"
 			Gui, TreeView, % Control.ClassNN
+			
+			;Backup properties which are stored in the TreeList itself
 			Text := this.Text
 			Bold := this.bold
 			Expanded := this.Expanded
 			Checked := this.Checked
 			Selected := this.Selected
 			OldID := this.ID
+			
+			;If no parent is specified, the item will be moved on the current level
 			if(!Parent)
 				Parent := this.Parent
+			OldParent := this.Parent
+			
+			;Add new node. At this point there are two nodes.
 			NewID := TV_Add(Text, Parent.ID, (Position = 1 ? "First" : Parent[Position-1].ID) " " (Bold ? "+Bold" : "") (Expanded ?  "Expand" : "") (Checked ? "Check" : "") (Selected ? "Select" : ""))
+			
+			;Collect all child items
 			Childs := []
 			for index, Item in this
 				Childs.Insert(Item)
+			
 			this._.ID := NewID
+			
+			;Remove old parent node link and set the new one
+			if(OldParent != Parent)
+			{
+				for Index, Item in OldParent
+					if(Item = this)
+					{
+						OldParent.Remove(A_Index)
+						break
+					}
+				Parent.Insert(Position, this)
+			}
+			
+			;Move child items
 			for index, Item in Childs
 				Item.Move(index, this)
+			
+			;Delete old tree node
 			TV_Delete(OldID)
 		}
 		SetIcon(Filename, IconNumberOrTransparencyColor = 1)
@@ -273,20 +309,20 @@ Class CTreeViewControl Extends CControl
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!GUI.IsDestroyed)
 				{					
-					if Name is Integer ;get a child node
-					{
-						if(Name <= this.MaxIndex())
-						{
-							Control := GUI[this._.ControlName]
-							Gui, % this._.GUINum ":Default"
-							Gui, TreeView, % Control.ClassNN
-							child := TV_GetChild(this._.ID) ;Find child node id
-							Loop % Name - 1
-								child := TV_GetNext(child)
-							Value := new CTreeViewControl.CItem(child, this._.GUINum, this._.ControlName)
-						}
-					}
-					else if(Name = "CheckedItems")
+					;~ if Name is Integer ;get a child node
+					;~ {
+						;~ if(Name <= this.MaxIndex())
+						;~ {
+							;~ Control := GUI[this._.ControlName]
+							;~ Gui, % this._.GUINum ":Default"
+							;~ Gui, TreeView, % Control.ClassNN
+							;~ child := TV_GetChild(this._.ID) ;Find child node id
+							;~ Loop % Name - 1
+								;~ child := TV_GetNext(child)
+							;~ Value := new CTreeViewControl.CItem(child, this._.GUINum, this._.ControlName)
+						;~ }
+					;~ }
+					if(Name = "CheckedItems")
 					{
 						Value := []
 						for index, Item in this
@@ -311,6 +347,13 @@ Class CTreeViewControl Extends CControl
 						Value := this._[Name]
 					else if(Name = "Count")
 						Value := this.MaxIndex()
+					else if(Name = "HasChildren")
+					{
+						Control := GUI[this._.ControlName]
+						Gui, % this._.GUINum ":Default"
+						Gui, TreeView, % Control.ClassNN
+						Value := TV_GetChild(this._.ID) > 0
+					}
 					else if(Name = "Text")
 					{
 						Control := GUI[this._.ControlName]
