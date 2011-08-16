@@ -27,7 +27,13 @@ Class CTreeViewControl Extends CControl
 		this.Type := "TreeView"
 	}
 	
-	;Find an item by its ID
+	/*
+	Function: FindItem
+	Finds an item by its ID.
+	
+	Parameters:
+		ID - The ID of the item.
+	*/
 	FindItem(ID, Root = "")
 	{
 		if(!ID) ;Root node
@@ -44,7 +50,7 @@ Class CTreeViewControl Extends CControl
 	}
 	/*
 	Variable: Items
-	Contains the nodes of the tree. Each level can be iterated and indexed.
+	Contains the nodes of the tree. Each level can be iterated and indexed. A node is of type <CTreeViewControl.CItem>
 	*/
 	__Get(Name, Params*)
 	{
@@ -125,7 +131,7 @@ Class CTreeViewControl Extends CControl
 	}
 	
 	/*
-	Class: CItem
+	Class: CTreeViewControl.CItem
 	A tree node.
 	*/
 	Class CItem
@@ -264,6 +270,14 @@ Class CTreeViewControl Extends CControl
 			;Delete old tree node
 			TV_Delete(OldID)
 		}
+		/*
+		Function: SetIcon
+		Sets the icon of a tree node
+		
+		Parameters:
+			Filename - The filename of the file containing the icon.
+			IconNumberOrTransparencyColor - The icon number or the transparency color if the used file has no transparency support.
+		*/
 		SetIcon(Filename, IconNumberOrTransparencyColor = 1)
 		{
 			global CGUI
@@ -275,6 +289,10 @@ Class CTreeViewControl Extends CControl
 			this._.Icon := Filename
 			this._.IconNumber := IconNumberOrTransparencyColor
 		}
+		/*
+		Function: MaxIndex()
+		Returns the number of child nodes.		
+		*/
 		MaxIndex()
 		{
 			global CGUI
@@ -293,6 +311,14 @@ Class CTreeViewControl Extends CControl
 				count++
 			return count + 1
 		}
+		
+		/*
+		Function: ItemByID
+		Access a child item by its ID. This function only works for childs of the first order, no grand-child nodes etc...
+		
+		Parameters:
+			ID - The ID of the child item
+		*/
 		;Access a child item by its ID
 		ItemByID(ID)
 		{
@@ -305,6 +331,50 @@ Class CTreeViewControl Extends CControl
 			global CEnumerator
 			return new CEnumerator(this)
 		}
+		
+		/*
+		Variable: 1,2,3,4,...
+		The child nodes of a tree node may be accessed by their index, e.g. this.TreeView1.Items[1][2][3].Text := "AHK"
+		
+		Variable: CheckedItems
+		An array containing all checked child nodes of type <CTreeViewControl.CItem>.
+		
+		Variable: CheckedIndices
+		An array containing all checked child indices.
+		
+		Variable: Parent
+		The parent node of this node.
+		
+		Variable: ID
+		The ID used internally in the TreeView control.
+		
+		Variable: Icon
+		The path of an icon assigned to this node.
+		
+		Variable: IconNumber
+		The icon number used when an icon file contains more than one icon.
+		
+		Variable: Count
+		The number of child nodes.
+		
+		Variable: HasChildren
+		True if there is at least one child node.
+		
+		Variable: Text
+		The text of this tree node.
+		
+		Variable: Checked
+		True if the tree node is checked.
+		
+		Variable: Selected
+		True if the tree node is selected.
+		
+		Variable: Expanded
+		True if the tree node is expanded.
+		
+		Variable: Bold
+		If true, the text of this node is bold.
+		*/
 		__Get(Name, Params*)
 		{
 			global CTreeViewControl, CGUI
@@ -347,7 +417,7 @@ Class CTreeViewControl Extends CControl
 						Gui, TreeView, % Control.ClassNN
 						VaLue := Control.FindItem(TV_GetParent(this._.ID))
 					}
-					else if(Name = "ID" || Name = "Icon")
+					else if(Name = "ID" || Name = "Icon" || Name = "IconNumber")
 						Value := this._[Name]
 					else if(Name = "Count")
 						Value := this.MaxIndex()
@@ -426,6 +496,13 @@ Class CTreeViewControl Extends CControl
 				else if(Name = "Icon")
 				{
 					this.SetIcon(Value, this._.HasKey("IconNumber") ? this._.IconNumber : 1)
+					return Value
+				}
+				else if(Name = "IconNumber")
+				{
+					this._.IconNumber := Value
+					if(this._.Icon)
+						this.SetIcon(this.Icon, Value)
 					return Value
 				}
 			}

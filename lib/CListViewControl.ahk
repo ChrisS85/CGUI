@@ -27,6 +27,11 @@ Class CListViewControl Extends CControl
 		this._.Insert("ImageListManager", new this.CImageListManager(GUINum, Name))
 		this.Type := "ListView"
 	}
+	
+	/*
+	Function: ModifyCol
+	Modifies a column. See AHK help on LV_ModifyCol for details.
+	*/
 	ModifyCol(ColumnNumber="", Options="", ColumnTitle="")
 	{
 		global CGUI
@@ -36,6 +41,10 @@ Class CListViewControl Extends CControl
 		Gui, ListView, % this.ClassNN
 		LV_ModifyCol(ColumnNumber, Options, ColumnTitle)
 	}
+	/*
+	Function: InsertCol
+	Inserts a column. See AHK help on LV_InsertCol for details.
+	*/
 	InsertCol(ColumnNumber, Options="", ColumnTitle="")
 	{
 		global CGUI
@@ -45,6 +54,10 @@ Class CListViewControl Extends CControl
 		Gui, ListView, % this.ClassNN
 		LV_InsertCol(ColumnNumber, Options, ColumnTitle)
 	}
+	/*
+	Function: DeleteCol
+	Deletes a column. See AHK help on LV_DeleteCol for details.
+	*/
 	DeleteCol(ColumnNumber)
 	{
 		global CGUI
@@ -56,10 +69,7 @@ Class CListViewControl Extends CControl
 	}
 	/*
 	Variable: Items
-	Contains all rows and fields. Indexing and iterating over it is possible to retrieve a row. 
-	A row has properties like Checked, Focused and Selected. 
-	To access single cells it is possible to index or iterate over a row.
-	Icons can be assigned to rows by calling SetIcon(Filename, IconIndex) or by assigning an icon file to the Icon property of a row.
+	An array of all ListView rows. See <CListViewControl.CItems>.
 	
 	Variable: SelectedItem
 	Contains the (first) selected row.
@@ -209,6 +219,11 @@ Class CListViewControl Extends CControl
 				return Value
 		}
 	}
+	
+	/*
+	Class: CListViewControl.CItems
+	An array of all ListView rows.
+	*/
 	Class CItems
 	{
 		__New(GUINum, ControlName)
@@ -222,6 +237,10 @@ Class CListViewControl Extends CControl
 			global CEnumerator
 			return new CEnumerator(this)
 		}
+		/*
+		Function: MaxIndex()
+		Returns the number of rows.
+		*/
 		MaxIndex()
 		{
 			global CGUI
@@ -233,6 +252,14 @@ Class CListViewControl Extends CControl
 			Gui, ListView, % Control.ClassNN
 			return LV_GetCount()
 		}
+		/*
+		Function: Add()
+		Adds a row.
+		
+		Parameters:
+			Options - Options for the new row. See AHK documentation on LV_Add().
+			Fields - Any additional parameters are used as cell text.
+		*/
 		Add(Options, Fields*)
 		{
 			global CGUI
@@ -246,6 +273,15 @@ Class CListViewControl Extends CControl
 			UnsortedIndex := LV_GetCount()
 			this._.Insert(UnsortedIndex, new this.CRow(SortedIndex, UnsortedIndex, this._.GUINum, Control.Name))
 		}
+		/*
+		Function: Insert()
+		Inserts a row.
+		
+		Parameters:
+			RowNumber - Index before which the row is inserted.
+			Options - Options for the new row. See AHK documentation on LV_Add().
+			Fields - Any additional parameters are used as cell text.
+		*/
 		Insert(RowNumber, Options, Fields*)
 		{
 			global CGUI
@@ -271,22 +307,17 @@ Class CListViewControl Extends CControl
 			
 			SortedIndex := LV_Insert(SortedIndex, Options, Fields*)
 			this._.Insert(UnsortedIndex, new this.CRow(SortedIndex, UnsortedIndex, this._.GUINum, Control.Name))
-		}
+		}	
 		
+		/*
+		Function: Modify()
+		Modifies a row.
 		
-		
-		
-		hex(ByRef data, vars)
-		{
-			string := ""
-			offset := 0
-			Loop, Parse, vars, |
-			{
-				string .= A_LoopField ": " NumGet(data,offset,A_LoopField) "`n"
-				offset += A_LoopField = "PTR" ? A_PtrSize : 4
-			}
-			return string
-		}
+		Parameters:
+			RowNumber - Index of the row which should be modified.
+			Options - Options for the modified row. See AHK documentation on LV_Modify().
+			Fields - Any additional parameters are used as cell text.
+		*/
 		Modify(RowNumber, Options, Fields*)
 		{
 			global CGUI
@@ -300,6 +331,13 @@ Class CListViewControl Extends CControl
 			LV_Modify(SortedIndex, Options, Fields*)
 		}
 		
+		/*
+		Function: Delete()
+		Deletes a row.
+		
+		Parameters:
+			RowNumber - Index of the row which should be deleted.
+		*/
 		Delete(RowNumber)
 		{
 			global CGUI
@@ -316,6 +354,13 @@ Class CListViewControl Extends CControl
 				this.CRow.SetUnsortedIndex(this.CRow.GetSortedIndex(UnsortedIndex + A_Index, Control.hwnd), UnsortedIndex + A_Index - 1, Control.hwnd)
 			LV_Delete(SortedIndex)
 		}
+		/*
+		Variable: 1,2,3,4,...
+		Rows can be accessed by their index, e.g. this.ListView.Items[1][2] accesses the text of the first row and second column.
+		
+		Variable: Count
+		The number of rows.
+		*/
 		__Get(Name)
 		{
 			global CGUI
@@ -355,7 +400,11 @@ Class CListViewControl Extends CControl
 			}
 		}
 		
-		;CRow uses the unsorted row numbers internally, but it can switch to sorted row numbers depending on the setting of the listview
+		/*
+		Class: CListViewControl.CItems.CRow
+		A single row of a ListView control.
+		CRow uses the unsorted row numbers internally, but it can switch to sorted row numbers depending on the setting of the ListView.
+		*/
 		Class CRow
 		{
 			__New(SortedIndex, UnsortedIndex, GUINum, ControlName)
@@ -461,6 +510,10 @@ Class CListViewControl Extends CControl
 				global CEnumerator
 				return new CEnumerator(this)
 			}
+			/*
+			Function: MaxIndex()
+			Returns the number of columns.
+			*/
 			MaxIndex()
 			{				
 				global CGUI
@@ -472,6 +525,14 @@ Class CListViewControl Extends CControl
 				Gui, ListView, % Control.ClassNN
 				Return LV_GetCount("Column")
 			}
+			/*
+			Function: SetIcon
+			Sets the icon of a ListView row
+			
+			Parameters:
+				Filename - The filename of the file containing the icon.
+				IconNumberOrTransparencyColor - The icon number or the transparency color if the used file has no transparency support.
+			*/
 			SetIcon(Filename, IconNumberOrTransparencyColor = 1)
 			{
 				global CGUI
@@ -483,6 +544,31 @@ Class CListViewControl Extends CControl
 				this._.Icon := Filename
 				this._.IconNumber := IconNumberOrTransparencyColor
 			}
+			/*
+			Variable: 1,2,3,4,...
+			Columns can be accessed by their index, e.g. this.ListView.Items[1][2] accesses the text of the first row and second column.
+			
+			Variable: Text
+			The text of the first column of this row.
+			
+			Variable: Count
+			The number of columns.
+			
+			Variable: Checked
+			True if the row is checked.
+			
+			Variable: Selected
+			True if the row is selected.
+			
+			Variable: Focused
+			True if the row is foucsed.
+			
+			Variable: Icon
+			The filename of the file containing the icon for the current row.
+			
+			Variable: IconNumber
+			The number of the icon in a multi-icon file.
+			*/
 			__Get(Name)
 			{
 				global CGUI				
@@ -537,7 +623,17 @@ Class CListViewControl Extends CControl
 						return Value
 					}
 					else if(Name = "Icon")
-						this.SetIcon(Value)
+					{
+						this.SetIcon(Value, this._.HasKey("IconNumber") ? this._.IconNumber : 1)
+						return Value
+					}
+					else if(Name = "IconNumber")
+					{
+						this._.IconNumber := Value
+						if(this._.Icon)
+							this.SetIcon(this._.Icon, Value)
+						return Value
+					}
 				}
 			}
 		}

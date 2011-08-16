@@ -330,6 +330,11 @@ Class CControl ;Never created directly
 				return Value
 		}
     }
+	
+	/*
+	Class: CImageListManager
+	This class is used internally to manage the ImageLists of ListView/TreeView/Tab controls. Does not need to be used directly.
+	*/
 	Class CImageListManager
 	{
 		__New(GUINum, ControlName)

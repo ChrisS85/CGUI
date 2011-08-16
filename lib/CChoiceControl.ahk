@@ -17,6 +17,16 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		this._.Insert("Events", ["SelectionChanged"])
 		this._.Items := new this.CItems(GUINum, Name)
 	}
+	/*
+	Variable: SelectedItem
+	The text of the selected item.
+	
+	Variable: SelectedIndex
+	The index of the selected item.
+	
+	Variable: Items
+	An array containing all items. See <CChoiceControl.CItems>.
+	*/
 	__Get(Name, Params*)
     {
 		global CGUI
@@ -141,6 +151,10 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			`(CGUI.GUIList[this.GUINum])[this.Name "_SelectionChanged"]()
 		}
 	}
+	/*
+	Class CChoiceControl.CItems
+	An array containing all items of the control.
+	*/
 	Class CItems
 	{
 		__New(GUINum, ControlName)
@@ -149,6 +163,14 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			this._.GUINum := GUINum
 			this._.ControlName := ControlName
 		}
+		
+		/*
+		Variable: 1,2,3,4,...
+		Individual items can be accessed by their index.
+		
+		Variable: Count
+		The number of items in this control.
+		*/		
 		__Get(Name)
 		{
 			global CGUI
@@ -172,6 +194,8 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 					return Value
 				}
 			}
+			else if(Name = "Count")
+				return this.MaxIndex()
 		}
 		__Set(Name, Value)
 		{
@@ -189,6 +213,10 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				return Value
 			}
 		}
+		/*
+		Function: MaxIndex()
+		Returns the number of items in this control.
+		*/
 		MaxIndex()
 		{
 			global CGUI

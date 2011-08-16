@@ -14,6 +14,13 @@ Class CStatusBarControl Extends CControl
 			this._.Parts._.Insert(1, new this.CParts.CPart(Text, 1, "", "", "", "", this.GUINum, this.Name))
 		this._.Insert("Events", ["Click", "DoubleClick", "RightClick", "DoubleRightClick"])
 	}
+	/*
+	Variable: Parts
+	An array of status bar parts/segments. See <CStatusBarControl.CParts>
+	
+	Variable: Text
+	The text of the first part.
+	*/
 	__Get(Name, Params*)
 	{
 		if(Name = "Parts")
@@ -92,6 +99,10 @@ Class CStatusBarControl Extends CControl
 		}
 	}
 	
+	/*
+	Class: CStatusBarControl.CParts
+	An array of StatusBar parts/segments.
+	*/
 	Class CParts
 	{
 		__New(GUINum, Name)
@@ -100,6 +111,10 @@ Class CStatusBarControl Extends CControl
 			this.GUINum := GUINum
 			this.Name := Name
 		}
+		/*
+		Variable: 1,2,3,4,...
+		Individual parts can be accessed by their index. Returns an object of type <CStatusBarControl.CParts.CPart>
+		*/
 		__Get(Name, Params*)
 		{
 			if Name is Integer
@@ -113,6 +128,10 @@ Class CStatusBarControl Extends CControl
 				}
 			}
 		}
+		/*
+		Function: MaxIndex()
+		Returns the number of parts.
+		*/
 		MaxIndex()
 		{
 			return this._.MaxIndex()
@@ -144,6 +163,18 @@ Class CStatusBarControl Extends CControl
 				}
 			}
 		}
+		/*
+		Function: Add()
+		Adds a part.
+		
+		Parameters:
+			Text - The text of the part.
+			PartNumber - The position at which the new part will appear.
+			Width - The width of the new part.
+			Style - Style options for the new part. See AHK documentation.
+			Icon - An icon filename for the part.
+			IconNumber - The index of the icon in a multi-icon file.
+		*/
 		Add(Text, PartNumber = "", Width = 50, Style = "", Icon = "", IconNumber = "")
 		{
 			global CGUI
@@ -154,6 +185,14 @@ Class CStatusBarControl Extends CControl
 			Control := CGUI.GUIList[this.GUINum][this.Name]
 			Control.RebuildStatusBar()
 		}
+		
+		/*
+		Function: Remove()
+		Removes a part.
+		
+		Parameters:
+			PartNumber - The index of the part which should be removed.
+		*/
 		Remove(PartNumber)
 		{
 			global CGUI
@@ -164,6 +203,11 @@ Class CStatusBarControl Extends CControl
 				Control.RebuildStatusBar()
 			}
 		}
+		
+		/*
+		Class CStatusBarControl.CPart
+		A single part object.
+		*/
 		Class CPart
 		{
 			__New(Text, PartNumber, Width, Style, Icon, IconNumber, GUINum, Name)
@@ -178,6 +222,25 @@ Class CStatusBarControl Extends CControl
 				this._.GUINum := GUINum
 				this._.Name := Name
 			}
+			/*
+			Variable: Text
+			The text of this part.
+			
+			Variable: PartNumber
+			The index of this part.
+			
+			Variable: Width
+			The width of this part.
+			
+			Variable: Style
+			The style of this part. See AHK docs.
+			
+			Variable: Icon
+			The path to the icon file assigned to this part.
+			
+			Variable: IconNumber
+			The index of the icon in a multi-icon file.
+			*/
 			__Get(Name)
 			{
 				if(Name != "_" && this._.HasKey(Name))

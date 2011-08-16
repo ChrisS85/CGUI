@@ -18,7 +18,10 @@ Class CTabControl Extends CControl
 	
 	/*
 	Variable: Tabs
-	A list of all tabs. Each tab contains a list of controls that belong to it.
+	A list of all tabs. Each tab contains a list of controls that belong to it. The returned object is of type <CTabControl.CTabs>
+	
+	Variable: Text
+	The text of the first tab.
 	*/
 	__Get(Name, Params*)
 	{
@@ -97,6 +100,10 @@ Class CTabControl Extends CControl
 			`(CGUI.GUIList[this.GUINum])[func](A_EventInfo)
 		}
 	}
+	/*
+	Class CTabControl.CTabs
+	An array of tabs.
+	*/
 	Class CTabs
 	{
 		__New(GUINum, Name)
@@ -105,6 +112,10 @@ Class CTabControl Extends CControl
 			this.GUINum := GUINum
 			this.Name := Name
 		}
+		/*
+		Variable: 1,2,3,4,...
+		Individual tabs can be accessed by their index.
+		*/
 		__Get(Name, Params*)
 		{
 			if Name is Integer
@@ -118,6 +129,10 @@ Class CTabControl Extends CControl
 				}
 			}
 		}
+		/*
+		Function: MaxIndex()
+		Returns the number of tabs.
+		*/
 		MaxIndex()
 		{
 			return this._.MaxIndex()
@@ -145,6 +160,17 @@ Class CTabControl Extends CControl
 				}
 			}
 		}
+		
+		/*
+		Function: Add()
+		Adds a tab.
+		
+		Parameters:
+			Text - The text of the new tab.
+			
+		Returns:
+			An object of type <CTabControl.CTabs.CTab>.
+		*/
 		Add(Text)
 		{
 			global CGUI
@@ -164,6 +190,11 @@ Class CTabControl Extends CControl
 		;~ Remove(TabNumber)
 		;~ {
 		;~ }
+		
+		/*
+		Class CTabControl.CTabs.CTab
+		A single tab object.
+		*/
 		Class CTab
 		{
 			__New(Text, TabNumber, GUINum, ControlName)
@@ -175,7 +206,17 @@ Class CTabControl Extends CControl
 				this._.Name := ControlName
 				this._.Controls := {}
 			}
-			;Add a control to this tab
+			
+			/*
+			Function: Add()
+			Adds a control to this tab. The parameters correspond to the Add() function of CGUI.
+			
+			Parameters:
+				Type - The type of the control.
+				Name - The name of the control.
+				Options - Options used for creating the control.
+				Text - The text of the control.
+			*/
 			Add(type, Name, Options, Text)
 			{
 				global CGUI
@@ -189,6 +230,16 @@ Class CTabControl Extends CControl
 					return Control
 				}
 			}
+			/*
+			Variable: Text
+			The text of the tab.
+			
+			Variable: Icon
+			The filename of the icon associated with this tab.
+			
+			Variable: IconNumber
+			The index of the icon in a multi-icon file.
+			*/
 			__Get(Name, Params*)
 			{
 				if(Name != "_" && this._.HasKey(Name))
@@ -228,10 +279,17 @@ Class CTabControl Extends CControl
 					return Value
 				}
 			}
+			/*
+			Function: SetIcon
+			Sets the icon of a tab.
+			
+			Parameters:
+				Filename - The filename of the file containing the icon.
+				IconNumber - The icon number in a multi-icon file.
+			*/
 			SetIcon(Filename, IconNumber = 1)
 			{
 				global CGUI
-				msgbox % "seticon" this._.TabNumber
 				this._.Icon := Filename
 				this._.IconNumber := IconNumber
 				Control := CGUI.GUIList[this.GUINum][this.Name]

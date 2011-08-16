@@ -11,6 +11,10 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 		this._.Insert("ControlStyles", {Center : 0x300, Left : 0x100, Right : 0x200, RightButton : 0x20, Default : 0x1, Wrap : 0x2000, Flat : 0x8000})
 		this._.Insert("Events", ["CheckedChanged"])
 	}
+	/*
+	Variable: Checked
+	If true, the control is checked.
+	*/
 	__Get(Name)
     {
 		global CGUI
