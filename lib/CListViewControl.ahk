@@ -27,10 +27,6 @@ Class CListViewControl Extends CControl
 		this._.Insert("ImageListManager", new this.CImageListManager(GUINum, Name))
 		this.Type := "ListView"
 	}
-	__Delete()
-	{
-		msgbox delete listview
-	}
 	ModifyCol(ColumnNumber="", Options="", ColumnTitle="")
 	{
 		global CGUI

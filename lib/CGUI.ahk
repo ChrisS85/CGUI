@@ -813,13 +813,6 @@ Class CFont
 			return this._[Name]
 	}
 }
-/*
-Ideas:
-Anchor
-Dock
-ShowDialog (modal to another CGUI)
-All kinds of events, some maybe through OnMessage
-*/
 #include <CControls>
 #include <CDialogs>
 #include <CEnumerator>

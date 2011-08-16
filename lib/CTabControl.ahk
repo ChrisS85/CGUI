@@ -10,9 +10,10 @@ Class CTabControl Extends CControl
 		this.Type := "Tab"
 		this._.Tabs := new this.CTabs(GUINum, Name)
 		Loop, Parse, Text, |
-			this._.Tabs._.Insert(1, new this.CTabs.CTab(A_LoopField, 1, GUINum, Name))
+			this._.Tabs._.Insert(new this.CTabs.CTab(A_LoopField, A_Index, GUINum, Name))
 		this._.Insert("ControlStyles", {Bottom : 0x2, HotTrack : 0x40, Buttons : 0x100, MultiLine : 0x200})
 		this._.Insert("Events", ["Click", "DoubleClick", "RightClick", "DoubleRightClick"])
+		this._.Insert("ImageListManager", new this.CImageListManager(GUINum, Name))
 	}
 	
 	/*
@@ -165,13 +166,13 @@ Class CTabControl Extends CControl
 		;~ }
 		Class CTab
 		{
-			__New(Text, TabNumber, GUINum, Name)
+			__New(Text, TabNumber, GUINum, ControlName)
 			{
 				this.Insert("_", {})
 				this._.Text := Text
 				this._.TabNumber := TabNumber
 				this._.GUINum := GUINum
-				this._.Name := Name
+				this._.Name := ControlName
 				this._.Controls := {}
 			}
 			;Add a control to this tab
@@ -212,7 +213,29 @@ Class CTabControl Extends CControl
 							Tabs .= "|" Value
 					this._[Name] := Value
 					GuiControl, % this.GUINum ":", % Control.ClassNN, %Tabs%
+					return Value
 				}
+				else if(Name = "Icon")
+				{
+					this.SetIcon(Value, this.IconNumber ? this.IconNumber : 1)
+					return Value
+				}
+				else if(Name = "IconNumber")
+				{
+					this.IconNumber := Value
+					if(this.Icon)
+						this.SetIcon(this.Icon, Value)
+					return Value
+				}
+			}
+			SetIcon(Filename, IconNumber = 1)
+			{
+				global CGUI
+				msgbox % "seticon" this._.TabNumber
+				this._.Icon := Filename
+				this._.IconNumber := IconNumber
+				Control := CGUI.GUIList[this.GUINum][this.Name]
+				Control._.ImageListManager.SetIcon(this._.TabNumber, Filename, IconNumber)
 			}
 		}
 	}

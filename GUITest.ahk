@@ -26,7 +26,6 @@ Class CMyWindow Extends CGUI
 		this.lvItems.Items.Add("", "test2", "test2") ;variadic function
 		this.lvItems.Items[1].SetIcon("D:\Projekte\Autohotkey\7plus\7+-128.ico", 1) ;Set icon and icon number
 		this.lvItems.Items.Add("", "test3", "test3") ;variadic function
-		msgbox % this.lvItems.Items[1].Text
 		;~ this.lvItems.Items[1].Icon := "D:\Projekte\Autohotkey\7plus\7+-128.ico" ;Use first icon.
 		;~ this.lvItems.Items[1].IconNumber := 2 ;Use 2nd icon. Beware that doing this will result in a second icon stored in the imagelist, so do not use this if you are concerned about memory
 		this.Add("ComboBox", "comboBox", "x100 y400", "a|b|c")
@@ -38,6 +37,9 @@ Class CMyWindow Extends CGUI
 		this.Add("Tab", "sometab", "x20 y200 w200 h200", "tab1|tab2|tab3")
 		this.sometab.Tabs[1].Add("Text", "tabtext", "", "text")
 		this.sometab.Tabs[1].Controls.tabtext.Link := 1
+		;~ msgbox % this.sometab.Tabs[1]._.TabNumber
+		this.sometab.Tabs[1].Icon := "C:\Program Files\Autohotkey\SciTE_beta5\AutoHotkey.exe"
+		this.sometab.Tabs[2].Icon := "D:\Projekte\Autohotkey\7plus\7+-128.ico"
 		this.lvItems.HotTrack := 1
 		;~ this.txtField2.AddUpDown(2, 40)
 		this.statBar.Parts.Add("bla")
@@ -50,6 +52,7 @@ Class CMyWindow Extends CGUI
 		T11 := T1.Add("T11")
 		T11.Icon := "C:\Program Files\Autohotkey\SciTE_beta5\AutoHotkey.exe"
 		T12 := T1.Add("T12")
+		T12.Icon := ""
 		T13 := T1.Add("T13")
 		T131 := T13.Add("T131")
 		T2 := this.tree.Items.Add("T2")

@@ -159,7 +159,7 @@ Class CTreeViewControl Extends CControl
 			Gui, TreeView, % Control.ClassNN
 			ID := TV_Add(Text, this.ID, Options)
 			Item := new CTreeViewControl.CItem(ID, this._.GUINum, this._.ControlName)
-			Item.Icon := ""
+			;~ Item.Icon := ""
 			this.Insert(Item)
 			return Item
 		}
@@ -254,6 +254,9 @@ Class CTreeViewControl Extends CControl
 				Parent.Insert(Position, this)
 			}
 			
+			if(this.Icon)
+				Control._.ImageListManager.SetIcon(this._.ID, this.Icon, this.IconNumber)
+			
 			;Move child items
 			for index, Item in Childs
 				Item.Move(index, this)
@@ -269,7 +272,8 @@ Class CTreeViewControl Extends CControl
 				return
 			Control := GUI[this._.ControlName]
 			Control._.ImageListManager.SetIcon(this._.ID, Filename, IconNumberOrTransparencyColor)
-			this._.Icon := {Filename : Filename, IconNumber : IconNumberOrTransparencyColor}
+			this._.Icon := Filename
+			this._.IconNumber := IconNumberOrTransparencyColor
 		}
 		MaxIndex()
 		{
@@ -421,7 +425,7 @@ Class CTreeViewControl Extends CControl
 				}
 				else if(Name = "Icon")
 				{
-					this.SetIcon(Value, 1)
+					this.SetIcon(Value, this._.HasKey("IconNumber") ? this._.IconNumber : 1)
 					return Value
 				}
 			}

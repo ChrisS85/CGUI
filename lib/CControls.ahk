@@ -365,6 +365,10 @@ Class CControl ;Never created directly
 					if ErrorLevel  ; The TreeView had a previous ImageList.
 						IL_Destroy(ErrorLevel)
 				}
+				else if(Control.Type = "Tab")
+				{
+					SendMessage, 0x1303, 0, this._.IconList.SmallIL_ID, % Control.ClassNN, % "ahk_id " GUI.hwnd  ; 0x1109 is TVM_SETIMAGELIST					
+				}
 			}
 			if(Path != "")
 			{
@@ -387,6 +391,13 @@ Class CControl ;Never created directly
 				LV_Modify(ID, "Icon" (Icon ? Icon.ID : -1))
 			else if(Control.Type = "TreeView")
 				TV_Modify(ID, "Icon" (Icon ? Icon.ID : -1))
+			else if(Control.Type = "Tab")
+			{
+				VarSetCapacity(TCITEM, 20 + 2 * A_PtrSize, 0)
+				NumPut(2, TCITEM, 0, "UInt") ;State mask TCIF_IMAGE
+				NumPut(Icon.ID - 1, TCITEM, 16 + A_PtrSize, "UInt") ;ID of icon in image list
+				SendMessage, 0x1306, ID-1, &TCITEM, % Control.ClassNN, % "ahk_id " GUI.hwnd ;TCM_SETITEM
+			}
 		}
 	}
 	
@@ -411,25 +422,3 @@ Class CControl ;Never created directly
 #include <CStatusBarControl>
 #include <CTreeViewControl>
 #include <CTabControl>
-/*
-TODO:
-Controls:
- - Progress 
- - Slider 
- - Hotkey 
- - MonthCal 
- - DateTime
-
-
-Improvements on existing controls:
- - ListBox multi selection
- - TreeView/Tab ImageList manager
- - Listview hottracking
- - Fix UpDown
-Other things:
- - Finish C# GUI converter to add support for the other controls 
- - Maybe include anchor and/or my ToolWindow function 
- - Complete documentation 
- - Provide some usage examples
- - Imagelist cache manager (recreate IL when N unused icons in list)
-*/
