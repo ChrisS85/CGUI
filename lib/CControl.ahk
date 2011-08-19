@@ -331,6 +331,19 @@ Class CControl ;Never created directly
 		}
     }
 	
+	
+	ProcessControlVisibility(From, To)
+	{
+		if(From != To)
+		{
+			if(From)
+				for index, Control in From.Controls
+					Control.Hide()
+			for index, Control in To.Controls
+				Control.Show()
+		}
+	}
+	
 	/*
 	Class: CImageListManager
 	This class is used internally to manage the ImageLists of ListView/TreeView/Tab controls. Does not need to be used directly.

@@ -1,6 +1,8 @@
 /*
 Class: CTextControl
 A static text control that can also be used as hyperlink.
+
+This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
 */
 Class CTextControl Extends CControl
 {

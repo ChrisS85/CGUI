@@ -1,6 +1,8 @@
 /*
 Class: CStatusBarControl
 The status bar. Can only be used once per window.
+
+This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
 */
 Class CStatusBarControl Extends CControl
 {
@@ -205,7 +207,7 @@ Class CStatusBarControl Extends CControl
 		}
 		
 		/*
-		Class CStatusBarControl.CPart
+		Class: CStatusBarControl.CParts.CPart
 		A single part object.
 		*/
 		Class CPart

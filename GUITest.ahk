@@ -28,8 +28,11 @@ Class CMyWindow Extends CGUI
 		this.lvItems.Items.Add("", "test3", "test3") ;variadic function
 		;~ this.lvItems.Items[1].Icon := "D:\Projekte\Autohotkey\7plus\7+-128.ico" ;Use first icon.
 		;~ this.lvItems.Items[1].IconNumber := 2 ;Use 2nd icon. Beware that doing this will result in a second icon stored in the imagelist, so do not use this if you are concerned about memory
-		this.Add("ComboBox", "comboBox", "x100 y400", "a|b|c")
+		this.Add("DropDownList", "comboBox", "x100 y400", "a|b|c")
 		this.comboBox.Tooltip := "Blup" ;combobox consists of edit + drop down button control, this will show tooltip on both
+		this.comboBox.SelectedIndex := 3
+		this.combobox.text := "a"
+		this.combobox.items[1].AddControl("edit", "txtblup", "x200 y250", "haha")
 		this.lvItems.tooltip := "List"
 		this.btnSave.Tooltip := "SAAAAAVEEEE"
 		this.btnLoad.Tooltip := "LOOOOAAAAAD"
@@ -50,8 +53,10 @@ Class CMyWindow Extends CGUI
 		this.Add("TreeView", "tree", "x300 y600 w100 h200 -Readonly", "")
 		T1 := this.tree.Items.Add("T1")
 		T11 := T1.Add("T11")
+		T11.AddControl("Text", "test1", "x100 y600", "hallo11")
 		T11.Icon := "C:\Program Files\Autohotkey\SciTE_beta5\AutoHotkey.exe"
 		T12 := T1.Add("T12")
+		T12.AddControl("Text", "test1", "x100 y600", "bla")
 		T12.Icon := ""
 		T13 := T1.Add("T13")
 		T131 := T13.Add("T131")
@@ -197,6 +202,7 @@ CMyWindow_btnLoad:
 CMyWindow_txtField1:
 CMyWindow_txtField2:
 CMyWindow_chkChecked:
+CMyWindow_comboBox:
 CMyWindow_tree:
 CGUI.HandleEvent()
 return

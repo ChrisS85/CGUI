@@ -274,7 +274,7 @@ Class CGUI
 		Options - Default options to be used for the control. These are in default AHK syntax according to <http://www.autohotkey.com/docs/commands/Gui.htm#OtherOptions> and <http://www.autohotkey.com/docs/commands/GuiControls.htm>. Do not use GUI variables (v option) and g-labels (g option).
 		Text - Text of the control. For some controls, this parameter has a special meaning. It can be a list of items or a collection of column headers separated by "|".
 	*/
-	Add(Control, Name, Options, Text)
+	Add(Control, Name, Options, Text, ControlList="")
 	{
 		global
 		local hControl, type
@@ -285,7 +285,9 @@ Class CGUI
 			Msgbox No name specified. Please supply a proper control name.
 			return
 		}
-		if(IsObject(this[Name]))
+		if(!ControlList)
+			ControlList := this
+		if(IsObject(ControlList[Name]))
 		{
 			Msgbox The control %Name% already exists. Please choose another name!
 			return
@@ -325,8 +327,9 @@ Class CGUI
 		Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl " (IsLabel(this.__Class "_" Control.Name) ? "g" this.__Class "_" Control.Name : ""), % Control.Content ;Create the control and get its window handle and setup a g-label
 		Control.Remove("Content")
 		Control.hwnd := hControl ;Window handle is used for all further operations on this control
-		this.Controls[Name] := Control ;Add to list of controls
-		this[Control.Name] := Control
+		ControlList[Control.Name] := Control
+		if(ControlList = this)
+			this.Controls[Name] := Control ;Add to list of controls
 		;Check if the programmer missed a g-label
 		for index, Event in Control._.Events
 			if(IsFunc(this.__Class "." Control.Name "_" Event) && !IsLabel(this.__Class "_" Control.Name))
@@ -813,6 +816,7 @@ Class CFont
 			return this._[Name]
 	}
 }
-#include <CControls>
-#include <CDialogs>
+#include <CControl>
+#include <CFileDialog>
+#include <CFolderDialog>
 #include <CEnumerator>

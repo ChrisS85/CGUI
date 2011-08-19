@@ -1,6 +1,8 @@
 /*
 Class: CListViewControl
 A ListView control. Additionally to its features present in AHK it can use sorting-independent indexing for synchronizing its fields with an array.
+
+This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
 */
 Class CListViewControl Extends CControl
 {
@@ -421,6 +423,27 @@ Class CListViewControl Extends CControl
 				;Store the real unsorted index in the custom property lParam field of the list view item so it can be reidentified later
 				this.SetUnsortedIndex(SortedIndex, UnsortedIndex, Control.hwnd)
 				this.SetIcon("")
+				this._.Insert("Controls", {})
+			}
+			/*
+			Function: AddControl()
+			Adds a control to this tree node that will be visible only when this node is selected. The parameters correspond to the Add() function of CGUI.
+			
+			Parameters:
+				Type - The type of the control.
+				Name - The name of the control.
+				Options - Options used for creating the control.
+				Text - The text of the control.
+			*/
+			AddControl(type, Name, Options, Text)
+			{
+				global CGUI
+				GUI := CGUI.GUIList[this._.GUINum]
+				if(!this.Selected)
+					Options .= " Hidden"
+				Control := GUI.Add(type, Name, Options, Text, this._.Controls)
+				this._.Controls.Insert(Name, Control)
+				return Control
 			}
 			/*
 			typedef struct {

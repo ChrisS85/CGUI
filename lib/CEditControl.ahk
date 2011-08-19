@@ -1,6 +1,8 @@
 /*
 Class: CEditControl
 An edit control.
+
+This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
 */
 Class CEditControl Extends CControl
 {

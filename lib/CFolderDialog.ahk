@@ -43,7 +43,7 @@ Class CFolderDialog
 	*/
 	Show()
 	{
-		FileSelectFolder, result, % ((this.ShowNewFolderButton > 0) + (this.ShowEditField>0) * 2 + (this.NewDialogStyle > 0) * 4, % this.Folder, % this.Title
+		FileSelectFolder, result, ((this.ShowNewFolderButton > 0) + (this.ShowEditField>0) * 2 + (this.NewDialogStyle > 0) * 4, % this.Folder, % this.Title
 		this.Folder := result
 		return result != ""
 	}

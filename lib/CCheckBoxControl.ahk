@@ -1,6 +1,8 @@
 /*
 Class: CCheckboxControl
 A checkbox/radio control.
+
+This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
 */
 Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 {

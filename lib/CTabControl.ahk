@@ -1,6 +1,8 @@
 /*
 Class: CTabControl
 A tab container control. The controls added to a tab panel can be accessed through this object.
+
+This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
 */
 Class CTabControl Extends CControl
 {
@@ -101,7 +103,7 @@ Class CTabControl Extends CControl
 		}
 	}
 	/*
-	Class CTabControl.CTabs
+	Class: CTabControl.CTabs
 	An array of tabs.
 	*/
 	Class CTabs
@@ -192,7 +194,7 @@ Class CTabControl Extends CControl
 		;~ }
 		
 		/*
-		Class CTabControl.CTabs.CTab
+		Class: CTabControl.CTabs.CTab
 		A single tab object.
 		*/
 		Class CTab
@@ -208,7 +210,7 @@ Class CTabControl Extends CControl
 			}
 			
 			/*
-			Function: Add()
+			Function: AddControl()
 			Adds a control to this tab. The parameters correspond to the Add() function of CGUI.
 			
 			Parameters:
@@ -217,7 +219,7 @@ Class CTabControl Extends CControl
 				Options - Options used for creating the control.
 				Text - The text of the control.
 			*/
-			Add(type, Name, Options, Text)
+			AddControl(type, Name, Options, Text)
 			{
 				global CGUI
 				if(type != "Tab")
