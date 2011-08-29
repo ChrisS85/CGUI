@@ -480,7 +480,7 @@ Class CListViewControl Extends CControl
 				NumPut(SortedIndex - 1, LVITEM, 4, "Int")   ; iItem 
 				NumPut(lParam, LVITEM, 7*4 + A_PtrSize, "PTR")
 				;~ string := this.hex(LVITEM,  "UINT|INT|INT|UINT|UINT|PTR|INT|INT|PTR|INT|INT|UINT|UINT|INT|INT")
-				SendMessage, % LVM_SETITEM := (A_IsUnicode ? 0x1000 + 76 : 0x1000 + 6), 0, &LVITEM,,% "ahk_id " hwnd
+				SendMessage, (A_IsUnicode ? 0x1000 + 76 : 0x1000 + 6), 0, &LVITEM,, % "ahk_id " hwnd ;LVM_SETITEM
 				;~ result := errorlevel
 				;~ result := DllCall("SendMessage", "PTR", hwnd, "UInt", LVM_SETITEM := (A_IsUnicode ? 0x1000 + 76 : 0x1000 + 6), "PTR", 0, "PTRP", LVITEM, "PTR")
 				;~ lParam2 := this.GetUnsortedIndex(RowNumber, hwnd)
@@ -506,7 +506,7 @@ Class CListViewControl Extends CControl
 				NumPut(mask, LVFINDINFO, 0, "UInt") 
 				NumPut(UnsortedIndex, LVFINDINFO, 4 + A_PtrSize, "PTR")
 				;~ string := hex(LVFINDINFO,  "UINT|INT|INT|UINT|UINT|PTR|INT|INT|PTR|INT|INT|UINT|UINT|INT|INT")
-				SendMessage, % LVM_FINDITEM := (A_IsUnicode ? 0x1000 + 83 : 0x1000 + 13), -1, &LVFINDINFO,,% "ahk_id " hwnd
+				SendMessage, (A_IsUnicode ? 0x1000 + 83 : 0x1000 + 13), -1, &LVFINDINFO,, % "ahk_id " hwnd ;LVM_FINDITEM
 				;~ MsgReply := ErrorLevel > 0x7FFFFFFF ? -(~ErrorLevel) - 1 : ErrorLevel
 				;~ result := DllCall("SendMessage", "PTR", hwnd, "UInt", LVM_FINDITEM := (A_IsUnicode ? 0x1000 + 83 : 0x1000 + 13), "PTR", -1, "UIntP", LVITEM, "PTR") + 1
 				return ErrorLevel + 1
@@ -521,7 +521,7 @@ Class CListViewControl Extends CControl
 				NumPut(SortedIndex - 1, LVITEM, 4, "Int")   ; iItem 
 				;~ NumPut(lParam, LVITEM, 7*4 + A_PtrSize, "PTR")
 				;~ string := this.hex(LVITEM,  "UINT|INT|INT|UINT|UINT|PTR|INT|INT|PTR|INT|INT|UINT|UINT|INT|INT")
-				SendMessage, % LVM_GETITEM := (A_IsUnicode ? 0x1000 + 75 : 0x1000 + 5), 0, &LVITEM,,% "ahk_id " hwnd
+				SendMessage, (A_IsUnicode ? 0x1000 + 75 : 0x1000 + 5), 0, &LVITEM,,% "ahk_id " hwnd ;LVM_GETITEM
 				;~ result := errorlevel
 				;~ result := DllCall("SendMessage", "PTR", hwnd, "UInt", LVM_GETITEM := (A_IsUnicode ? 0x1000 + 75 : 0x1000 + 5), "PTR", 0, "PTRP", LVITEM, "PTR")
 				;~ string := this.hex(LVITEM,  "UINT|INT|INT|UINT|UINT|PTR|INT|INT|PTR|INT|INT|UINT|UINT|INT|INT")
@@ -623,6 +623,8 @@ Class CListViewControl Extends CControl
 					}
 					else if(Name = "Icon" || Name = "IconNumber")
 						return this._[Name]
+					else if(Name = "Controls")
+						return this._.Controls
 				}
 			}
 			__Set(Name, Value)
@@ -781,6 +783,19 @@ Class CListViewControl Extends CControl
 				}
 		if(A_GuiEvent == "I")
 		{
+			if(InStr(ErrLevel, "S"))
+			{
+				if(LV_GetCount("Selected") = 1)
+				{
+					this.ProcessControlVisibility(this._.PreviouslySelectedItem, this.SelectedItem)
+					this._.PreviouslySelectedItem := this.SelectedItem
+				}
+				else
+				{
+					this.ProcessControlVisibility(this._.PreviouslySelectedItem, "")
+					this._.PreviouslySelectedItem := ""
+				}
+			}
 			Mapping := { Sa : "_ItemSelected", sb : "_ItemDeselected", Fa : "_ItemFocused", fb : "_ItemDefocused", Ca : "_ItemChecked", cb : "_ItemUnChecked"} ;Case insensitivity strikes back!
 			for Event, Function in Mapping
 				if(InStr(ErrLevel, SubStr(Event, 1, 1), true))

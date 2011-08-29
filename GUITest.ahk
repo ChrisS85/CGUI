@@ -1,5 +1,5 @@
 MyWindow := new CMyWindow("first") ;Create an instance of this window class
-MySecondWindow := new CMyWindow("second") ;Create a second instance of this window class
+;~ MySecondWindow := new CMyWindow("second") ;Create a second instance of this window class
 return
 
 #include <CGUI>
@@ -26,6 +26,8 @@ Class CMyWindow Extends CGUI
 		this.lvItems.Items.Add("", "test2", "test2") ;variadic function
 		this.lvItems.Items[1].SetIcon("D:\Projekte\Autohotkey\7plus\7+-128.ico", 1) ;Set icon and icon number
 		this.lvItems.Items.Add("", "test3", "test3") ;variadic function
+		this.lvItems.Items[1].AddControl("Text", "test1", "x400 y600", "bla")
+		this.lvItems.Items[2].AddControl("Text", "test1", "x500 y600", "bla")
 		;~ this.lvItems.Items[1].Icon := "D:\Projekte\Autohotkey\7plus\7+-128.ico" ;Use first icon.
 		;~ this.lvItems.Items[1].IconNumber := 2 ;Use 2nd icon. Beware that doing this will result in a second icon stored in the imagelist, so do not use this if you are concerned about memory
 		this.Add("DropDownList", "comboBox", "x100 y400", "a|b|c")
@@ -72,6 +74,8 @@ Class CMyWindow Extends CGUI
 		;~ msgbox % this.picTest.Picture
 		;~ this.statBar.Parts.Remove(1)
 		;~ this.lvItems.Items[1].Checked := true
+		;~ msgbox % this.lvItems.Items[1][1]
+		;~ this.lvItems.Items[1].SetUnsortedIndex(1, 20, this.lvItems.hwnd)
 		this.CloseOnEscape := true
 		this.DestroyOnClose := true
 		this.Show("")
