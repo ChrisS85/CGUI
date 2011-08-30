@@ -332,15 +332,23 @@ Class CControl ;Never created directly
     }
 	
 	
-	ProcessControlVisibility(From, To)
+	ProcessSubControlState(From, To)
 	{
 		if(From != To)
 		{
 			if(From)
 				for index, Control in From.Controls
-					Control.Hide()
+				{
+					if(Control._.UseEnabledState)
+						Control.Disable()
+					else
+						Control.Hide()
+				}
 			for index, Control in To.Controls
-				Control.Show()
+				if(Control._.UseEnabledState)
+					Control.Enable()
+				else
+					Control.Show()
 		}
 	}
 	

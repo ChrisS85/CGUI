@@ -87,14 +87,14 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 					if(this.Items[A_Index] = Value)
 					{
 						GuiControl, % this.GUINum ":Choose", % this.ClassNN, % A_Index
-						this.ProcessControlVisibility(this._.PreviouslySelectedItem, this.SelectedItem)
+						this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 						this._.PreviouslySelectedItem := this.SelectedItem
 					}
 			}
 			else if(Name = "SelectedIndex" && Value >= 1 && Value <= this.Items.MaxIndex())
 			{
 				GuiControl, % this.GUINum ":Choose", % this.ClassNN, % Value
-				this.ProcessControlVisibility(this._.PreviouslySelectedItem, this.SelectedItem)
+				this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 				this._.PreviouslySelectedItem := this.SelectedItem
 			}
 			;~ else if(Name = "Items" && !Params[1])
@@ -154,14 +154,14 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 					if(this.Items[A_Index].Text = Value)
 					{
 						GuiControl, % this.GUINum ":Choose", % this.ClassNN, % A_Index
-						this.ProcessControlVisibility(this._.PreviouslySelectedItem, this.SelectedItem)
+						this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 						this._.PreviouslySelectedItem := this.SelectedItem
 						found := true
 					}
 				if(!found && this.type = "Combobox")
 				{
 					GuiControl, % this.GUINum ":ChooseString", % this.ClassNN, % Value
-					this.ProcessControlVisibility(this._.PreviouslySelectedItem, this.SelectedItem)
+					this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 					this._.PreviouslySelectedItem := this.SelectedItem
 				}
 			}
@@ -190,7 +190,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		ErrLevel := ErrorLevel
-		this.ProcessControlVisibility(this._.PreviouslySelectedItem, this.SelectedItem)
+		this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 		this._.PreviouslySelectedItem := this.SelectedItem
 		if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_SelectionChanged"]))
 		{			
@@ -329,24 +329,27 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			}
 			/*
 			Function: AddControl()
-			Adds a control to this tree node that will be visible only when this node is selected. The parameters correspond to the Add() function of CGUI.
+			Adds a control to this item that will be visible only when this item is selected. The parameters correspond to the Add() function of CGUI.
 			
 			Parameters:
 				Type - The type of the control.
 				Name - The name of the control.
 				Options - Options used for creating the control.
 				Text - The text of the control.
+				UseEnabledState - If true, the control will be enabled/disabled instead of visible/hidden.
 			*/
-			AddControl(type, Name, Options, Text)
+			AddControl(type, Name, Options, Text, UseEnabledState = 0)
 			{
 				global CGUI
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!this.Selected)
-					Options .= " Hidden"
-				Control := GUI.Add(type, Name, Options, Text, this.Controls)
+					Options .= UseEnabledState ? " Disabled" : " Hidden"
+				Control := GUI.Add(type, Name, Options, Text, this._.Controls)
+				Control._.UseEnabledState := UseEnabledState
 				this._.Controls.Insert(Name, Control)
 				return Control
 			}
+			
 			__Get(Name, Params*)
 			{
 				global CGUI
@@ -400,7 +403,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 					GUI := CGUI.GUIList[this._.GUINum]
 					Control := GUI[this._.ControlName]
 					GuiControl, % this._.GUINum ":Choose", % Control.ClassNN, % this._.Index
-					this.ProcessControlVisibility(this._.PreviouslySelectedItem, this.SelectedItem)
+					this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 					Control._.PreviouslySelectedItem := Control.SelectedItem
 					return Value
 				}

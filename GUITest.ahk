@@ -16,7 +16,10 @@ Class CMyWindow Extends CGUI
 		this.Add("ListView", "lvItems", "x12 y12 w301 h155 Checked", "Field 1|Field 2")
 		this.Add("Button", "btnAdd", "x319 y12 w75 h23", "Add")
 		this.Add("Button", "btnRemove", "x319 y41 w75 h23", "Remove")
-		this.Add("Checkbox", "chkChecked", "x13 y174 w69 h17 Disabled", "Checked")
+		this.Add("Radio", "chkChecked", "x13 y174 w69 h17 Disabled", "Checked")
+		this.Add("Radio", "chkChecked2", "x313 y174 w69 h17", "Checked")
+		this.chkChecked.AddControl("Text", "test1", "x400 y700", "bla", 1)
+		this.chkChecked2.AddControl("Text", "test1", "x400 y720", "bla", 1)
 		this.Add("Edit", "txtField1", "x99 y174 w104 h20 Disabled", "")
 		this.Add("Edit", "txtField2", "x209 y174 w104 h20 Disabled", "")
 		this.Add("Button", "btnSave", "x319 y144 w75 h23", "Save")
@@ -26,15 +29,15 @@ Class CMyWindow Extends CGUI
 		this.lvItems.Items.Add("", "test2", "test2") ;variadic function
 		this.lvItems.Items[1].SetIcon("D:\Projekte\Autohotkey\7plus\7+-128.ico", 1) ;Set icon and icon number
 		this.lvItems.Items.Add("", "test3", "test3") ;variadic function
-		this.lvItems.Items[1].AddControl("Text", "test1", "x400 y600", "bla")
-		this.lvItems.Items[2].AddControl("Text", "test1", "x500 y600", "bla")
+		this.lvItems.Items[1].AddControl("Text", "test1", "x400 y600", "bla", 1)
+		this.lvItems.Items[2].AddControl("Text", "test1", "x500 y600", "bla", 1)
 		;~ this.lvItems.Items[1].Icon := "D:\Projekte\Autohotkey\7plus\7+-128.ico" ;Use first icon.
 		;~ this.lvItems.Items[1].IconNumber := 2 ;Use 2nd icon. Beware that doing this will result in a second icon stored in the imagelist, so do not use this if you are concerned about memory
 		this.Add("DropDownList", "comboBox", "x100 y400", "a|b|c")
 		this.comboBox.Tooltip := "Blup" ;combobox consists of edit + drop down button control, this will show tooltip on both
 		this.comboBox.SelectedIndex := 3
 		this.combobox.text := "a"
-		this.combobox.items[1].AddControl("edit", "txtblup", "x200 y250", "haha")
+		this.combobox.items[1].AddControl("edit", "txtblup", "x200 y250", "haha", 1)
 		this.lvItems.tooltip := "List"
 		this.btnSave.Tooltip := "SAAAAAVEEEE"
 		this.btnLoad.Tooltip := "LOOOOAAAAAD"
@@ -206,6 +209,7 @@ CMyWindow_btnLoad:
 CMyWindow_txtField1:
 CMyWindow_txtField2:
 CMyWindow_chkChecked:
+CMyWindow_chkChecked2:
 CMyWindow_comboBox:
 CMyWindow_tree:
 CGUI.HandleEvent()

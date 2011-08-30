@@ -95,7 +95,7 @@ Class CTreeViewControl Extends CControl
 				Gui, % this.GUINum ":Default"
 				Gui, TreeView, % this.ClassNN
 				TV_Modify(Value._.ID)
-				this.ProcessControlVisibility(this._.PreviouslySelectedItem, this.SelectedItem)
+				this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 				this._.PreviouslySelectedItem := this.SelectedItem
 			}
 			else
@@ -152,7 +152,7 @@ Class CTreeViewControl Extends CControl
 		;Handle visibility of controls associated with tree nodees
 		if(A_GuiEvent = "S")
 		{
-			this.ProcessControlVisibility(this.PreviouslySelectedItem, this.SelectedItem)
+			this.ProcessSubControlState(this.PreviouslySelectedItem, this.SelectedItem)
 			this.PreviouslySelectedItem := this.SelectedItem
 		}
 		Mapping := {DoubleClick : "_DoubleClick", eb : "_EditingEnd", S : "_ItemSelected", Normal : "_Click", RightClick : "_RightClick", Ea : "_EditingStart", K : "_KeyPress", "+" : "_ItemExpanded", "-" : "ItemCollapsed"}
@@ -191,7 +191,7 @@ Class CTreeViewControl Extends CControl
 			this._.Insert("GUINum", GUINum)
 			this._.Insert("ControlName", ControlName)
 			this._.Insert("ID", ID)
-			this.Insert("Controls", {})
+			this._.Insert("Controls", {})
 		}
 		/*
 			Function: Add
@@ -219,7 +219,7 @@ Class CTreeViewControl Extends CControl
 			this.Insert(Item)
 			return Item
 		}
-				
+		
 		/*
 		Function: AddControl()
 		Adds a control to this tree node that will be visible only when this node is selected. The parameters correspond to the Add() function of CGUI.
@@ -229,17 +229,20 @@ Class CTreeViewControl Extends CControl
 			Name - The name of the control.
 			Options - Options used for creating the control.
 			Text - The text of the control.
+			UseEnabledState - If true, the control will be enabled/disabled instead of visible/hidden.
 		*/
-		AddControl(type, Name, Options, Text)
+		AddControl(type, Name, Options, Text, UseEnabledState = 0)
 		{
 			global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(!this.Selected)
-				Options .= " Hidden"
-			Control := GUI.Add(type, Name, Options, Text, this.Controls)
+				Options .= UseEnabledState ? " Disabled" : " Hidden"
+			Control := GUI.Add(type, Name, Options, Text, this._.Controls)
+			Control._.UseEnabledState := UseEnabledState
 			this._.Controls.Insert(Name, Control)
 			return Control
 		}
+		
 		/*
 			Function: Remove
 			Removes an item.
@@ -272,7 +275,7 @@ Class CTreeViewControl Extends CControl
 			TV_Delete(ObjectOrIndex.ID)
 			if(WasSelected)
 			{
-				Control.ProcessControlVisibility(ObjectOrIndex, this.SelectedItem)
+				Control.ProcessSubControlState(ObjectOrIndex, this.SelectedItem)
 				Control.PreviouslySelectedItem := ObjectOrIndex ;The node is accessible here even though it does not exist anymore because the user might have stored data in it that might need to be used in _ItemSelected handler.
 			}
 			if(TV_GetCount() = 0) ;If all TreeView items are deleted, fire a selection changed event
@@ -527,6 +530,8 @@ Class CTreeViewControl Extends CControl
 						Gui, TreeView, % Control.ClassNN
 						Value := TV_GetSelection() = this._.ID
 					}
+					else if(Name = "Controls")
+						Value := this._.Controls
 					Loop % Params.MaxIndex()
 						if(IsObject(Value)) ;Fix unlucky multi parameter __GET
 							Value := Value[Params[A_Index]]
@@ -561,7 +566,7 @@ Class CTreeViewControl Extends CControl
 						Gui, % this._.GUINum ":Default"
 						Gui, TreeView, % Control.ClassNN
 						TV_Modify(this._.ID)
-						Control.ProcessControlVisibility(Control._.PreviouslySelectedItem, Control.SelectedItem)
+						Control.ProcessSubControlState(Control._.PreviouslySelectedItem, Control.SelectedItem)
 						Control._.PreviouslySelectedItem := Control.SelectedItem
 					}
 					return Value

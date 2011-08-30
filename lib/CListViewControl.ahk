@@ -189,6 +189,19 @@ Class CListViewControl Extends CControl
 				Loop % Indices.MaxIndex()
 					if(Indices[A_Index] > 0)
 						LV_Modify(this._.Items.IndependentSorting ? this.CItems.CRow.GetSortedIndex(Indices[A_Index], this.hwnd) : Indices[A_Index], Name = "SelectedIndices" ? "Select" : "Check")
+				if(Name = "SelectedIndices")
+				{
+					if(LV_GetCount("Selected") = 1)
+					{
+						this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
+						this._.PreviouslySelectedItem := this.SelectedItem
+					}
+					else
+					{
+						this.ProcessSubControlState(this._.PreviouslySelectedItem, "")
+						this._.PreviouslySelectedItem := ""
+					}
+				}
 			}
 			else if(Name = "SelectedIndex" || Name = "CheckedIndex")
 			{
@@ -196,7 +209,22 @@ Class CListViewControl Extends CControl
 				Gui, ListView, % this.ClassNN
 				LV_Modify(0, Name = "SelectedIndex" ? "-Select" : "-Check")
 				if(Value > 0)
+				{
 					LV_Modify(this._.Items.IndependentSorting ? this.CItems.CRow.GetSortedIndex(Value, this.hwnd) : Value, Name = "SelectedIndex" ? "Select" : "Check")
+					if(Name = "SelectedIndex")
+					{
+						if(LV_GetCount("Selected") = 1)
+						{
+							this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
+							this._.PreviouslySelectedItem := this.SelectedItem
+						}
+						else
+						{
+							this.ProcessSubControlState(this._.PreviouslySelectedItem, "")
+							this._.PreviouslySelectedItem := ""
+						}
+					}
+				}
 			}
 			else if(Name = "FocusedIndex")
 			{
@@ -274,6 +302,19 @@ Class CListViewControl Extends CControl
 			SortedIndex := LV_Add(Options, Fields*)
 			UnsortedIndex := LV_GetCount()
 			this._.Insert(UnsortedIndex, new this.CRow(SortedIndex, UnsortedIndex, this._.GUINum, Control.Name))
+			if(InStr(Options, "Select"))
+			{
+				if(LV_GetCount("Selected") = 1)
+				{
+					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, Control.SelectedItem)
+					Control._.PreviouslySelectedItem := Control.SelectedItem
+				}
+				else
+				{
+					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, "")
+					Control._.PreviouslySelectedItem := ""
+				}
+			}
 		}
 		/*
 		Function: Insert()
@@ -309,6 +350,19 @@ Class CListViewControl Extends CControl
 			
 			SortedIndex := LV_Insert(SortedIndex, Options, Fields*)
 			this._.Insert(UnsortedIndex, new this.CRow(SortedIndex, UnsortedIndex, this._.GUINum, Control.Name))
+			if(InStr(Options, "Select"))
+			{
+				if(LV_GetCount("Selected") = 1)
+				{
+					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, Control.SelectedItem)
+					Control._.PreviouslySelectedItem := Control.SelectedItem
+				}
+				else
+				{
+					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, "")
+					Control._.PreviouslySelectedItem := ""
+				}
+			}
 		}	
 		
 		/*
@@ -331,6 +385,19 @@ Class CListViewControl Extends CControl
 			Gui, ListView, % Control.ClassNN
 			SortedIndex := this.IndependentSorting ? this.CRow.GetSortedIndex(RowNumber, Control.hwnd) : RowNumber ;If independent sorting is off, the RowNumber parameter of this function is interpreted as sorted index
 			LV_Modify(SortedIndex, Options, Fields*)
+			if(InStr(Options, "Select"))
+			{
+				if(LV_GetCount("Selected") = 1)
+				{
+					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, Control.SelectedItem)
+					Control._.PreviouslySelectedItem := Control.SelectedItem
+				}
+				else
+				{
+					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, "")
+					Control._.PreviouslySelectedItem := ""
+				}
+			}
 		}
 		
 		/*
@@ -349,12 +416,26 @@ Class CListViewControl Extends CControl
 			Control := GUI[this._.ControlName]
 			Gui, % Control.GUINum ":Default"
 			Gui, ListView, % Control.ClassNN
+			WasSelected := Control.Items[RowNumber].Selected
 			SortedIndex := this.IndependentSorting ? this.CRow.GetSortedIndex(RowNumber, Control.hwnd) : RowNumber ;If independent sorting is off, the RowNumber parameter of this function is interpreted as sorted index
 			UnsortedIndex := this.CRow.GetUnsortedIndex(SortedIndex, Control.hwnd)
 			;Decrease the unsorted indices after the deletion index by one
 			Loop % LV_GetCount() - UnsortedIndex
 				this.CRow.SetUnsortedIndex(this.CRow.GetSortedIndex(UnsortedIndex + A_Index, Control.hwnd), UnsortedIndex + A_Index - 1, Control.hwnd)
 			LV_Delete(SortedIndex)
+			if(WasSelected)
+			{
+				if(LV_GetCount("Selected") = 1)
+				{
+					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, Control.SelectedItem)
+					Control._.PreviouslySelectedItem := Control.SelectedItem
+				}
+				else
+				{
+					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, "")
+					Control._.PreviouslySelectedItem := ""
+				}
+			}
 		}
 		/*
 		Variable: 1,2,3,4,...
@@ -427,21 +508,23 @@ Class CListViewControl Extends CControl
 			}
 			/*
 			Function: AddControl()
-			Adds a control to this tree node that will be visible only when this node is selected. The parameters correspond to the Add() function of CGUI.
+			Adds a control to this item that will be visible/enabled only when this item is selected. The parameters correspond to the Add() function of CGUI.
 			
 			Parameters:
 				Type - The type of the control.
 				Name - The name of the control.
 				Options - Options used for creating the control.
 				Text - The text of the control.
+				UseEnabledState - If true, the control will be enabled/disabled instead of visible/hidden.
 			*/
-			AddControl(type, Name, Options, Text)
+			AddControl(type, Name, Options, Text, UseEnabledState = 0)
 			{
 				global CGUI
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!this.Selected)
-					Options .= " Hidden"
+					Options .= UseEnabledState ? " Disabled" : " Hidden"
 				Control := GUI.Add(type, Name, Options, Text, this._.Controls)
+				Control._.UseEnabledState := UseEnabledState
 				this._.Controls.Insert(Name, Control)
 				return Control
 			}
@@ -640,11 +723,24 @@ Class CListViewControl Extends CControl
 							LV_Modify(this.GetSortedIndex(this._.RowNumber, Control.hwnd), "Col" Name, Value)
 						return Value
 					}
-					else if(Key := {Checked : "Check", Focused : "Focus", "Select" : ""}[Name])
+					else if(Key := {Checked : "Check", Focused : "Focus", "Selected" : ""}[Name])
 					{
 						Gui, % Control.GUINum ":Default"
 						Gui, ListView, % Control.ClassNN
 						LV_Modify(this.GetSortedIndex(this._.RowNumber, Control.hwnd), (Value = 0 ? "-" : "") Key)
+						if(Name = "Selected")
+						{							
+							if(LV_GetCount("Selected") = 1)
+							{
+								Control.ProcessSubControlState(Control._.PreviouslySelectedItem, Control.SelectedItem)
+								Control._.PreviouslySelectedItem := Control.SelectedItem
+							}
+							else
+							{
+								Control.ProcessSubControlState(Control._.PreviouslySelectedItem, "")
+								Control._.PreviouslySelectedItem := ""
+							}
+						}
 						return Value
 					}
 					else if(Name = "Icon")
@@ -787,12 +883,12 @@ Class CListViewControl Extends CControl
 			{
 				if(LV_GetCount("Selected") = 1)
 				{
-					this.ProcessControlVisibility(this._.PreviouslySelectedItem, this.SelectedItem)
+					this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 					this._.PreviouslySelectedItem := this.SelectedItem
 				}
 				else
 				{
-					this.ProcessControlVisibility(this._.PreviouslySelectedItem, "")
+					this.ProcessSubControlState(this._.PreviouslySelectedItem, "")
 					this._.PreviouslySelectedItem := ""
 				}
 			}
