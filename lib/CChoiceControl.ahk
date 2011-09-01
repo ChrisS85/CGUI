@@ -232,6 +232,14 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			if Name is Integer
 				return
 		}
+		/*
+		Function: Add()
+		Adds an item to the list of choices.
+		
+		Parameters:
+			Text - The text of the new item.
+			Position - The position at which the item will be inserted. Items with indices >= this value will be appended.
+		*/
 		Add(Text, Position = -1)
 		{
 			global CGUI
@@ -256,6 +264,13 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				item._.Index := index
 			GuiControl, % this.GUINum ":Choose", % Control.ClassNN, % (Position != -1 && Selected < Position ? Selected : Selected + 1)
 		}
+		/*
+		Function: Remove()
+		Removes an item to the list of choices.
+		
+		Parameters:
+			IndexTextOrItem - The item which should be removed. This can either be an index, the text of the item or the item object stored in the Items array.
+		*/
 		Remove(IndexTextOrItem)
 		{
 			global CGUI
@@ -349,7 +364,13 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				this._.Controls.Insert(Name, Control)
 				return Control
 			}
+			/*
+			Variable: Selected
+			If true, the item is selected.
 			
+			Variable: Text
+			The text of the list item.
+			*/
 			__Get(Name, Params*)
 			{
 				global CGUI

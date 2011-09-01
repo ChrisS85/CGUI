@@ -171,7 +171,3 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 		}
 	}
 }
-
-;~ Todo:
-;~ Call ProcessSubControlState more often (ListView programmatically set selection etc)
-;~ Find a way to do the same but for enabled/disabled instead of visibility state for all controls

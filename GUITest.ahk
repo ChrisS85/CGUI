@@ -12,7 +12,6 @@ Class CMyWindow Extends CGUI
 		this.Title := Title
 		this.Resize := true
 		this.MinSize := "500x"
-		this[title] := 5 ;for debugging
 		this.Add("ListView", "lvItems", "x12 y12 w301 h155 Checked", "Field 1|Field 2")
 		this.Add("Button", "btnAdd", "x319 y12 w75 h23", "Add")
 		this.Add("Button", "btnRemove", "x319 y41 w75 h23", "Remove")
@@ -22,6 +21,7 @@ Class CMyWindow Extends CGUI
 		this.chkChecked2.AddControl("Text", "test1", "x400 y720", "bla", 1)
 		this.Add("Edit", "txtField1", "x99 y174 w104 h20 Disabled", "")
 		this.Add("Edit", "txtField2", "x209 y174 w104 h20 Disabled", "")
+		this.txtField2.AddUpDown(2, 40)
 		this.Add("Button", "btnSave", "x319 y144 w75 h23", "Save")
 		this.Add("Button", "btnLoad", "x319 y115 w75 h23", "Load")
 		this.Add("Picture", "picTest", "x500 y500 w200 h-1", "D:\Projekte\Autohotkey\7plus\7+-128.ico")
@@ -49,7 +49,6 @@ Class CMyWindow Extends CGUI
 		this.sometab.Tabs[1].Icon := "C:\Program Files\Autohotkey\SciTE_beta5\AutoHotkey.exe"
 		this.sometab.Tabs[2].Icon := "D:\Projekte\Autohotkey\7plus\7+-128.ico"
 		this.lvItems.HotTrack := 1
-		;~ this.txtField2.AddUpDown(2, 40)
 		this.statBar.Parts.Add("bla")
 		this.statBar.Parts[1].Icon := "C:\Program Files\Autohotkey\SciTE_beta5\AutoHotkey.exe"
 		this.statBar.Parts[1] := {text : "blup", width : 50}
@@ -67,6 +66,7 @@ Class CMyWindow Extends CGUI
 		T131 := T13.Add("T131")
 		T2 := this.tree.Items.Add("T2")
 		T21 := T2.Add("T21")
+		this.txtField2.Max := 5
 		;~ for index, Item in this.Tree.Items[1]
 			;~ msgbox % Item.Text
 		;~ T1[3].Remove(1)
@@ -219,3 +219,8 @@ ExploreObj(Obj, NewRow="`n", Equal="  =  ", Indent="`t", Depth=12, CurIndent="")
         ToReturn .= CurIndent . k . (IsObject(v) && depth>1 ? NewRow . ExploreObj(v, NewRow, Equal, Indent, Depth-1, CurIndent . Indent) : Equal . v) . NewRow 
     return RTrim(ToReturn, NewRow) 
 }
+
+#t::
+MyWindow.Owner := WinExist("A")
+MyWindow.OwnerAutoClose := 1
+return

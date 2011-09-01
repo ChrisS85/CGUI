@@ -6,6 +6,7 @@
 Class CGUI
 {
 	static GUIList := Object()
+	static _ := Object() ;Proxy object
 	/*	
 	Get only:
 	var Controls := Object()
@@ -449,7 +450,12 @@ Class CGUI
 	Provides a thin title bar.
 	
 	Variable: Owner
-	Makes this window owned by another. Not supported atm!
+	Assigning a hwnd to this property makes this window owned by another so it will act like a tool window of said window. Supports any window, not just windows from this process.
+	
+	Variable: OwnerAutoClose
+	By enabling this, an owned window (which has its Owner property set to the window handle of its parent window) will automatically close itself when its parent window closes.
+	The window can use its PreClose() event to decide if it should really be closed, but the owner status will be removed anyway.
+	To archive this behaviour a shell message hook is used. If there is already such a hook present in the script, this library will intercept it and forward any messages to the original callback function.
 	
 	Variable: OwnDialogs
 	Determines if the dialogs that this window shows will be owned by it.
@@ -560,6 +566,7 @@ Class CGUI
 	}
 	__Set(Name, Value)
 	{
+		global CGUI
 		DetectHidden := A_DetectHiddenWindows
 		DetectHiddenWindows, On
 		Handled := true
@@ -587,8 +594,48 @@ Class CGUI
 			}
 			else if(Name = "Owner")
 			{
-				Gui, % this.GUINum ":" (Value > 0 && Value < 100 && Value != this.GUINum ? "+" : "-") "Owner" Value
-				this._.Owner := Value
+				if(Value && WinExist("ahk_id " Value))
+				{
+					DllCall("SetWindowLong" (A_PtrSize = 4 ? "" : "Ptr"), "Ptr", this.hwnd, "int", -8, "PTR", Value) ;This line actually sets the owner behavior
+					this._.hOwner := Value
+				}
+				else
+				{
+					DllCall("SetWindowLong" (A_PtrSize = 4 ? "" : "Ptr"), "Ptr", this.hwnd, "int", -8, "PTR", 0) ;Remove tool window behavior
+					this._.Remove("hOwner")
+				}
+			}
+			else if(Name = "OwnerAutoClose" && this._.HasKey("hOwner"))
+			{
+				if(Value = 1)
+				{
+					if(!CGUI._.ShelllHook)
+					{
+						DllCall( "RegisterShellHookWindow", "Ptr", A_ScriptHWND) 
+						CGUI._.ShellHookMsg := DllCall( "RegisterWindowMessage", Str,"SHELLHOOK" ) 
+						CGUI._.ShellHook := OnMessage(CGUI._.ShellHookMsg, "CGUI_ShellMessage")
+						if(CGUI._.ShellHook = "CGUI_ShellMessage")
+							CGUI._.ShellHook := 1
+					}
+					this._.OwnerAutoClose := 1
+				}
+				else
+				{
+					if(this._.OwnerAutoClose)
+					{
+						for GUINum, GUI in CGUI.GUIList
+							if(GUI.hwnd != this.hwnd && GUI._.OwnerAutoClose)
+								found := true
+						if(!found)
+						{
+							OnMessage(CGUI._.ShellHookMsg, (CGUI._.ShellHook && CGUI._.ShellHook != 1) ? CGUI._.ShellHook : "")
+							if(!CGUI._.ShellHook)
+								DllCall("DeRegisterShellHookWindow", "Ptr", A_ScriptHWND)
+							CGUI._.Remove("ShellHook")
+						}
+					}
+					this._.OwnerAutoClose := 0
+				}
 			}
 			else if Name in Style, ExStyle, Transparent, TransColor
 				WinSet, %Name%, %Value%, % "ahk_id " this.hwnd
@@ -767,6 +814,48 @@ CGUI_Escape:
 CControl_Event:
 CGUI.HandleEvent()
 return
+
+/*
+Function: CGUI_ShellMessage()
+This function is used to monitor closing of the parent windows of owned GUIs. It does not need to be called directly.
+It is still possible to use a shell message hook as usual in your script as long as you initialize it before setting GUI.OwnerAutoClose := 1.
+This library will intercept all ShellMessage calls and forward it to the previously used ShellMessage callback function.
+This callback function will only be used when there are owned windows which have OwnerAutoClose activated. In all other cases it won't be used and can safely be ignored.
+*/
+CGUI_ShellMessage(wParam, lParam, msg, hwnd) 
+{ 
+   global CGUI 
+   outputdebug shellmessage %wparam% %lparam%
+   if(wParam = 2) ;Window Destroyed 
+   {
+	  Loop % CGUI.GUIList.MaxIndex() 
+	  { 
+		 if(CGUI.GUIList[A_Index]._.hOwner = lParam && CGUI.GUIList[A_Index]._.OwnerAutoClose)
+		 {
+			PostMessage, 0x112, 0xF060,,, % "ahk_id " CGUI.GUIList[A_Index].hwnd  ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE --> this should trigger AHK CGUI_Close label so the GUI class may process the close request
+			CGUI.GUIList[A_Index]._.Remove("hOwner")
+			CGUI.GUIList[A_Index]._.Remove("OwnerAutoClose")
+			for GUINum, GUI in CGUI.GUIList
+				if(GUI._.OwnerAutoClose)
+					found := true
+			if(!found) ;No more tool windows, remove shell hook 
+			{ 
+				OnMessage(CGUI._.ShellHookMsg, (CGUI._.ShellHook && CGUI._.ShellHook != 1) ? CGUI._.ShellHook : "")
+				if(!CGUI._.ShellHook)
+					DllCall("DeRegisterShellHookWindow", "Ptr", A_ScriptHWND)
+				CGUI._.Remove("ShellHook")
+			} 
+			break 
+		 } 
+	  } 
+   } 
+   if(IsFunc(CGUI._.ShellHook)) 
+   { 
+		msgbox % "reroute to " CGUI._.ShellHook
+	  ShellHook := CGUI._.ShellHook 
+	  %ShellHook%(wParam, lParam, msg, hwnd) ;This is allowed even if the function uses less parameters 
+   } 
+}
 
 Class CFont
 {
