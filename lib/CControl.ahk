@@ -273,7 +273,7 @@ Class CControl ;Never created directly
 				Control, ExStyle, %Value%,,,% "ahk_id " this.hwnd
 			else if(Name = "_") ;Prohibit setting the proxy object
 				Handled := true
-			else if(this._.HasKey("ControlStyles") && Style := this._.ControlStyles[Name])
+			else if(this._.HasKey("ControlStyles") && Style := this._.ControlStyles[Name]) ;Generic control styles which are only of boolean type can be handled simply by a list of name<->value assignments. Prepending "-" to a value in such a list inverts the behaviour here.
 			{
 				if(SubStr(Style, 1,1) = "-")
 				{
@@ -448,3 +448,6 @@ Class CControl ;Never created directly
 #include <CStatusBarControl>
 #include <CTreeViewControl>
 #include <CTabControl>
+#include <CProgressControl>
+#include <CSliderControl>
+#include <CHotkeyControl>

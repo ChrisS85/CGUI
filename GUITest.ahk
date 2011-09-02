@@ -31,6 +31,9 @@ Class CMyWindow Extends CGUI
 		this.lvItems.Items.Add("", "test3", "test3") ;variadic function
 		this.lvItems.Items[1].AddControl("Text", "test1", "x400 y600", "bla", 1)
 		this.lvItems.Items[2].AddControl("Text", "test1", "x500 y600", "bla", 1)
+		this.Add("Hotkey", "prgTest", "x300 y300 w100 h100", 50)
+		;~ GuiControl, % this.GUINum ":-Smooth", % this.prgTest.ClassNN
+		;~ this.prgTest.Vertical := 1
 		;~ this.lvItems.Items[1].Icon := "D:\Projekte\Autohotkey\7plus\7+-128.ico" ;Use first icon.
 		;~ this.lvItems.Items[1].IconNumber := 2 ;Use 2nd icon. Beware that doing this will result in a second icon stored in the imagelist, so do not use this if you are concerned about memory
 		this.Add("DropDownList", "comboBox", "x100 y400", "a|b|c")

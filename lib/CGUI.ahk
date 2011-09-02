@@ -6,7 +6,7 @@
 Class CGUI
 {
 	static GUIList := Object()
-	static _ := Object() ;Proxy object
+	_ := Object() ;Proxy object
 	/*	
 	Get only:
 	var Controls := Object()
@@ -55,7 +55,7 @@ Class CGUI
 		if(!this.GUINum)
 			return ""
 		this.Controls := Object()
-		this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set
+		;~ this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set
 		this.Font := new CFont(this.GUINum)
 		CGUI.GUIList[this.GUINum] := this
 		GUI, % this.GUINum ":+LabelCGUI_ +LastFound"		
@@ -271,6 +271,7 @@ Class CGUI
 					- Tab
 					- GroupBox
 					- Picture
+					- Progress
 		Name - The name of the control. The control can be accessed by its name directly from the GUI object, i.e. GUI.MyEdit1 or similar. Names must be unique and must not be empty.
 		Options - Default options to be used for the control. These are in default AHK syntax according to <http://www.autohotkey.com/docs/commands/Gui.htm#OtherOptions> and <http://www.autohotkey.com/docs/commands/GuiControls.htm>. Do not use GUI variables (v option) and g-labels (g option).
 		Text - Text of the control. For some controls, this parameter has a special meaning. It can be a list of items or a collection of column headers separated by "|".
