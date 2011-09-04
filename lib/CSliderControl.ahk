@@ -18,8 +18,8 @@ Class CSliderControl Extends CControl
 	}	
 	
 	/*
-	Variable: Position
-	The position of the Slider control. Relative offsets are possible by adding a sign when assigning it, i.e. Slider.Position := "+10". Slider.Position += 10 is also possible but less efficient.
+	Variable: Value
+	The value of the Slider control. Relative offsets are possible by adding a sign when assigning it, i.e. Slider.Value := "+10". Slider.Value += 10 is also possible but less efficient.
 	
 	Variable: Min
 	The minimum value of the Slider control.
@@ -34,7 +34,7 @@ Class CSliderControl Extends CControl
 		{
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
-			if(Name = "Position")
+			if(Name = "Value")
 				GuiControlGet, Value, % this.GUINum ":", % this.ClassNN
 			else if(Name = "Min")
 				Value := this._.Min
@@ -65,7 +65,7 @@ Class CSliderControl Extends CControl
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
 			Handled := true
-			if(Name = "Position")
+			if(Name = "Value")
 				GuiControl, % this.GUINum ":", % this.ClassNN, %Value%
 			else if(Name = "Min")
 			{

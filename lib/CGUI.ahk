@@ -294,21 +294,19 @@ Class CGUI
 			Msgbox The control %Name% already exists. Please choose another name!
 			return
 		}
+		type := Control
 		if(Control = "DropDownList" || Control = "ComboBox" || Control = "ListBox")
 		{
-			type := Control
 			Control := object("base", CChoiceControl)
 			Control.__New(Name, Options, Text, this.GUINum, type)
 		}
 		else if(Control = "Checkbox" || Control = "Radio" )
 		{
-			type := Control
 			Control := object("base", CCheckboxControl)
 			Control.__New(Name, Options, Text, this.GUINum, type)
 		}
 		else if(Control = "Tab" )
 		{
-			type := "Tab2"
 			Control := object("base", CTabControl)
 			Control.__New(Name, Options, Text, this.GUINum)
 		}
@@ -328,7 +326,7 @@ Class CGUI
 		}
 		Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl " (IsLabel(this.__Class "_" Control.Name) ? "g" this.__Class "_" Control.Name : ""), % Control.Content ;Create the control and get its window handle and setup a g-label
 		Control.Remove("Content")
-		Control.hwnd := hControl ;Window handle is used for all further operations on this control
+		Control.Insert("hwnd", hControl) ;Window handle is used for all further operations on this control
 		ControlList[Control.Name] := Control
 		if(ControlList = this)
 			this.Controls[Name] := Control ;Add to list of controls
@@ -344,6 +342,20 @@ Class CGUI
 		{
 			Gui, % this.GUINum ":Tab"
 			Control.Type := "Tab"
+		}
+		else if(type = "ActiveX")
+		{
+			GUINum := Control.GUINum
+			classnn := Control.ClassNN
+			GuiControlGet, object, % Control.GUINum ":", % Control.ClassNN
+			Control._.Object := object
+			;~ Events := {}
+			;~ for key, value in this.base
+				;~ if(InStr(key, Control.Name "_") = 1 && IsFunc(this[key]))
+					;~ Events.Insert(SubStr(key, StrLen(Control.Name "_") + 1), Value)
+			;~ Control._.Events := {base : Events}
+			Control._.Events := new Control.CEvents(Control.GUINum, Control.Name)
+			ComObjConnect(object, Control._.Events)
 		}
 		return Control
 	}
@@ -362,6 +374,16 @@ Class CGUI
 					return Control
 	}
 	
+	/*
+	Function: ControlFromHWND
+	Returns the object that belongs to a control with a specific window handle.
+	Parameters:
+		HWND - The window handle.
+	*/
+	ControlFromGUINumAndName(GUINum, Name)
+	{
+		return this.GUIList[GUINum][Name]
+	}
 	/*
 	Variable: GUIList
 	This static array contains a list of all GUIs created with this library.

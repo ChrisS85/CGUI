@@ -17,8 +17,8 @@ Class CProgressControl Extends CControl
 	}	
 	
 	/*
-	Variable: Position
-	The position of the progress indicator. Relative offsets are possible by adding a sign when assigning it, i.e. Progress.Position := "+10". Progress.Position += 10 is also possible but less efficient.
+	Variable: Value
+	The Value of the progress indicator. Relative offsets are possible by adding a sign when assigning it, i.e. Progress.Value := "+10". Progress.Value += 10 is also possible but less efficient.
 	
 	Variable: Min
 	The minimum value of the progress indicator.
@@ -33,7 +33,7 @@ Class CProgressControl Extends CControl
 		{
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
-			if(Name = "Position")
+			if(Name = "Value")
 				GuiControlGet, Value, % this.GUINum ":", % this.ClassNN
 			else if(Name = "Min")
 				Value := this._.Min
@@ -56,7 +56,7 @@ Class CProgressControl Extends CControl
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
 			Handled := true
-			if(Name = "Position")
+			if(Name = "Value")
 				GuiControl, % this.GUINum ":", % this.ClassNN, %Value%
 			else if(Name = "Min")
 			{

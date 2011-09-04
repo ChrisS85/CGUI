@@ -77,6 +77,9 @@ Class CMyWindow Extends CGUI
 		T1[3].Bold := 1
 		;~ T1[3].Move(4)
 		this.tree.HotTrack := 1
+		this.Add("ActiveX", "explorer", "x400 y400 w200 h200", "Shell.Explorer")
+		;~ this.explorer._.Object.Navigate("http://www.google.de")
+		this.explorer.Navigate("http://www.google.de")
 		;~ msgbox % this.picTest.Picture
 		;~ this.statBar.Parts.Remove(1)
 		;~ this.lvItems.Items[1].Checked := true
@@ -86,6 +89,11 @@ Class CMyWindow Extends CGUI
 		this.DestroyOnClose := true
 		this.Show("")
 		return this
+	}
+	explorer_NavigateComplete2(pDisp, URL)
+	{
+		if(InStr(URL, "google"))
+			pDisp.Navigate("http://www.microsoft.com")
 	}
 	tabtext_Click()
 	{

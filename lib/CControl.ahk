@@ -7,12 +7,12 @@ Class CControl ;Never created directly
 	__New(Name, Options, Text, GUINum) ;Basic constructor for all controls. The control is created in CGUI.Add()
 	{
 		global CFont
-		this.Name := Name
-		this.Options := Options
-		this.Content := Text
-		this.GUINum := GUINum ;Store link to gui for GuiControl purposes (and possibly others later
+		this.Insert("Name", Name)
+		this.Insert("Options", Options)
+		this.Insert("Content", Text)
+		this.Insert("GUINum", GUINum) ;Store link to gui for GuiControl purposes (and possibly others later
 		this.Insert("_", {}) ;Create proxy object to enable __Get and __Set calls for existing keys (like ClassNN which stores a cached value in the proxy)
-		this.Font := new CFont(GUINum, Name)
+		this.Insert("Font", new CFont(GUINum, Name))
 	}
 	/*
 	Function: Show
@@ -150,102 +150,111 @@ Class CControl ;Never created directly
 	Variable: Border
 	Provides a thin-line border around the control.
 	*/
-	__Get(Name)
+	__Get(Name, Params*) 
+    { 
+        if this.__GetEx(Result, Name, Params*) 
+            return Result 
+    }
+	__GetEx(ByRef Result, Name, Params*)
     {
 		global CGUI
-		if(Name != "_" && Name != "GUINum" && !CGUI.GUIList[this.GUINum].IsDestroyed)
-		{
-			DetectHidden := A_DetectHiddenWindows
-			DetectHiddenWindows, On
-			if(Name = "Text")
-				GuiControlGet, Value,% this.GuiNum ":", % this.ClassNN
-				;~ ControlGetText, Value,, % "ahk_id " this.hwnd
-			;~ else if(Name = "GUI")
-				;~ value := CGUI.GUIList[this.GUINum]
-			else if(Name = "x" || Name = "y"  || Name = "width" || Name = "height")
+		Handled := false
+		if Name not in base,_,GUINum
+			if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 			{
-				ControlGetPos, x,y,width,height,,% "ahk_id " this.hwnd
-				Value := %Name%
-			}
-			else if(Name = "Position")
-			{
-				ControlGetPos, x,y,,,,% "ahk_id " this.hwnd
-				Value := {x:x, y:y}
-			}
-			else if(Name = "Size")
-			{
-				ControlGetPos,,,width,height,,% "ahk_id " this.hwnd
-				Value := {width:width, height:height}
-			}
-			else if(Name = "ClassNN")
-			{
-				if(this._.ClassNN != "" && this.hwnd && WinExist("ahk_class " this._.ClassNN) = this.hwnd) ;Check for cached value first
-					return this._.ClassNN
-				else
+				DetectHidden := A_DetectHiddenWindows
+				DetectHiddenWindows, On
+				Handled := true
+				if(Name = "Text")
+					GuiControlGet, Result,% this.GuiNum ":", % this.ClassNN
+					;~ ControlGetText, Result,, % "ahk_id " this.hwnd
+				;~ else if(Name = "GUI")
+					;~ Result := CGUI.GUIList[this.GUINum]
+				else if(Name = "x" || Name = "y"  || Name = "width" || Name = "height")
 				{
-					win := DllCall("GetParent", "PTR", this.hwnd, "PTR")
-					WinGet ctrlList, ControlList, ahk_id %win%
-					Loop Parse, ctrlList, `n 
+					ControlGetPos, x,y,width,height,,% "ahk_id " this.hwnd
+					Result := %Name%
+				}
+				else if(Name = "Position")
+				{
+					ControlGetPos, x,y,,,,% "ahk_id " this.hwnd
+					Result := {x:x, y:y}
+				}
+				else if(Name = "Size")
+				{
+					ControlGetPos,,,width,height,,% "ahk_id " this.hwnd
+					Result := {width:width, height:height}
+				}
+				else if(Name = "ClassNN")
+				{
+					if(this._.ClassNN != "" && this.hwnd && WinExist("ahk_class " this._.ClassNN) = this.hwnd) ;Check for cached Result first
+						return this._.ClassNN
+					else
 					{
-						ControlGet hwnd, Hwnd, , %A_LoopField%, ahk_id %win%
-						if(hwnd=this.hwnd)
+						win := DllCall("GetParent", "PTR", this.hwnd, "PTR")
+						WinGet ctrlList, ControlList, ahk_id %win%
+						Loop Parse, ctrlList, `n 
 						{
-							Value := A_LoopField
-							break
+							ControlGet hwnd, Hwnd, , %A_LoopField%, ahk_id %win%
+							if(hwnd=this.hwnd)
+							{
+								Result := A_LoopField
+								break
+							}
 						}
+						this._.ClassNN := Result
 					}
-					this._.ClassNN := value
 				}
-			}
-			else if(Name = "Enabled")
-				ControlGet, Value, Enabled,,,% "ahk_id " this.hwnd
-			else if(Name = "Visible")
-				ControlGet, Value, Visible,,,% "ahk_id " this.hwnd
-			else if(Name = "Style")
-				ControlGet, Value, Style,,,% "ahk_id " this.hwnd
-			else if(Name = "ExStyle")
-				ControlGet, Value, ExStyle,,,% "ahk_id " this.hwnd
-			else if(Name = "Focused")
-			{
-				ControlGetFocus, Value, % "ahk_id " CGUI.GUIList[this.GUINum].hwnd
-				ControlGet, Value, Hwnd,, %Value%, % "ahk_id " CGUI.GUIList[this.GUINum].hwnd
-				Value := Value = this.hwnd
-			}
-			else if(key := {Left : "Left", Center : "Center", Right : "Right", TabStop : "TabStop", Wrap : "Wrap", HScroll : "HScroll", VScroll : "VScroll", BackgroundTrans : "BackgroundTrans", Background : "Background", Border : "Border"}[Name])
-				GuiControl, % this.GUINum ":", (Value ? "+" : "-") key
-			else if(Name = "Color")
-				GuiControl, % this.GUINum ":", "+c" Value
-			else if(this._.HasKey("ControlStyles") && Style := this._.ControlStyles[Name])
-			{
-				if(SubStr(Style, 1,1) = "-")
+				else if(Name = "Enabled")
+					ControlGet, Result, Enabled,,,% "ahk_id " this.hwnd
+				else if(Name = "Visible")
+					ControlGet, Result, Visible,,,% "ahk_id " this.hwnd
+				else if(Name = "Style")
+					ControlGet, Result, Style,,,% "ahk_id " this.hwnd
+				else if(Name = "ExStyle")
+					ControlGet, Result, ExStyle,,,% "ahk_id " this.hwnd
+				else if(Name = "Focused")
 				{
-					Negate := true
-					Style := SubStr(Style, 2)
+					ControlGetFocus, Result, % "ahk_id " CGUI.GUIList[this.GUINum].hwnd
+					ControlGet, Result, Hwnd,, %Result%, % "ahk_id " CGUI.GUIList[this.GUINum].hwnd
+					Result := Result = this.hwnd
 				}
-				ControlGet, Value, Style,,,% "ahk_id " this.hwnd
-				Value = Value & Style > 0
-				if(Negate)
-					Value := !Value
-			}
-			else if(this._.HasKey("ControlExStyles") && ExStyle := this._.ControlExStyles[Name])
-			{
-				if(SubStr(ExStyle, 1,1) = "-")
+				else if(key := {Left : "Left", Center : "Center", Right : "Right", TabStop : "TabStop", Wrap : "Wrap", HScroll : "HScroll", VScroll : "VScroll", BackgroundTrans : "BackgroundTrans", Background : "Background", Border : "Border"}[Name])
+					GuiControl, % this.GUINum ":", (Result ? "+" : "-") key
+				else if(Name = "Color")
+					GuiControl, % this.GUINum ":", "+c" Result
+				else if(this._.HasKey("ControlStyles") && Style := this._.ControlStyles[Name])
 				{
-					Negate := true
-					ExStyle := SubStr(ExStyle, 2)
+					if(SubStr(Style, 1,1) = "-")
+					{
+						Negate := true
+						Style := SubStr(Style, 2)
+					}
+					ControlGet, Result, Style,,,% "ahk_id " this.hwnd
+					Result = Result & Style > 0
+					if(Negate)
+						Result := !Result
 				}
-				ControlGet, Value, ExStyle,,,% "ahk_id " this.hwnd
-				Value = Value & ExStyle > 0
-				if(Negate)
-					Value := !Value
+				else if(this._.HasKey("ControlExStyles") && ExStyle := this._.ControlExStyles[Name])
+				{
+					if(SubStr(ExStyle, 1,1) = "-")
+					{
+						Negate := true
+						ExStyle := SubStr(ExStyle, 2)
+					}
+					ControlGet, Result, ExStyle,,,% "ahk_id " this.hwnd
+					Result = Result & ExStyle > 0
+					if(Negate)
+						Result := !Result
+				}
+				else if(Name = "Tooltip")
+					Result := this._.Tooltip
+				else
+					Handled := false
+				if(!DetectHidden)
+					DetectHiddenWindows, Off
 			}
-			else if(Name = "Tooltip")
-				Value := this._.Tooltip
-			if(!DetectHidden)
-				DetectHiddenWindows, Off
-			if(Value != "")
-				return Value
-		}
+		return Handled
     }
     __Set(Name, Value)
     {
@@ -451,3 +460,4 @@ Class CControl ;Never created directly
 #include <CProgressControl>
 #include <CSliderControl>
 #include <CHotkeyControl>
+#include <CActiveXControl>
