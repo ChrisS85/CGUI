@@ -3,6 +3,10 @@ Class: CActiveXControl
 An ActiveX control.
 
 This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
+
+Variable: Accessing the properties of the ActiveX object
+The specific properties of the ActiveX control can simply be accessed through this control object as if it were the ActiveX object itself.
+However if you need to access the ActiveX object directly you can do so by using Control._.Object .
 */
 Class CActiveXControl Extends CControl
 {
@@ -39,10 +43,13 @@ Class CActiveXControl Extends CControl
 				{
 					DetectHidden := A_DetectHiddenWindows
 					DetectHiddenWindows, On
-					Value := this._.Object[Name]
-					Loop % Params.MaxIndex()
-						if(IsObject(Value)) ;Fix unlucky multi parameter __GET
-							Value := Value[Params[A_Index]]
+					if(this.IsMemberOf(Name))
+					{
+						Value := this._.Object[Name]
+						Loop % Params.MaxIndex()
+							if(IsObject(Value)) ;Fix unlucky multi parameter __GET
+								Value := Value[Params[A_Index]]
+					}
 					if(!DetectHidden)
 						DetectHiddenWindows, Off
 					if(Value != "")
@@ -59,8 +66,11 @@ Class CActiveXControl Extends CControl
 			{
 				DetectHidden := A_DetectHiddenWindows
 				DetectHiddenWindows, On
-				Handled := true
-				this._.Object[Name] := Value
+				if(this.IsMemberOf(Name))
+				{
+					Handled := true
+					this._.Object[Name] := Value
+				}
 				if(!DetectHidden)
 					DetectHiddenWindows, Off
 				if(Handled)
@@ -76,15 +86,23 @@ Class CActiveXControl Extends CControl
 		}	
 	}
 	/*
+	Function: IsMemberOf()
+	Checks if the ActiveX object supports a parameter. This does not check if it is read/write/call-able.
+	
+	Parameters:
+		name - the parameter to check for.
+	*/
+	IsMemberOf(name) { 
+	   out := DllCall(NumGet(NumGet(1*p:=ComObjUnwrap(this._.Object))+A_PtrSize*5), "Ptr",p, "Ptr",VarSetCapacity(iid,16,0)*0+&iid, "Ptr*",&name, "UInt",1, "UInt",1024, "Int*",dispID)=0 && dispID+1
+	   ObjRelease(p)
+	   return out
+	}
+	/*
 	Event: Introduction
 	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
-	The parameters depend on the event and there may not be params at all in some cases.
-	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
-	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
-	For better readability labels may be chained since they all execute the same code.
-	
-	Event: ActiveXMoved()
-	Invoked when the user clicked on the control.
+	The parameters depend on the event and there may not be params at all in some cases. 
+	You can look up the definitions of the parameters in the documentation of the ActiveX control.
+	ActiveX controls do not require a separate G-label to make the events work.
 	*/
 	HandleEvent(Params*)
 	{
