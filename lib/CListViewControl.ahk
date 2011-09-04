@@ -22,14 +22,17 @@ Class CListViewControl Extends CControl
 			}
 		}
 		base.__New(Name, Options, Text, GUINum)
-		this._.Insert("Items", new this.CItems(GUINum, Name))
 		this._.Insert("ControlStyles", {ReadOnly : -0x200, Header : -0x4000, NoSortHdr : 0x8000, AlwaysShowSelection : 0x8, Multi : -0x4, Sort : 0x10, SortDescending : 0x20})
 		this._.Insert("ControlExStyles", {Checked : 0x4, FullRowSelect : 0x20, Grid : 0x1, AllowHeaderReordering : 0x10, HotTrack : 0x8})
 		this._.Insert("Events", ["DoubleClick", "DoubleRightClick", "ColumnClick", "EditingEnd", "Click", "RightClick", "ItemActivate", "EditingStart", "KeyPress", "FocusReceived", "FocusLost", "Marquee", "ScrollingStart", "ScrollingEnd", "ItemSelected", "ItemDeselected", "ItemFocused", "ItemDefocused", "ItemChecked", "ItemUnChecked", "SelectionChanged", "CheckedChanged", "FocusedChanged"])
-		this._.Insert("ImageListManager", new this.CImageListManager(GUINum, Name))
 		this.Type := "ListView"
 	}
 	
+	PostCreate()
+	{		
+		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
+		this._.Insert("Items", new this.CItems(this.GUINum, this.hwnd))
+	}
 	/*
 	Function: ModifyCol
 	Modifies a column. See AHK help on LV_ModifyCol for details.
@@ -256,11 +259,11 @@ Class CListViewControl Extends CControl
 	*/
 	Class CItems
 	{
-		__New(GUINum, ControlName)
+		__New(GUINum, hwnd)
 		{
 			this._Insert("_", {})
 			this._.GUINum := GUINum
-			this._.ControlName := ControlName
+			this._.hwnd := hwnd
 		}
 		_NewEnum()
 		{
@@ -277,7 +280,7 @@ Class CListViewControl Extends CControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this._.hwnd]
 			Gui, % this._.GUINum ":Default"
 			Gui, ListView, % Control.ClassNN
 			return LV_GetCount()
@@ -296,12 +299,12 @@ Class CListViewControl Extends CControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this._.hwnd]
 			Gui, % Control.GUINum ":Default"
 			Gui, ListView, % Control.ClassNN
 			SortedIndex := LV_Add(Options, Fields*)
 			UnsortedIndex := LV_GetCount()
-			this._.Insert(UnsortedIndex, new this.CRow(SortedIndex, UnsortedIndex, this._.GUINum, Control.Name))
+			this._.Insert(UnsortedIndex, new this.CRow(SortedIndex, UnsortedIndex, this._.GUINum, Control.hwnd))
 			if(InStr(Options, "Select"))
 			{
 				if(LV_GetCount("Selected") = 1)
@@ -331,7 +334,7 @@ Class CListViewControl Extends CControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this._.hwnd]
 			Gui, % Control.GUINum ":Default"
 			Gui, ListView, % Control.ClassNN
 			SortedIndex := this.IndependentSorting ? this.CRow.GetSortedIndex(RowNumber, Control.hwnd) : RowNumber ;If independent sorting is off, the RowNumber parameter of this function is interpreted as sorted index
@@ -349,7 +352,7 @@ Class CListViewControl Extends CControl
 			}
 			
 			SortedIndex := LV_Insert(SortedIndex, Options, Fields*)
-			this._.Insert(UnsortedIndex, new this.CRow(SortedIndex, UnsortedIndex, this._.GUINum, Control.Name))
+			this._.Insert(UnsortedIndex, new this.CRow(SortedIndex, UnsortedIndex, this._.GUINum, Control.hwnd))
 			if(InStr(Options, "Select"))
 			{
 				if(LV_GetCount("Selected") = 1)
@@ -380,7 +383,7 @@ Class CListViewControl Extends CControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this._.hwnd]
 			Gui, % Control.GUINum ":Default"
 			Gui, ListView, % Control.ClassNN
 			SortedIndex := this.IndependentSorting ? this.CRow.GetSortedIndex(RowNumber, Control.hwnd) : RowNumber ;If independent sorting is off, the RowNumber parameter of this function is interpreted as sorted index
@@ -413,7 +416,7 @@ Class CListViewControl Extends CControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this._.hwnd]
 			Gui, % Control.GUINum ":Default"
 			Gui, ListView, % Control.ClassNN
 			WasSelected := Control.Items[RowNumber].Selected
@@ -452,7 +455,7 @@ Class CListViewControl Extends CControl
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(GUI.IsDestroyed)
 					return
-				Control := GUI[this._.ControlName]
+				Control := GUI.Controls[this._.hwnd]
 				if Name is Integer
 				{
 					if(Name > 0 && Name <= this.Count)
@@ -490,17 +493,17 @@ Class CListViewControl Extends CControl
 		*/
 		Class CRow
 		{
-			__New(SortedIndex, UnsortedIndex, GUINum, ControlName)
+			__New(SortedIndex, UnsortedIndex, GUINum, hwnd)
 			{
 				global CGUI
 				this.Insert("_", {})				
 				this._.RowNumber := UnsortedIndex
 				this._.GUINum := GUINum
-				this._.ControlName := ControlName
+				this._.hwnd := hwnd
 				GUI := CGUI.GUIList[GUINum]
 				if(GUI.IsDestroyed)
 					return
-				Control := GUI[ControlName]				
+				Control := GUI.Controls[hwnd]				
 				;Store the real unsorted index in the custom property lParam field of the list view item so it can be reidentified later
 				this.SetUnsortedIndex(SortedIndex, UnsortedIndex, Control.hwnd)
 				this.SetIcon("")
@@ -626,7 +629,7 @@ Class CListViewControl Extends CControl
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(GUI.IsDestroyed)
 					return
-				Control := GUI[this._.ControlName]
+				Control := GUI.Controls[this._.hwnd]
 				Gui, % Control.GUINum ":Default"
 				Gui, ListView, % Control.ClassNN
 				Return LV_GetCount("Column")
@@ -645,7 +648,7 @@ Class CListViewControl Extends CControl
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(GUI.IsDestroyed)
 					return
-				Control := GUI[this._.ControlName]
+				Control := GUI.Controls[this._.hwnd]
 				Control._.ImageListManager.SetIcon(this.GetSortedIndex(this._.RowNumber, Control.hwnd), Filename, IconNumberOrTransparencyColor)
 				this._.Icon := Filename
 				this._.IconNumber := IconNumberOrTransparencyColor
@@ -681,7 +684,7 @@ Class CListViewControl Extends CControl
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!GUI.IsDestroyed)
 				{
-					Control := GUI[this._.ControlName]
+					Control := GUI.Controls[this._.hwnd]
 					if Name is Integer
 					{
 						if(Name > 0 && Name <= this.Count) ;Setting default listview is already done by this.Count __Get
@@ -716,7 +719,7 @@ Class CListViewControl Extends CControl
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!GUI.IsDestroyed)
 				{
-					Control := GUI[this._.ControlName]
+					Control := GUI.Controls[this._.hwnd]
 					if Name is Integer
 					{
 						if(Name <= this.Count) ;Setting default listview is already done by this.Count __Get

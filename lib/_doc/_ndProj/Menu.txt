@@ -46,6 +46,7 @@ Format: 1.4
 # --------------------------------------------------------------------------
 
 
+File: CActiveXControl  (CActiveXControl.ahk)
 File: CButtonControl  (CButtonControl.ahk)
 File: CCheckboxControl  (CCheckBoxControl.ahk)
 File: CChoiceControl  (CChoiceControl.ahk)
@@ -56,8 +57,11 @@ File: CFileDialog  (CFileDialog.ahk)
 File: CFolderDialog  (CFolderDialog.ahk)
 File: CGroupBoxControl  (CGroupBoxControl.ahk)
 File: CGUI  (CGUI.ahk)
+File: CHotkeyControl  (CHotkeyControl.ahk)
 File: CListViewControl  (CListViewControl.ahk)
 File: CPictureControl  (CPictureControl.ahk)
+File: CProgressControl  (CProgressControl.ahk)
+File: CSliderControl  (CSliderControl.ahk)
 File: CStatusBarControl  (CStatusBarControl.ahk)
 File: CTabControl  (CTabControl.ahk)
 File: CTextControl  (CTextControl.ahk)

@@ -10,11 +10,14 @@ Class CStatusBarControl Extends CControl
 	{
 		base.__New(Name, Options, Text, GUINum)
 		this.Type := "StatusBar"
-		this._.Parts := new this.CParts(this.GUINum, this.Name)
 		this._.Insert("ControlStyles", {SizingGrip : 0x100})
-		if(Text)
-			this._.Parts._.Insert(1, new this.CParts.CPart(Text, 1, "", "", "", "", this.GUINum, this.Name))
 		this._.Insert("Events", ["Click", "DoubleClick", "RightClick", "DoubleRightClick"])
+	}
+	PostCreate()
+	{		
+		this._.Parts := new this.CParts(this.GUINum, this.hwnd)
+		if(this.Content)
+			this._.Parts._.Insert(1, new this.CParts.CPart(Text, 1, "", "", "", "", this.GUINum, this.hwnd))
 	}
 	/*
 	Variable: Parts
@@ -50,7 +53,7 @@ Class CStatusBarControl Extends CControl
 			{
 				if(IsObject(Value)) ;Set an object
 				{
-					Part := new this.CParts.CPart(Value.HasKey("Text") ? Value.Text : "", Params[1], Value.HasKey("Width") ? Value.Width : 50, Value.HasKey("Style") ? Value.Style : "", Value.HasKey("Icon") ? Value.Icon : "", Value.HasKey("IconNumber") ? Value.IconNumber : "", this.GUINum, this.Name)
+					Part := new this.CParts.CPart(Value.HasKey("Text") ? Value.Text : "", Params[1], Value.HasKey("Width") ? Value.Width : 50, Value.HasKey("Style") ? Value.Style : "", Value.HasKey("Icon") ? Value.Icon : "", Value.HasKey("IconNumber") ? Value.IconNumber : "", this.GUINum, this.hwnd)
 					this._.Parts._.Remove(Params[1])
 					this._.Parts._.Insert(Params[1], Part)
 					this.RebuildStatusBar()
@@ -72,9 +75,9 @@ Class CStatusBarControl Extends CControl
 					Loop, Parse, Value, |
 						Data.Insert({Text : A_LoopField})
 				}
-				this._.Insert("Parts", new this.CParts(this.GUINum, this.Name))
+				this._.Insert("Parts", new this.CParts(this.GUINum, this.hwnd))
 				Loop % Data.MaxIndex()
-					this._.Parts._.Insert(new this.CParts.CPart(Data[A_Index].HasKey("Text") ? Data[A_Index].Text : "", A_Index, Data[A_Index].HasKey("Width") ? Data[A_Index].Width : 50, Data[A_Index].HasKey("Style") ? Data[A_Index].Style : "", Data[A_Index].HasKey("Icon") ? Data[A_Index].Icon : "", Data[A_Index].HasKey("IconNumber") ? Data[A_Index].IconNumber : "", this.GUINum, this.Name))
+					this._.Parts._.Insert(new this.CParts.CPart(Data[A_Index].HasKey("Text") ? Data[A_Index].Text : "", A_Index, Data[A_Index].HasKey("Width") ? Data[A_Index].Width : 50, Data[A_Index].HasKey("Style") ? Data[A_Index].Style : "", Data[A_Index].HasKey("Icon") ? Data[A_Index].Icon : "", Data[A_Index].HasKey("IconNumber") ? Data[A_Index].IconNumber : "", this.GUINum, this.hwnd))
 				this.RebuildStatusBar()
 			}
 			return Value
@@ -107,11 +110,11 @@ Class CStatusBarControl Extends CControl
 	*/
 	Class CParts
 	{
-		__New(GUINum, Name)
+		__New(GUINum, hwnd)
 		{
 			this.Insert("_", [])
 			this.GUINum := GUINum
-			this.Name := Name
+			this.hwnd := hwnd
 		}
 		/*
 		Variable: 1,2,3,4,...
@@ -145,7 +148,6 @@ Class CStatusBarControl Extends CControl
 		}
 		__Set(Name, Params*)
 		{
-			global CGUI
 			Value := Params[Params.MaxIndex()]
 			Params.Remove(Params.MaxIndex())
 			if Name is Integer
@@ -157,10 +159,6 @@ Class CStatusBarControl Extends CControl
 						Part := this._[Name]
 						Part[Params*] := Value
 					}
-					;~ else
-					;~ {
-						
-					;~ }
 					return Value
 				}
 			}
@@ -181,10 +179,10 @@ Class CStatusBarControl Extends CControl
 		{
 			global CGUI
 			if(PartNumber)
-				this._.Insert(PartNumber, new this.CPart(Text, PartNumber, Width, Style, Icon, IconNumber, this.GUINum, this.Name))
+				this._.Insert(PartNumber, new this.CPart(Text, PartNumber, Width, Style, Icon, IconNumber, this.GUINum, this.hwnd))
 			else
-				this._.Insert(new this.CPart(Text, this._.MaxIndex() + 1, Width, Style, Icon, IconNumber, this.GUINum, this.Name))
-			Control := CGUI.GUIList[this.GUINum][this.Name]
+				this._.Insert(new this.CPart(Text, this._.MaxIndex() + 1, Width, Style, Icon, IconNumber, this.GUINum, this.hwnd))
+			Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]
 			Control.RebuildStatusBar()
 		}
 		
@@ -201,7 +199,7 @@ Class CStatusBarControl Extends CControl
 			if PartNumber is Integer
 			{
 				this._.Remove(PartNumber)
-				Control := CGUI.GUIList[this.GUINum][this.Name]
+				Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]
 				Control.RebuildStatusBar()
 			}
 		}
@@ -212,7 +210,7 @@ Class CStatusBarControl Extends CControl
 		*/
 		Class CPart
 		{
-			__New(Text, PartNumber, Width, Style, Icon, IconNumber, GUINum, Name)
+			__New(Text, PartNumber, Width, Style, Icon, IconNumber, GUINum, hwnd)
 			{
 				this.Insert("_", {})
 				this._.Text := Text
@@ -222,7 +220,7 @@ Class CStatusBarControl Extends CControl
 				this._.Icon := Icon
 				this._.IconNumber := IconNumber
 				this._.GUINum := GUINum
-				this._.Name := Name
+				this._.hwnd := hwnd
 			}
 			/*
 			Variable: Text
@@ -251,7 +249,7 @@ Class CStatusBarControl Extends CControl
 			__Set(Name, Value)
 			{
 				global CGUI
-				Control := CGUI.GUIList[this.GUINum][this.Name]
+				Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]
 				if(Name = "Width")
 				{
 					this._[Name] := Value

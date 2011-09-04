@@ -168,8 +168,8 @@ Class CControl ;Never created directly
 				if(Name = "Text")
 					GuiControlGet, Result,% this.GuiNum ":", % this.ClassNN
 					;~ ControlGetText, Result,, % "ahk_id " this.hwnd
-				;~ else if(Name = "GUI")
-					;~ Result := CGUI.GUIList[this.GUINum]
+				else if(Name = "GUI")
+					Result := CGUI.GUIList[this.GUINum]
 				else if(Name = "x" || Name = "y"  || Name = "width" || Name = "height")
 				{
 					ControlGetPos, x,y,width,height,,% "ahk_id " this.hwnd
@@ -367,18 +367,18 @@ Class CControl ;Never created directly
 	*/
 	Class CImageListManager
 	{
-		__New(GUINum, ControlName)
+		__New(GUINum, hwnd)
 		{
 			this.Insert("_", {})
 			this._.GUINum := GUINum
-			this._.ControlName := ControlName
+			this._.hwnd := hwnd
 			this._.IconList := {}
 		}
 		SetIcon(ID, Path, IconNumber)
 		{
 			global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this._.hwnd]
 			GUI, % this._.GUINum ":Default"
 			if(Control.Type = "ListView")
 				GUI, ListView, % Control.ClassNN

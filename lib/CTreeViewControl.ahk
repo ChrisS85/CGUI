@@ -22,13 +22,16 @@ Class CTreeViewControl Extends CControl
 			}
 		}
 		base.__New(Name, Options, Text, GUINum)
-		this._.Insert("Items", new this.CItem(0, GUINum, Name))
 		this._.Insert("ControlStyles", {Checked : 0x100, ReadOnly : -0x8, FullRowSelect : 0x1000, Buttons : 0x1, Lines : 0x2, HScroll : -0x8000, AlwaysShowSelection : 0x20, SingleExpand : 0x400, HotTrack : 0x200})
 		this._.Insert("Events", ["DoubleClick", "EditingEnd", "ItemSelected", "Click", "RightClick", "EditingStart", "KeyPress", "ItemExpanded", "ItemCollapsed", "FocusReceived", "FocusLost"])
-		this._.Insert("ImageListManager", new this.CImageListManager(GUINum, Name))
 		this.Type := "TreeView"
 	}
 	
+	PostCreate()
+	{
+		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
+		this._.Insert("Items", new this.CItem(0, this.GUINum, this.hwnd))
+	}
 	/*
 	Function: FindItem
 	Finds an item by its ID.
@@ -185,11 +188,11 @@ Class CTreeViewControl Extends CControl
 	*/
 	Class CItem
 	{
-		__New(ID, GUINum, ControlName)
+		__New(ID, GUINum, hwnd)
 		{
 			this.Insert("_", {})
 			this._.Insert("GUINum", GUINum)
-			this._.Insert("ControlName", ControlName)
+			this._.Insert("hwnd", hwnd)
 			this._.Insert("ID", ID)
 			this._.Insert("Controls", {})
 		}
@@ -210,11 +213,11 @@ Class CTreeViewControl Extends CControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this._.hwnd]
 			Gui, % this._.GUINum ":Default"
 			Gui, TreeView, % Control.ClassNN
 			ID := TV_Add(Text, this.ID, Options)
-			Item := new CTreeViewControl.CItem(ID, this._.GUINum, this._.ControlName)
+			Item := new CTreeViewControl.CItem(ID, this._.GUINum, this._.hwnd)
 			;~ Item.Icon := ""
 			this.Insert(Item)
 			return Item
@@ -256,7 +259,7 @@ Class CTreeViewControl Extends CControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this._.hwnd]
 			Gui, % this._.GUINum ":Default"
 			Gui, TreeView, % Control.ClassNN
 			if(!IsObject(ObjectOrIndex)) ;If index, get object and then handle
@@ -302,7 +305,7 @@ Class CTreeViewControl Extends CControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this._.hwnd]
 			Gui, % this._.GUINum ":Default"
 			Gui, TreeView, % Control.ClassNN
 			
@@ -365,7 +368,7 @@ Class CTreeViewControl Extends CControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this._.hwnd]
 			Control._.ImageListManager.SetIcon(this._.ID, Filename, IconNumberOrTransparencyColor)
 			this._.Icon := Filename
 			this._.IconNumber := IconNumberOrTransparencyColor
@@ -380,7 +383,7 @@ Class CTreeViewControl Extends CControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this._.hwnd]
 			Gui, % this._.GUINum ":Default"
 			text := this.text
 			Gui, TreeView, % Control.ClassNN
@@ -468,13 +471,13 @@ Class CTreeViewControl Extends CControl
 					;~ {
 						;~ if(Name <= this.MaxIndex())
 						;~ {
-							;~ Control := GUI[this._.ControlName]
+							;~ Control := GUI.Controls[this._.hwnd]
 							;~ Gui, % this._.GUINum ":Default"
 							;~ Gui, TreeView, % Control.ClassNN
 							;~ child := TV_GetChild(this._.ID) ;Find child node id
 							;~ Loop % Name - 1
 								;~ child := TV_GetNext(child)
-							;~ Value := new CTreeViewControl.CItem(child, this._.GUINum, this._.ControlName)
+							;~ Value := new CTreeViewControl.CItem(child, this._.GUINum, this._.hwnd)
 						;~ }
 					;~ }
 					if(Name = "CheckedItems")
@@ -493,7 +496,7 @@ Class CTreeViewControl Extends CControl
 					}
 					else if(Name = "Parent")
 					{
-						Control := GUI[this._.ControlName]
+						Control := GUI.Controls[this._.hwnd]
 						Gui, % this._.GUINum ":Default"
 						Gui, TreeView, % Control.ClassNN
 						VaLue := Control.FindItem(TV_GetParent(this._.ID))
@@ -504,28 +507,28 @@ Class CTreeViewControl Extends CControl
 						Value := this.MaxIndex()
 					else if(Name = "HasChildren")
 					{
-						Control := GUI[this._.ControlName]
+						Control := GUI.Controls[this._.hwnd]
 						Gui, % this._.GUINum ":Default"
 						Gui, TreeView, % Control.ClassNN
 						Value := TV_GetChild(this._.ID) > 0
 					}
 					else if(Name = "Text")
 					{
-						Control := GUI[this._.ControlName]
+						Control := GUI.Controls[this._.hwnd]
 						Gui, % this._.GUINum ":Default"
 						Gui, TreeView, % Control.ClassNN
 						TV_GetText(Value, this._.ID)
 					}
 					else if(Name = "Checked" || Name = "Expanded" || Name = "Bold")
 					{
-						Control := GUI[this._.ControlName]
+						Control := GUI.Controls[this._.hwnd]
 						Gui, % this._.GUINum ":Default"
 						Gui, TreeView, % Control.ClassNN
 						Value := TV_Get(this._.ID, Name) > 0
 					}
 					else if(Name = "Selected")
 					{
-						Control := GUI[this._.ControlName]
+						Control := GUI.Controls[this._.hwnd]
 						Gui, % this._.GUINum ":Default"
 						Gui, TreeView, % Control.ClassNN
 						Value := TV_GetSelection() = this._.ID
@@ -550,9 +553,7 @@ Class CTreeViewControl Extends CControl
 			{
 				if(Name = "Text")
 				{
-					if(Value = "New Category")
-						outputdebug break
-					Control := GUI[this._.ControlName]
+					Control := GUI.Controls[this._.hwnd]
 					Gui, % this._.GUINum ":Default"
 					Gui, TreeView, % Control.ClassNN
 					TV_Modify(this._.ID, "", Value)
@@ -562,7 +563,7 @@ Class CTreeViewControl Extends CControl
 				{
 					if(Value = 1)
 					{
-						Control := GUI[this._.ControlName]
+						Control := GUI.Controls[this._.hwnd]
 						Gui, % this._.GUINum ":Default"
 						Gui, TreeView, % Control.ClassNN
 						TV_Modify(this._.ID)
@@ -573,7 +574,7 @@ Class CTreeViewControl Extends CControl
 				}
 				else if(Option := {Checked : "Check", Expanded : "Expand", Bold : "Bold"}[Name]) ;Wee, check and remapping in one step
 				{
-					Control := GUI[this._.ControlName]
+					Control := GUI.Controls[this._.hwnd]
 					Gui, % this._.GUINum ":Default"
 					Gui, TreeView, % Control.ClassNN				
 					TV_Modify(this._.ID, (Value = 1 ? "+" : "-") Option)

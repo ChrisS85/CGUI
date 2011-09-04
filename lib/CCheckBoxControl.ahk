@@ -78,7 +78,7 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 			Options .= UseEnabledState ? " Disabled" : " Hidden"
 		Control := GUI.Add(type, Name, Options, Text, this._.Controls)
 		Control._.UseEnabledState := UseEnabledState
-		this._.Controls.Insert(Name, Control)
+		this._.Controls.Insert(Control.hwnd, Control)
 		return Control
 	}
 	/*
@@ -104,12 +104,8 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 				WinGet, style, Style, ahk_id %hwnd%
 				if(class = "Button" && (style & 0x0004 || style & 0x0009)) ;BS_AUTORADIOBUTTON or BS_RADIOBUTTON
 				{
-					for Name, Control in GUI.Controls
-						if(Control.hwnd = hwnd)
-						{
-							Group.Insert(Control)
-							break
-						}
+					if(GUI.Controls.HasKey(hwnd))
+						Group.Insert(Gui.Controls[hwnd])
 					WinGet, style, Style, % "ahk_id " hwnd
 					if(style & 0x00020000) ;WS_GROUP
 						break
@@ -132,12 +128,8 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 				WinGet, style, Style, % "ahk_id " hwnd
 				if(style & 0x00020000) ;WS_GROUP
 					break
-				for Name, Control in GUI.Controls
-					if(Control.hwnd = hwnd)
-					{
-						Group.Insert(Control)
-						break
-					}				
+				if(GUI.Controls.HasKey(hwnd))
+					Group.Insert(Gui.Controls[hwnd])
 			}
 			else
 				break

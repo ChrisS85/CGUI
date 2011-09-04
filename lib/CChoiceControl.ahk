@@ -17,9 +17,13 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		else if(Type = "ListBox")
 			this._.Insert("ControlStyles", {Multi : 0x800, ReadOnly : 0x4000, Sort : 0x2, ToggleSelection : 0x8})
 		this._.Insert("Events", ["SelectionChanged"])
-		this._.Items := new this.CItems(GUINum, Name)
-		Loop, Parse, Text, |
-			this._.Items.Insert(new this.CItems.CItem(A_Index, GUINum, Name))
+	}
+	PostCreate()
+	{		
+		this._.Items := new this.CItems(this.GUINum, this.hwnd)
+		Content := this.Content
+		Loop, Parse, Content, |
+			this._.Items.Insert(new this.CItems.CItem(A_Index, this.GUINum, this.hwnd))
 		this._.PreviouslySelectedItem := this.SelectedItem
 	}
 	/*
@@ -204,11 +208,11 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	*/
 	Class CItems
 	{
-		__New(GUINum, ControlName)
+		__New(GUINum, hwnd)
 		{
 			this.Insert("_", {})
 			this._.GUINum := GUINum
-			this._.ControlName := ControlName
+			this._.hwnd := hwnd
 		}
 		
 		/*
@@ -244,7 +248,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		{
 			global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this.hwnd]
 			Selected := Control.SelectedIndex
 			ItemsString := ""
 			Pos := 1
@@ -275,7 +279,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		{
 			global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this.hwnd]
 			if(IsObject(IndexTextOrItem))
 			{
 				Loop % this.MaxIndex()
@@ -314,7 +318,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
 			GUI := CGUI.GUIList[this._.GUINum]
-			Control := GUI[this._.ControlName]
+			Control := GUI.Controls[this.hwnd]
 			ControlGet, List, List,,, % " ahk_id " Control.hwnd
 			count := 0
 			Loop, Parse, List, `n
@@ -334,11 +338,11 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		*/
 		Class CItem
 		{
-			__New(Index, GUINum, ControlName)
+			__New(Index, GUINum, hwnd)
 			{
 				this.Insert("_", {})
 				this._.Insert("GUINum", GUINum)
-				this._.Insert("ControlName", ControlName)
+				this._.Insert("hwnd", hwnd)
 				this._.Insert("Index", Index)
 				this._.Insert("Controls", {})
 			}
@@ -379,7 +383,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				if(Name = "Text")
 				{
 					GUI := CGUI.GUIList[this._.GUINum]
-					Control := GUI[this._.ControlName]
+					Control := GUI.Controls[this.hwnd]
 					ControlGet, List, List,,, % " ahk_id " Control.hwnd
 					Loop, Parse, List, `n
 						if(A_Index = this._.Index)
@@ -391,7 +395,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				else if(Name = "Selected")
 				{
 					GUI := CGUI.GUIList[this._.GUINum]
-					Control := GUI[this._.ControlName]
+					Control := GUI.Controls[this.hwnd]
 					SendMessage, 0x147, 0, 0,,% "ahk_id " Control.hwnd
 					Value := (this._.Index = ErrorLevel + 1)
 				}
@@ -410,7 +414,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				if(Name = "Text")
 				{
 					GUI := CGUI.GUIList[this._.GUINum]
-					Control := GUI[this._.ControlName]
+					Control := GUI.Controls[this.hwnd]
 					ItemsString := ""
 					SelectedIndex := Control.SelectedIndex
 					for index, item in Control.Items
@@ -422,7 +426,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				else if(Name = "Selected" && Value = 1)
 				{
 					GUI := CGUI.GUIList[this._.GUINum]
-					Control := GUI[this._.ControlName]
+					Control := GUI.Controls[this.hwnd]
 					GuiControl, % this._.GUINum ":Choose", % Control.ClassNN, % this._.Index
 					this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 					Control._.PreviouslySelectedItem := Control.SelectedItem

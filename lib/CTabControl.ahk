@@ -10,14 +10,18 @@ Class CTabControl Extends CControl
 	{
 		base.__New(Name, Options, Text, GUINum)
 		this.Type := "Tab"
-		this._.Tabs := new this.CTabs(GUINum, Name)
-		Loop, Parse, Text, |
-			this._.Tabs._.Insert(new this.CTabs.CTab(A_LoopField, A_Index, GUINum, Name))
 		this._.Insert("ControlStyles", {Bottom : 0x2, HotTrack : 0x40, Buttons : 0x100, MultiLine : 0x200})
 		this._.Insert("Events", ["Click", "DoubleClick", "RightClick", "DoubleRightClick"])
-		this._.Insert("ImageListManager", new this.CImageListManager(GUINum, Name))
 	}
 	
+	PostCreate()
+	{
+		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
+		this._.Tabs := new this.CTabs(this.GUINum, this.hwnd)
+		Content := this.Content
+		Loop, Parse, Content, |
+			this._.Tabs._.Insert(new this.CTabs.CTab(A_LoopField, A_Index, this.GUINum, this.hwnd))
+	}
 	/*
 	Variable: Tabs
 	A list of all tabs. Each tab contains a list of controls that belong to it. The returned object is of type <CTabControl.CTabs>
@@ -108,11 +112,11 @@ Class CTabControl Extends CControl
 	*/
 	Class CTabs
 	{
-		__New(GUINum, Name)
+		__New(GUINum, hwnd)
 		{
 			this.Insert("_", [])
 			this.GUINum := GUINum
-			this.Name := Name
+			this.hwnd := hwnd
 		}
 		/*
 		Variable: 1,2,3,4,...
@@ -179,10 +183,10 @@ Class CTabControl Extends CControl
 			Tabs := []
 			Loop, Parse, Text, |
 			{
-				Tab := new this.CTab(A_loopField, this._.MaxIndex() + 1, this.GUINum, this.Name)
+				Tab := new this.CTab(A_loopField, this._.MaxIndex() + 1, this.GUINum, this.hwnd)
 				this._.Insert(Tab)
 				Tabs.Insert(Tab)
-				Control := CGUI.GUIList[this.GUINum][this.Name]
+				Control := CGUI.GUIList[this.GUINum][this.hwnd]
 				GuiControl, % this.GUINum ":", % Control.ClassNN, %A_loopField%
 			}
 			return Tabs.MaxIndex() > 1 ? Tabs : Tabs[1]
@@ -199,13 +203,13 @@ Class CTabControl Extends CControl
 		*/
 		Class CTab
 		{
-			__New(Text, TabNumber, GUINum, ControlName)
+			__New(Text, TabNumber, GUINum, hwnd)
 			{
 				this.Insert("_", {})
 				this._.Text := Text
 				this._.TabNumber := TabNumber
 				this._.GUINum := GUINum
-				this._.Name := ControlName
+				this._.hwnd := hwnd
 				this._.Controls := {}
 			}
 			
@@ -231,6 +235,8 @@ Class CTabControl Extends CControl
 					Gui, % this.GUINum ":Tab"
 					return Control
 				}
+				else
+					Msgbox Tabs may not be added in a tab container.
 			}
 			/*
 			Variable: Text
@@ -257,7 +263,7 @@ Class CTabControl Extends CControl
 				global CGUI
 				if(Name = "Text")
 				{
-					Control := CGUI.GUIList[this.GUINum][this.Name]
+					Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]
 					Tabs := ""
 					for index, Tab in Control.Tabs
 						if(index != this._.TabNumber)
@@ -294,7 +300,7 @@ Class CTabControl Extends CControl
 				global CGUI
 				this._.Icon := Filename
 				this._.IconNumber := IconNumber
-				Control := CGUI.GUIList[this.GUINum][this.Name]
+				Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]
 				Control._.ImageListManager.SetIcon(this._.TabNumber, Filename, IconNumber)
 			}
 		}

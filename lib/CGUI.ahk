@@ -2,6 +2,10 @@
 /*
    Class: CGUI
    The main GUI class. User created GUIs need to extend this class and call Base.__New() in their constructor before doing anything related to this class.
+   
+   Variable: Accessing Controls
+   Controls may be accessed by their name by using GUI.Name or by their window handle by using GUI.Controls[hwnd] (assuming Name is a string and hwnd is a variable).
+   The difference between these two methods is that controls which are added as sub-controls to other controls are not accessible by their name through the main GUI object. They can either be accessed by hwnd like described above or by GUI.ParentControl.Controls.SubControlName (again assuming that SubControlName is a string).
 */
 Class CGUI
 {
@@ -325,11 +329,11 @@ Class CGUI
 			}
 		}
 		Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl " (IsLabel(this.__Class "_" Control.Name) ? "g" this.__Class "_" Control.Name : ""), % Control.Content ;Create the control and get its window handle and setup a g-label
-		Control.Remove("Content")
 		Control.Insert("hwnd", hControl) ;Window handle is used for all further operations on this control
+		Control.PostCreate()
+		Control.Remove("Content")
 		ControlList[Control.Name] := Control
-		if(ControlList = this)
-			this.Controls[Name] := Control ;Add to list of controls
+		this.Controls[hControl] := Control ;Add to list of controls
 		;Check if the programmer missed a g-label
 		for index, Event in Control._.Events
 			if(IsFunc(this.__Class "." Control.Name "_" Event) && !IsLabel(this.__Class "_" Control.Name))
@@ -366,12 +370,11 @@ Class CGUI
 	Parameters:
 		HWND - The window handle.
 	*/
-	ControlFromHWND(HWND)
+	ControlFromHWND(hwnd)
 	{
 		for GUINum, GUI in this.GUIList
-			for Name, Control in GUI.Controls
-				if(Control.hwnd = hwnd)
-					return Control
+			if(GUI.Controls.HasKey(hwnd))
+				return GUI.Controls[hwnd]
 	}
 	
 	/*
@@ -531,12 +534,8 @@ Class CGUI
 			{
 				ControlGetFocus, Value, % "ahk_id " this.hwnd
 				ControlGet, Value, Hwnd,, %Value%, % "ahk_id " this.hwnd
-				for Name, Control in this.Controls
-					if(Control.hwnd = Value)
-					{
-						Value := Control
-						break
-					}
+				if(this.Controls.HasKey(Value))
+					Value := this.Controls[Value]
 			}
 			else if(Name="Enabled")
 				Value := !(this.Style & 0x8000000) ;WS_DISABLED
@@ -681,7 +680,9 @@ Class CGUI
 				Gui, % this.GUINum ":Color",, %Value%
 			else if(Name = "ActiveControl")
 			{
-				if(!IsObject(Value))
+				if(!IsObject(Value) && WinExist("ahk_id " Value))
+					Value := this.Controls[Value]
+				else if(!IsObject(Value))
 					Value := this[Value]
 				if(IsObject(Value))
 					ControlFocus,,% "ahk_id " Value.hwnd
@@ -762,9 +763,9 @@ Class CGUI
 			}
 			else
 			{
-				for Name, Control in GUI.Controls
+				for hwnd, Control in GUI.Controls
 				{
-					if(Name = ControlName)
+					if(Control.Name = ControlName)
 					{
 						ErrorLevel := ErrLevel
 						Control.HandleEvent()
@@ -790,13 +791,7 @@ Class CGUI
 			else if(msg = WM_MOUSEMOVE)
 			{
 				MouseGetPos,,,,ControlHWND, 2
-				for name, Control in GUI.Controls
-					if(Control.hwnd = ControlHWND && Control.Link)
-					{
-						ShouldHover := true
-						break
-					}
-				if(ShouldHover)
+				if(GUI.Controls.HasKey(ControlHWND) && GUI.Controls[ControlHWND].Link)
 				{
 					if(!GUI._.Hovering)
 					{
@@ -811,15 +806,13 @@ Class CGUI
 				else
 				{
 					if(GUI._.Hovering)
-					{					
-						for name, Control in GUI.Controls
-							if(Control.hwnd = GUI._.LastHoveredControl && Control.Link)
-							{
-								Control.Font.Options := "norm cBlue"
-								DllCall("SetCursor", "Ptr", GUI._.h_old_cursor)
-								GUI._.Hovering := false
-								break
-							}					
+					{
+						if(GUI.Controls.HasKey(GUI._.LastHoveredControl) && GUI.Controls[GUI._.LastHoveredControl].Link)
+						{
+							Control.Font.Options := "norm cBlue"
+							DllCall("SetCursor", "Ptr", GUI._.h_old_cursor)
+							GUI._.Hovering := false
+						}					
 					}
 				}
 			}
@@ -882,21 +875,21 @@ CGUI_ShellMessage(wParam, lParam, msg, hwnd)
 
 Class CFont
 {
-	__New(GUINum, ControlName)
+	__New(GUINum, hwnd)
 	{
 		this.Insert("_", {})
 		this._.GUINum := GUINum
-		this._.ControlName := ControlName
+		this._.hwnd := hwnd
 	}
 	__Set(Name, Value)
 	{
 		global CGUI
 		if(Name = "Options")
 		{
-			if(this._.ControlName) ;belonging to a control
+			if(this._.hwnd) ;belonging to a control
 			{
 				GUI := CGUI.GUIList[this._.GUINum]
-				Control := GUI[this._.ControlName]
+				Control := GUI.Controls[this._.hwnd]
 				Gui, % this._.GUINum ":Font", %Value%
 				GuiControl, % this.GUINum ":Font", % Control.ClassNN
 				Gui, % this._.GUINum ":Font", % GUI.Font.Options ;Restore current font
@@ -908,10 +901,10 @@ Class CFont
 		}
 		else if(Name = "Font")
 		{
-			if(this._.ControlName) ;belonging to a control
+			if(this._.hwnd) ;belonging to a control
 			{
 				GUI := CGUI.GUIList[this._.GUINum]
-				Control := GUI[this._.ControlName]
+				Control := GUI.Controls[this._.hwnd]
 				Gui, % this._.GUINum ":Font",, %Value%
 				GuiControl, % this.GUINum ":Font", % Control.ClassNN
 				Gui, % this._.GUINum ":Font",, % GUI.Font.Font ;Restore current font

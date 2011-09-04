@@ -93,7 +93,7 @@ Class CMyWindow Extends CGUI
 	explorer_NavigateComplete2(pDisp, URL)
 	{
 		if(InStr(URL, "google"))
-			pDisp.Navigate("http://www.microsoft.com")
+			this.explorer.Navigate("http://www.microsoft.com")
 	}
 	tabtext_Click()
 	{
@@ -122,6 +122,10 @@ Class CMyWindow Extends CGUI
 			this.txtField1.Text := ""
 			this.txtField2.Text := ""
 		}
+	}
+	lvItems_CheckedChanged(Row)
+	{
+		this.chkChecked.Checked := this.lvItems.Items[Row].Checked
 	}
 	lvItems_KeyPress(key)
 	{
