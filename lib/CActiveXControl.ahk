@@ -68,8 +68,14 @@ Class CActiveXControl Extends CControl
 				DetectHiddenWindows, On
 				if(this.IsMemberOf(Name))
 				{
-					Handled := true
+					;~ Handled := true
+					Error := ComObjError()
+					ComObjError(false)
 					this._.Object[Name] := Value
+					Handled := true
+					ComObjError(Error)
+					if(A_LastError)
+						Value := 0
 				}
 				if(!DetectHidden)
 					DetectHiddenWindows, Off
@@ -88,6 +94,7 @@ Class CActiveXControl Extends CControl
 	/*
 	Function: IsMemberOf()
 	Checks if the ActiveX object supports a parameter. This does not check if it is read/write/call-able.
+	Thanks to jethrow, Lexikos and Sean for this function!
 	
 	Parameters:
 		name - the parameter to check for.

@@ -87,7 +87,7 @@ Class CPictureControl Extends CControl
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		ErrLevel := ErrorLevel
-		func := A_GUIEvent = "DoubleClick" ? "_DoubleClick" : "Click"
+		func := A_GUIEvent = "DoubleClick" ? "_DoubleClick" : "_Click"
 		if(IsFunc(CGUI.GUIList[this.GUINum][this.Name func]))
 		{
 			ErrorLevel := ErrLevel

@@ -185,7 +185,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
 	For better readability labels may be chained since they all execute the same code.
 	
-	Event: SelectionChanged(TabIndex)
+	Event: SelectionChanged(SelectedIndex)
 	Invoked when the selection was changed.
 	*/
 	HandleEvent()
@@ -383,7 +383,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				if(Name = "Text")
 				{
 					GUI := CGUI.GUIList[this._.GUINum]
-					Control := GUI.Controls[this.hwnd]
+					Control := GUI.Controls[this._.hwnd]
 					ControlGet, List, List,,, % " ahk_id " Control.hwnd
 					Loop, Parse, List, `n
 						if(A_Index = this._.Index)
@@ -395,7 +395,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				else if(Name = "Selected")
 				{
 					GUI := CGUI.GUIList[this._.GUINum]
-					Control := GUI.Controls[this.hwnd]
+					Control := GUI.Controls[this._.hwnd]
 					SendMessage, 0x147, 0, 0,,% "ahk_id " Control.hwnd
 					Value := (this._.Index = ErrorLevel + 1)
 				}
@@ -414,7 +414,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				if(Name = "Text")
 				{
 					GUI := CGUI.GUIList[this._.GUINum]
-					Control := GUI.Controls[this.hwnd]
+					Control := GUI.Controls[this._.hwnd]
 					ItemsString := ""
 					SelectedIndex := Control.SelectedIndex
 					for index, item in Control.Items
@@ -426,7 +426,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				else if(Name = "Selected" && Value = 1)
 				{
 					GUI := CGUI.GUIList[this._.GUINum]
-					Control := GUI.Controls[this.hwnd]
+					Control := GUI.Controls[this._.hwnd]
 					GuiControl, % this._.GUINum ":Choose", % Control.ClassNN, % this._.Index
 					this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 					Control._.PreviouslySelectedItem := Control.SelectedItem

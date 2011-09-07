@@ -9,12 +9,12 @@ Class CListViewControl Extends CControl
 	__New(Name, ByRef Options, Text, GUINum)
 	{
 		global CGUI		
-		Events := ["Click", "RightClick", "ItemActivated", "MouseLeave", "EditingStart", "FocusReceived", "FocusLost", "ItemSelected", "ItemDeselected", "ItemFocused", "ItemDefocused", "ItemChecked",  "ItemUnChecked", "SelectionChanged", "CheckedChanged", "FocusedChanged", "KeyPress", "Marquee", "ScrollingStart", "ScrollingEnd"]
+		Events := ["Click", "RightClick", "ItemActivated", "MouseLeave", "EditingStart", "FocusReceived", "FocusLost", "ItemSelected", "ItemDeselected", "ItemFocused", "ItemDefocused", "ItemChecked", " ItemUnChecked", "SelectionChanged", "CheckedChanged", "FocusedChanged", "KeyPress", "Marquee", "ScrollingStart", "ScrollingEnd"]
 		if(!InStr(Options, "AltSubmit")) ;Automagically add AltSubmit when necessary
 		{
 			for index, function in Events
 			{
-				if(IsFunc(CGUI.GUIList[GUINum][Name "_" Function]))
+				if(IsFunc(CGUI.GUIList[GUINum][Name "_" function]))
 				{
 					Options .= " AltSubmit"
 					break
