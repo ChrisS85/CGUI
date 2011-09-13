@@ -93,16 +93,8 @@ Class CEditControl Extends CControl
 	Event: TextChanged()
 	Invoked when the text of the control is changed.
 	*/
-	HandleEvent()
+	HandleEvent(Event)
 	{
-		global CGUI
-		if(CGUI.GUIList[this.GUINum].IsDestroyed)
-			return
-		ErrLevel := ErrorLevel
-		if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_TextChanged"]))
-		{
-			ErrorLevel := ErrLevel
-			`(CGUI.GUIList[this.GUINum])[this.Name "_TextChanged"]()
-		}
+		this.CallEvent("TextChanged")
 	}
 }

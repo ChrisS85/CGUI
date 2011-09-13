@@ -92,19 +92,9 @@ Class CTabControl Extends CControl
 	Event: DoubleRightClick(TabIndex)
 	Invoked when the user double-right-clicked on the control.
 	*/
-	HandleEvent()
+	HandleEvent(Event)
 	{
-		global CGUI
-		if(CGUI.GUIList[this.GUINum].IsDestroyed)
-			return
-		ErrLevel := ErrorLevel
-		Mapping := {Normal : "_Click", DoubleClick : "_DoubleClick", Right : "_RightClick", R : "_DoubleRightClick"}
-		func := this.Name Mapping[A_GuiEvent]
-		if(IsFunc(CGUI.GUIList[this.GUINum][func]))
-		{
-			ErrorLevel := ErrLevel
-			`(CGUI.GUIList[this.GUINum])[func](A_EventInfo)
-		}
+		this.CallEvent({Normal : "_Click", DoubleClick : "_DoubleClick", Right : "_RightClick", R : "_DoubleRightClick"}[Event.GUIEvent], Event.EventInfo)
 	}
 	/*
 	Class: CTabControl.CTabs

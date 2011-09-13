@@ -25,16 +25,8 @@ Class CButtonControl Extends CControl
 	Event: Click()
 	Invoked when the user clicked on the button.
 	*/
-	HandleEvent()
+	HandleEvent(Event)
 	{
-		global CGUI
-		if(CGUI.GUIList[this.GUINum].IsDestroyed)
-			return
-		ErrLevel := ErrorLevel
-		if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_Click"]))
-		{
-			ErrorLevel := ErrLevel
-			`(CGUI.GUIList[this.GUINum])[this.Name "_Click"]()
-		}
+		this.CallEvent("Click")
 	}
 }

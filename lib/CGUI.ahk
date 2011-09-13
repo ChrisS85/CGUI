@@ -10,7 +10,7 @@
 Class CGUI
 {
 	static GUIList := Object()
-	_ := Object() ;Proxy object
+	;~ _ := Object() ;Proxy object
 	/*	
 	Get only:
 	var Controls := Object()
@@ -44,6 +44,8 @@ Class CGUI
 	__New()
 	{
 		global CGUI, CFont
+		this.Insert("_", {})
+		CGUI.Insert("EventQueue", [])
 		start := 10 ;Let's keep some gui numbers free for other uses
 		loop {
 			Gui %start%:+LastFoundExist
@@ -286,18 +288,12 @@ Class CGUI
 		local hControl, type
 		if(this.IsDestroyed)
 			return
-		if(!Name)
-		{
-			Msgbox No name specified. Please supply a proper control name.
+		if(!CGUI_Assert(Name, "GUI.Add() : No name specified. Please supply a proper control name.", -2)) ;Validate name.
 			return
-		}
 		if(!ControlList)
 			ControlList := this
-		if(IsObject(ControlList[Name]))
-		{
-			Msgbox The control %Name% already exists. Please choose another name!
+		if(!CGUI_Assert(!IsObject(ControlList[Name]), "GUI.Add(): The control " Name " already exists. Please choose another name!", -2)) ;Make sure not to add a control with duplicate name.
 			return
-		}
 		type := Control
 		if(Control = "DropDownList" || Control = "ComboBox" || Control = "ListBox")
 		{
@@ -317,16 +313,13 @@ Class CGUI
 		else
 		{
 			Control := "C" Control "Control"
-			if(IsObject(%Control%))
+			if(CGUI_Assert(IsObject(%Control%), "The control " Control " was not found!", -2)) ;Make sure that a control of this type exists.
 			{
 				Control := object("base", %Control%)
 				Control.__New(Name, Options, Text, this.GUINum)
 			}
 			else
-			{
-				Msgbox The control %Control% was not found!
 				return
-			}
 		}
 		Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl " (IsLabel(this.__Class "_" Control.Name) ? "g" this.__Class "_" Control.Name : ""), % Control.Content ;Create the control and get its window handle and setup a g-label
 		Control.Insert("hwnd", hControl) ;Window handle is used for all further operations on this control
@@ -336,11 +329,8 @@ Class CGUI
 		this.Controls[hControl] := Control ;Add to list of controls
 		;Check if the programmer missed a g-label
 		for index, Event in Control._.Events
-			if(IsFunc(this.__Class "." Control.Name "_" Event) && !IsLabel(this.__Class "_" Control.Name))
-			{
-				Msgbox % "Event notification function found for " Control.Name ", but the appropriate label " this.__Class "_" Control.Name " does not exist!"
+			if(!CGUI_Assert(!(IsFunc(this.__Class "." Control.Name "_" Event) && !IsLabel(this.__Class "_" Control.Name)), "Event notification function found for " Control.Name ", but the appropriate label " this.__Class "_" Control.Name " does not exist!", -2))
 				break
-			}
 		
 		if(type = "Tab2") ;Fix tab name
 		{
@@ -358,7 +348,7 @@ Class CGUI
 				;~ if(InStr(key, Control.Name "_") = 1 && IsFunc(this[key]))
 					;~ Events.Insert(SubStr(key, StrLen(Control.Name "_") + 1), Value)
 			;~ Control._.Events := {base : Events}
-			Control._.Events := new Control.CEvents(Control.GUINum, Control.Name)
+			Control._.Events := new Control.CEvents(Control.GUINum, Control.Name, Control.hwnd)
 			ComObjConnect(object, Control._.Events)
 		}
 		return Control
@@ -733,42 +723,51 @@ Class CGUI
 	HandleEvent()
 	{
 		global CGUI
+		WasCritical := A_IsCritical
+		Critical
 		if(this.IsDestroyed)
 			return
-		ErrLevel := ErrorLevel
-		ControlName := SubStr(A_ThisLabel, InStr(A_ThisLabel, "_") + 1)
-		GUI := CGUI.GUIList[A_GUI]
+		CGUI.EventQueue.Insert({Label : A_ThisLabel, Errorlevel : Errorlevel, GUI : A_GUI, EventInfo : A_EventInfo, GUIEvent : A_GUIEvent})
+		SetTimer, CGUI_HandleEvent, -10
+		if(!WasCritical)
+			Critical, Off
+	}
+	
+	RerouteEvent(Event)
+	{
+		global CGUI
+		ControlName := SubStr(Event.Label, InStr(Event.Label, "_") + 1)
+		GUI := CGUI.GUIList[Event.GUI]
 		if(IsObject(GUI))
 		{
-			if(InStr(A_ThisLabel, "CGUI_")) ;Handle default gui events (Close, Escape, DropFiles, ContextMenu)
+			if(InStr(Event.Label, "CGUI_")) ;Handle default gui events (Close, Escape, DropFiles, ContextMenu)
 			{
-				func := SubStr(A_ThisLabel, InStr(A_ThisLabel, "_") + 1)
+				func := SubStr(Event.Label, InStr(Event.Label, "_") + 1)				
+				;Call PreClose before closing a window so it can be skipped
 				func := func = "Escape" && GUI.CloseOnEscape ? "PreClose" : func
 				func := func = "Close" ? "PreClose" : func
 				if(IsFunc(GUI[func]))
-				{				
-					ErrorLevel := ErrLevel
-					if(A_ThisLabel = "CGUI_Size")
-						result := `(GUI)[func](A_EventInfo)
+				{
+					if(Event.Label = "CGUI_Size")
+						result := `(GUI)[func](Event.EventInfo)
 					else
-						result := `(GUI)[func]()
+						result := `(GUI)[func]() ;PreClose can return false to prevent closing the window
 				}
 				if(!this.IsDestroyed)
 				{
-					if(func = "PreClose" && !result && !GUI.DestroyOnClose) ;Hide the GUI
+					if(func = "PreClose" && !result && !GUI.DestroyOnClose) ;Hide the GUI if closing was not aborted and the GUI should not destroy itself on closing
 						GUI.Hide()
-					else if(func = "PreClose" && !result)
+					else if(func = "PreClose" && !result) ;Otherwise if not aborted destroy the GUI
 						GUI.Destroy()
 				}
 			}
-			else
+			else ;Forward events to specific controls so they can split the specific g-label cases
 			{
 				for hwnd, Control in GUI.Controls
 				{
 					if(Control.Name = ControlName)
 					{
-						ErrorLevel := ErrLevel
-						Control.HandleEvent()
+						Control.HandleEvent(Event)
 						return
 					}
 				}
@@ -831,6 +830,16 @@ CControl_Event:
 CGUI.HandleEvent()
 return
 
+;Events are processed through an event queue and a timer so that no window messages will be missed.
+CGUI_HandleEvent:
+while(CGUI.EventQueue.MaxIndex())
+{
+	SetTimer, CGUI_HandleEvent, Off
+	CGUI.GUIList[CGUI.EventQueue[1].GUI].RerouteEvent(CGUI.EventQueue[1])
+	CGUI.EventQueue.Remove(1)
+	SetTimer, CGUI_HandleEvent, -10
+}
+return
 /*
 Function: CGUI_ShellMessage()
 This function is used to monitor closing of the parent windows of owned GUIs. It does not need to be called directly.
@@ -867,7 +876,6 @@ CGUI_ShellMessage(wParam, lParam, msg, hwnd)
    } 
    if(IsFunc(CGUI._.ShellHook)) 
    { 
-		msgbox % "reroute to " CGUI._.ShellHook
 	  ShellHook := CGUI._.ShellHook 
 	  %ShellHook%(wParam, lParam, msg, hwnd) ;This is allowed even if the function uses less parameters 
    } 
@@ -921,6 +929,19 @@ Class CFont
 			return this._[Name]
 	}
 }
+
+;Simple assert function
+CGUI_Assert(Condition, Message, CallStackLevel = -1)
+{
+	if(!Condition)
+	{
+		E := Exception("", CallStackLevel)
+		MsgBox % "Assert failed in " E.File ", line " E.Line ": " Message
+	}
+	return Condition
+}
+
+#include <gdip>
 #include <CControl>
 #include <CFileDialog>
 #include <CFolderDialog>

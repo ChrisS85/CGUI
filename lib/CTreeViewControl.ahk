@@ -144,42 +144,25 @@ Class CTreeViewControl Extends CControl
 	Event: KeyPress(KeyCode)
 	Invoked when the user pressed a key while the control was focused.
 	*/
-	HandleEvent()
+	HandleEvent(Event)
 	{
 		global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
-		;~ Critical := A_IsCritical
-		;~ Critical, On
-		ErrLevel := ErrorLevel
 		;Handle visibility of controls associated with tree nodees
-		if(A_GuiEvent = "S")
+		if(Event.GUIEvent = "S")
 		{
 			this.ProcessSubControlState(this.PreviouslySelectedItem, this.SelectedItem)
 			this.PreviouslySelectedItem := this.SelectedItem
 		}
-		Mapping := {DoubleClick : "_DoubleClick", eb : "_EditingEnd", S : "_ItemSelected", Normal : "_Click", RightClick : "_RightClick", Ea : "_EditingStart", K : "_KeyPress", "+" : "_ItemExpanded", "-" : "ItemCollapsed"}
-		for Event, Function in Mapping
-			if((strlen(A_GuiEvent) = 1 && A_GuiEvent == SubStr(Event, 1, 1)) || A_GuiEvent == Event)
-				if(IsFunc(CGUI.GUIList[this.GUINum][this.Name Function]))
-				{
-					ErrorLevel := ErrLevel
-					`(CGUI.GUIList[this.GUINum])[this.Name Function](this.FindItem(A_EventInfo))
-					;~ if(!Critical)
-						;~ Critical, Off
-					return
-				}
-		Mapping := {Fa : "_FocusReceived", fb : "_FocusLost"} ;Case insensitivity strikes back!
-		for Event, Function in Mapping
-			if(A_GuiEvent == SubStr(Event, 1, 1))
-				if(IsFunc(CGUI.GUIList[this.GUINum][this.Name Function]))
-				{
-					ErrorLevel := ErrLevel
-					`(CGUI.GUIList[this.GUINum])[this.Name Function]()
-					;~ if(!Critical)
-						;~ Critical, Off
-					return
-				}
+		if(Event.GUIEvent == "E")
+			this.CallEvent("EditingStart", Event.EventInfo)
+		else if(EventName := {DoubleClick : "DoubleClick", e : "EditingEnd", S : "ItemSelected", Normal : "Click", RightClick : "RightClick", K : "KeyPress", "+" : "ItemExpanded", "-" : "ItemCollapsed"}[Event.GUIEvent])
+			this.CallEvent(EventName, Event.EventInfo)
+		else if(Event.GUIEvent == "F")
+			this.CallEvent("FocusReceived")
+		else if(Event.GUIEvent == "f")
+			this.CallEvent("FocusLost")
 	}
 	
 	/*

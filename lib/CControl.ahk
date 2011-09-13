@@ -13,6 +13,7 @@ Class CControl ;Never created directly
 		this.Insert("GUINum", GUINum) ;Store link to gui for GuiControl purposes (and possibly others later
 		this.Insert("_", {}) ;Create proxy object to enable __Get and __Set calls for existing keys (like ClassNN which stores a cached value in the proxy)
 		this.Insert("Font", new CFont(GUINum, Name))
+		this._.Insert("RegisteredEvents")
 	}
 	/*
 	Function: Show
@@ -119,6 +120,7 @@ Class CControl ;Never created directly
 	
 	Variable: Tooltip
 	If a text is set for this value, this control will show a tooltip when the mouse hovers over it.
+	Text and Picture controls require that you define a g-label for them to make this work.
 	
 	Variable: Left
 	The control left-aligns its text. This is the default setting.
@@ -320,8 +322,8 @@ Class CControl ;Never created directly
 				if(!TThwnd){         
 					; - 'ListView' = ListView + Header       (Get hWnd of the 'Header' control using "ControlGet" command). 
 					TThwnd := CGUI.GUIList[this.GUINum]._.TThwnd := DllCall("CreateWindowEx","Uint",0,"Str","TOOLTIPS_CLASS32","Uint",0,"Uint",2147483648 | 3,"Uint",-2147483648 
-									,"Uint",-2147483648,"Uint",-2147483648,"Uint",-2147483648,"Uint",GuiHwnd,"Uint",0,"Uint",0,"Uint",0) 
-					DllCall("uxtheme\SetWindowTheme","Uint",TThwnd,Ptr,0,"UintP",0)   ; TTM_SETWINDOWTHEME 
+									,"Uint",-2147483648,"Uint",-2147483648,"Uint",-2147483648,"Ptr",GuiHwnd,"Uint",0,"Uint",0,"Uint",0, "PTR") 
+					DllCall("uxtheme\SetWindowTheme","Ptr",TThwnd,"Ptr",0,"UintP",0)   ; TTM_SETWINDOWTHEME 
 				}
 				for index, chwnd in Controlhwnd
 				{
@@ -339,11 +341,46 @@ Class CControl ;Never created directly
 				return Value
 		}
     }
+	/*
+	Function: RegisterEvent()
+	Assigns (or unassigns) a function to a specific event of this control so that the function will be called when the event occurs.
+	This is normally not necessary because functions in the GUI class with the name ControlName_EventName()
+	will be called automatically without needing to be registered. However this can be useful if you want to handle
+	multiple events with a single function, e.g. for a group of radio controls. Right now only one registered function per event
+	is supported, let me know if you need more.
 	
+	Parameters:
+		Type - The event name for which the function should be registered. If a control normally calls "GUI.ControlName_TextChanged()", specify "TextChanged" here.
+		FunctionName - The name of the function specified in the window class that is supposed to handle the event. Specify only the name of the function, skip the class.
+	*/
+	RegisterEvent(Type, FunctionName)
+	{
+		global CGUI
+		if(FunctionName)
+		{
+			;Make sure function name is valid (or tell the developer about it)
+			if(CGUI_Assert(IsFunc(this[FunctionName]), "Invalid function name passed to CControl.RegisterEvent()"), -2)
+				this._.RegisteredEvents[Type] := FunctionName
+		}
+		else
+			this._.RegisteredEvents.Remove(Type)
+	}
 	
+	;Calls an event with a specified name by looking up a possibly registered event handling function or calling the function with the default name.
+	CallEvent(Name, Params*)
+	{
+		global CGUI
+		if(CGUI.GUIList[this.GUINum].IsDestroyed)
+			return
+		if(this._.RegisteredEvents.HasKey(Name))
+			`(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)
+		else if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_" Name]))
+			`(CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)
+	}
 	ProcessSubControlState(From, To)
 	{
-		if(From != To)
+		global CGUI
+		if(From != To && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			if(From)
 				for index, Control in From.Controls

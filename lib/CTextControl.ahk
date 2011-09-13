@@ -94,27 +94,8 @@ Class CTextControl Extends CControl
 	Event: DoubleClick()
 	Invoked when the user double-clicked on the control.
 	*/
-	HandleEvent()
+	HandleEvent(Event)
 	{
-		global CGUI
-		if(CGUI.GUIList[this.GUINum].IsDestroyed)
-			return
-		ErrLevel := ErrorLevel
-		if(A_GUIEvent = "DoubleClick")
-		{
-			if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_DoubleClick"]))
-			{
-				ErrorLevel := ErrLevel
-				`(CGUI.GUIList[this.GUINum])[this.Name "_DoubleClick"]()
-			}
-		}
-		else
-		{
-			if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_Click"]))
-			{
-				ErrorLevel := ErrLevel
-				`(CGUI.GUIList[this.GUINum])[this.Name "_Click"]()
-			}
-		}
+		this.CallEvent(Event.GUIEvent = "DoubleClick" ? "DoubleClick" : "Click")
 	}
 }

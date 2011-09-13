@@ -23,12 +23,8 @@ Class CHotkeyControl Extends CControl
 	Event: HotkeyChanged()
 	Invoked when the user clicked on the control.
 	*/
-	HandleEvent()
+	HandleEvent(Event)
 	{
-		global CGUI
-		if(CGUI.GUIList[this.GUINum].IsDestroyed)
-			return
-		if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_HotkeyChanged"]))
-			`(CGUI.GUIList[this.GUINum])[this.Name "_HotkeyChanged"]()
+		this.CallEvent("HotkeyChanged")
 	}
 }

@@ -188,19 +188,11 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	Event: SelectionChanged(SelectedIndex)
 	Invoked when the selection was changed.
 	*/
-	HandleEvent()
+	HandleEvent(Event)
 	{
-		global CGUI
-		if(CGUI.GUIList[this.GUINum].IsDestroyed)
-			return
-		ErrLevel := ErrorLevel
 		this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 		this._.PreviouslySelectedItem := this.SelectedItem
-		if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_SelectionChanged"]))
-		{			
-			ErrorLevel := ErrLevel
-			`(CGUI.GUIList[this.GUINum])[this.Name "_SelectionChanged"]()
-		}
+		this.CallEvent("SelectionChanged")
 	}
 	/*
 	Class: CChoiceControl.CItems

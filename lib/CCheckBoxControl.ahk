@@ -88,8 +88,11 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 	{
 		global CGUI
 		GUI := CGUI.GUIList[this.GUINum]
+		if(GUI.IsDestroyed)
+			return []
 		Group := [this]
-		
+		if(this.type = "Checkbox")
+			return Group
 		WinGet, style, Style, % "ahk_id " this.hwnd
 		;Backtrack all previous controls in the tab order
 		if(!(style & 0x00020000)) ;WS_GROUP
@@ -135,6 +138,20 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 		}
 		return Group
 	}
+	
+	/*
+	Function: GetSelectedRadioButton()
+	Returns the radio button control of the current group which is currently selected. Returns 0 if no button is selected.
+	*/
+	GetSelectedRadioButton()
+	{
+		if(this.type = "Checkbox" && !this.Selected)
+			return 0
+		for index, Control in this.GetRadioButtonGroup()
+			if(Control.Selected)
+				return Control
+		return 0
+	}
 	/*
 	Event: Introduction
 	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
@@ -146,19 +163,11 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 	Event: CheckedChanged()
 	Invoked when the checkbox/radio value changes.
 	*/
-	HandleEvent()
+	HandleEvent(Event)
 	{
-		global CGUI
-		if(CGUI.GUIList[this.GUINum].IsDestroyed)
-			return
-		ErrLevel := ErrorLevel
 		Group := this.Type = "Radio" ? this.GetRadioButtonGroup() : [this]
 		for Index, Control in Group
 			Control.ProcessSubControlState(Control.Checked ? "" : Control, Control.Checked ? Control : "")
-		if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_CheckedChanged"]))
-		{
-			ErrorLevel := ErrLevel
-			`(CGUI.GUIList[this.GUINum])[this.Name "_CheckedChanged"]()
-		}
+		this.CallEvent("CheckedChanged")
 	}
 }

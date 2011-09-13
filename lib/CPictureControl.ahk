@@ -11,6 +11,7 @@ Class CPictureControl Extends CControl
 		base.__New(Name, Options, Text, GUINum)
 		this.Type := "Picture"
 		this._.Picture := Text
+		this._.Insert("Picture", "Text")
 		this._.Insert("ControlStyles", {Center : 0x200, ResizeImage : 0x40})
 		this._.Insert("Events", ["Click", "DoubleClick"])
 	}
@@ -18,6 +19,13 @@ Class CPictureControl Extends CControl
 	/*
 	Variable: Picture
 	The picture can be changed by assigning a filename to this property.
+	If the picture was set by providing a hBitmap in <SetImageFromHBitmap>, this variable will be empty.
+	
+	Variable: PictureWidth
+	The width of the currently displayed picture in pixels.
+	
+	Variable: PictureHeight
+	The height of the currently displayed picture in pixels.
 	*/
 	__Get(Name) 
     {
@@ -28,6 +36,18 @@ Class CPictureControl Extends CControl
 			DetectHiddenWindows, On
 			if(Name = "Picture")
 				Value := this._.Picture
+			else if(Name = "PictureWidth" || Name = "PictureHeight")
+			{
+				if(!this._.HasKey(Name))
+				{
+					pBitmap := Gdip_CreateBitmapFromFile(this._.Picture) ;Note: This does not work if the user specifies icon number or other special properties in picture path since these are handled as separate parameters here.
+					Gdip_GetImageDimensions(pBitmap, w, h)
+					this._.PictureWidth := w
+					this._.PictureHeight := h
+					Gdip_DisposeImage(pBitmap)
+				}
+				Value := this._[Name]
+			}
 			if(!DetectHidden)
 				DetectHiddenWindows, Off
 			if(Value != "")
@@ -48,6 +68,8 @@ Class CPictureControl Extends CControl
 				Gui, % this.GUINum ":Default"
 				GuiControl,, % this.ClassNN, %Value%
 				this._.Picture := Value
+				this._.Remove("PictureWidth")
+				this._.Remove("PictureHeight")
 			}
 			else
 				Handled := false
@@ -64,10 +86,13 @@ Class CPictureControl Extends CControl
 	Parameters:
 		hBitamp - The bitmap handle to which the picture of this control is set
 	*/
-	SetImageFromHBitmap(hBitmap)
+	SetImageFromHBitmap(hBitmap, Path = "")
 	{
 		SendMessage, 0x172, 0x0, hBitmap,, % "ahk_id " this.hwnd
 		DllCall("gdi32\DeleteObject", "PTR", ErrorLevel)
+		this._.Remove("PictureWidth")
+		this._.Remove("PictureHeight")
+		this._.Picture := Path
 	}
 	
 	/*
@@ -81,17 +106,10 @@ Class CPictureControl Extends CControl
 	Event: Click()
 	Invoked when the user clicked on the control.
 	*/
-	HandleEvent()
+	HandleEvent(Event)
 	{
-		global CGUI
-		if(CGUI.GUIList[this.GUINum].IsDestroyed)
-			return
-		ErrLevel := ErrorLevel
-		func := A_GUIEvent = "DoubleClick" ? "_DoubleClick" : "_Click"
-		if(IsFunc(CGUI.GUIList[this.GUINum][this.Name func]))
-		{
-			ErrorLevel := ErrLevel
-			`(CGUI.GUIList[this.GUINum])[this.Name func]()
-		}
+		this.CallEvent(Event.GUIEvent = "DoubleClick" ? "DoubleClick" : "Click")
 	}
+	
+
 }

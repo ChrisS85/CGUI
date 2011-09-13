@@ -17,16 +17,18 @@ Class CActiveXControl Extends CControl
 	}	
 	Class CEvents
 	{
-		__New(GUINum, ControlName)
+		__New(GUINum, ControlName, hwnd)
 		{
 			this.GUINum := GUINum
 			this.ControlName := ControlName
+			this.hwnd := hwnd
 		}
 		__Call(Name, Params*)
 		{
 			global CGUI
-			if(ObjHasKey(CGUI.GUIList[this.GUINum].base, this.ControlName "_" Name))
-				`(CGUI.GUIList[this.GUINum])[this.ControlName "_" Name](Params*)
+			CGUI.GUIList[this.GUINum].Controls[this.hwnd].CallEvent(Name, Params*)
+			;~ if(ObjHasKey(CGUI.GUIList[this.GUINum].base, this.ControlName "_" Name))
+				;~ `(CGUI.GUIList[this.GUINum])[this.ControlName "_" Name](Params*)
 		}
 	}
 	/*
@@ -111,12 +113,12 @@ Class CActiveXControl Extends CControl
 	You can look up the definitions of the parameters in the documentation of the ActiveX control.
 	ActiveX controls do not require a separate G-label to make the events work.
 	*/
-	HandleEvent(Params*)
-	{
-		global CGUI
-		if(CGUI.GUIList[this.GUINum].IsDestroyed)
-			return
-		if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_ActiveXMoved"]))
-			`(CGUI.GUIList[this.GUINum])[this.Name "_ActiveXMoved"]()
-	}
+	;~ HandleEvent(Params*)
+	;~ {
+		;~ global CGUI
+		;~ if(CGUI.GUIList[this.GUINum].IsDestroyed)
+			;~ return
+		;~ if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_ActiveXMoved"]))
+			;~ `(CGUI.GUIList[this.GUINum])[this.Name "_ActiveXMoved"]()
+	;~ }
 }

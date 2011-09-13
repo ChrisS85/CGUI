@@ -701,8 +701,9 @@ Class CListViewControl Extends CControl
 						Gui, ListView, % Control.ClassNN
 						Return LV_GetCount("Column")
 					}
-					else if(Value := {Checked : "Checked", Focused : "Focused", "Selected" : ""}[Name])
+					else if Name in Checked,Focused,Selected
 					{
+						Value := {Checked : "Checked", Focused : "Focused", Selected : ""}[Name]
 						Gui, % Control.GUINum ":Default"
 						Gui, ListView, % Control.ClassNN
 						return this.GetUnsortedIndex(LV_GetNext(this.GetSortedIndex(this._.RowNumber, Control.hwnd) - 1, Value), Control.hwnd) = this._.RowNumber
@@ -843,46 +844,22 @@ Class CListViewControl Extends CControl
 	Event: CheckedChanged(RowIndex)
 	Invoked when the checked row(s) has/have changed.
 	*/
-	HandleEvent()
+	HandleEvent(Event)
 	{
-		global CGUI
-		if(CGUI.GUIList[this.GUINum].IsDestroyed)
-			return
-		Critical := A_IsCritical
-		Critical, On
-		ErrLevel := ErrorLevel
-		;~ if(!events)
-			;~ events := object()
-		;~ events[mod(i,30) +1] := A_GuiEvent " " A_EventInfo " " ErrLevel
-		;~ i++
-		;~ loop 30
-			;~ text .= events[A_Index] "`n"
-		;~ tooltip %text%
-		Mapping := {DoubleClick : "_DoubleClick", R : "_DoubleRightClick", ColClick : "_ColumnClick", eb : "_EditingEnd", Normal : "_Click", RightClick : "_RightClick",  A : "_ItemActivate", Ea : "_EditingStart", K : "_KeyPress"}
-		for Event, Function in Mapping
-			if((strlen(A_GuiEvent) = 1 && A_GuiEvent == SubStr(Event, 1, 1)) || A_GuiEvent == Event)
-				if(IsFunc(CGUI.GUIList[this.GUINum][this.Name Function]))
-				{
-					ErrorLevel := ErrLevel
-					`(CGUI.GUIList[this.GUINum])[this.Name Function]({DoubleClick : 1, R : 1, Normal : 1, RightClick : 1,  A : 1, E : 1}[A_GUIEvent] && this._.Items.IndependentSorting ? this.CItems.CRow.GetUnsortedIndex(A_EventInfo, this.hwnd) : A_EventInfo)
-					if(!Critical)
-						Critical, Off
-					return
-				}
-		Mapping := {C : "_MouseLeave", Fa : "_FocusReceived", fb : "_FocusLost", M : "_Marquee", Sa : "_ScrollingStart", sb : "_ScrollingEnd"} ;Case insensitivity strikes back!
-		for Event, Function in Mapping
-			if(A_GuiEvent == SubStr(Event, 1, 1))
-				if(IsFunc(CGUI.GUIList[this.GUINum][this.Name Function]))
-				{
-					ErrorLevel := ErrLevel
-					`(CGUI.GUIList[this.GUINum])[this.Name Function]()
-					if(!Critical)
-						Critical, Off
-					return
-				}
-		if(A_GuiEvent == "I")
+		Row := this._.Items.IndependentSorting ? this.CItems.CRow.GetUnsortedIndex(Event.EventInfo, this.hwnd) : Event.EventInfo
+		if(Event.GUIEvent == "E")
+			this.CallEvent("EditingStart", Row)
+		else if(EventName := {DoubleClick : "DoubleClick", R : "DoubleRightClick", ColClick : "ColumnClick", e : "EditingEnd", Normal : "Click", RightClick : "RightClick",  A : "ItemActivate", K : "KeyPress"}[Event.GUIEvent])
+			this.CallEvent(EventName, Row)
+		else if(Event.GUIEvent == "F")
+			this.CallEvent("FocusReceived")
+		else if(Event.GUIEvent == "S")
+			this.CallEvent("ScrollingStart")
+		else if(EventName :=  {C : "MouseLeave", f : "FocusLost", M : "Marquee", s : "ScrollingEnd"}[Event.GUIEvent])
+			this.CallEvent(EventName)
+		else if(Event.GUIEvent = "I")
 		{
-			if(InStr(ErrLevel, "S"))
+			if(InStr(Event.Errorlevel, "S")) ;Process sub control state
 			{
 				if(LV_GetCount("Selected") = 1)
 				{
@@ -895,27 +872,13 @@ Class CListViewControl Extends CControl
 					this._.PreviouslySelectedItem := ""
 				}
 			}
-			Mapping := { Sa : "_ItemSelected", sb : "_ItemDeselected", Fa : "_ItemFocused", fb : "_ItemDefocused", Ca : "_ItemChecked", cb : "_ItemUnChecked"} ;Case insensitivity strikes back!
-			for Event, Function in Mapping
-				if(InStr(ErrLevel, SubStr(Event, 1, 1), true))
-					if(IsFunc(CGUI.GUIList[this.GUINum][this.Name Function]))
-					{
-						ErrorLevel := ErrLevel
-						`(CGUI.GUIList[this.GUINum])[this.Name Function](this._.Items.IndependentSorting ? this.CItems.CRow.GetUnsortedIndex(A_EventInfo, this.hwnd) : A_EventInfo)
-						if(!Critical)
-							Critical, Off
-					}
-			Mapping := {S : "_SelectionChanged", C : "_CheckedChanged", F : "_FocusedChanged"}
-			for Event, Function in Mapping
-				if(InStr(ErrLevel, Event, false) = 1)
-					if(IsFunc(CGUI.GUIList[this.GUINum][this.Name Function]))
-					{
-						ErrorLevel := ErrLevel
-						`(CGUI.GUIList[this.GUINum])[this.Name Function](this._.Items.IndependentSorting ? this.CItems.CRow.GetUnsortedIndex(A_EventInfo, this.hwnd) : A_EventInfo)
-					}
-			if(!Critical)
-				Critical, Off
-			return
+			
+			Mapping := { Sa : "ItemSelected", sb : "ItemDeselected", Fa : "ItemFocused", fb : "ItemDefocused", Ca : "ItemChecked", cb : "ItemUnChecked"} ;Case insensitivity strikes back!
+			for EventIndex, Function in Mapping
+				if(InStr(Event.Errorlevel, SubStr(EventIndex, 1, 1), true))
+					this.CallEvent(Function, Row)
+			else if(EventName :=  {S : "SelectionChanged", C : "CheckedChanged", F : "FocusedChanged"}[Event.Errorlevel])
+				this.CallEvent(EventName, Row)
 		}
 	}
 }

@@ -112,12 +112,8 @@ Class CSliderControl Extends CControl
 	Event: SliderMoved()
 	Invoked when the user clicked on the control.
 	*/
-	HandleEvent()
+	HandleEvent(Event)
 	{
-		global CGUI
-		if(CGUI.GUIList[this.GUINum].IsDestroyed)
-			return
-		if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_SliderMoved"]))
-			`(CGUI.GUIList[this.GUINum])[this.Name "_SliderMoved"]()
+		this.CallEvent("SliderMoved")
 	}
 }
