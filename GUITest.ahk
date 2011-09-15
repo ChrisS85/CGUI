@@ -88,8 +88,14 @@ Class CMyWindow Extends CGUI
 		;~ this.lvItems.Items[1].SetUnsortedIndex(1, 20, this.lvItems.hwnd)
 		this.CloseOnEscape := true
 		this.DestroyOnClose := true
+		this.OnGUIMessage(0x200, "MouseMove")
 		this.Show("")
 		return this
+	}
+	MouseMove(Msg, wParam, lParam)
+	{
+		tooltip mousemove
+		return 0
 	}
 	explorer_NavigateComplete2(pDisp, URL)
 	{

@@ -46,6 +46,7 @@ Class CGUI
 		global CGUI, CFont
 		this.Insert("_", {})
 		CGUI.Insert("EventQueue", [])
+		CGUI._.Insert("WindowMessageListeners", []) 
 		start := 10 ;Let's keep some gui numbers free for other uses
 		loop {
 			Gui %start%:+LastFoundExist
@@ -68,8 +69,104 @@ Class CGUI
 		this.hwnd := WinExist()
 		;~ this.Base.ImageListManager := new this.CImageListManager(GUINum) ;ImageListManager is stored in the base object of a gui class so that multiple instances of a gui may reuse the same Imagelist
 	}
+	;This class handles window message routing to the instances of window classes that register for a specific window message
+	Class WindowMessageHandler
+	{
+		static WindowMessageListeners := [] ;This object stores instances of this class that are associated with a specific window message. The instances keep records of all windows that listen to this message.
+		__New(Message)
+		{
+			this.Message := Message
+			this.Listeners := [] ;Array containing all window classes that listen to Message.
+			this.ListenerCount := 0 ;Number of all window class instances that are listening to a message
+		}
+		/*
+		Registers a window instance as a listener to a window message.
+		*/
+		RegisterListener(Message, hwnd, FunctionName)
+		{
+			global CGUI
+			;Don't allow calling this function on the contained instances
+			if(this.Base.__Class = this.__Class)
+				return
+			;if parameters are valid and the listener isn't registered yet, add it and possibly set up the OnMessage Callback
+			GUI := CGUI.GUIFromHWND(hwnd)
+			if(Message && GUI && FunctionName && IsFunc(GUI[FunctionName]))
+			{
+				;If the current message hasn't been registered anywhere
+				if(!this.WindowMessageListeners.HasKey(Message))
+				{
+					this.WindowMessageListeners[Message] := new this(Message)
+					OnMessage(Message, "CGUI_WindowMessageHandler")
+				}
+				
+				;If this instance isn't already registered for this message, increase listener count for this message
+				if(!this.WindowMessageListeners[Message].Listeners.HasKey(hwnd))
+					this.WindowMessageListeners[Message].ListenerCount++
+				
+				;Register the message in the listeners list of the CWindowMessageHandler object associated with the current Message
+				this.WindowMessageListeners[Message].Listeners[hwnd] := FunctionName
+				
+			}
+		}
+		UnregisterListener(hwnd, Message = "")
+		{
+			global CGUI
+			;Don't allow calling this function on the contained instances
+			if(this.Base.__Class = this.__Class)
+				return
+			GUI := CGUI.GUIFromHWND(hwnd)
+			if(GUI)
+			{
+				;Remove one or all registered listeners associated with the window handle
+				Messages := Message ? [Message]  : []
+				if(!Message)
+					for Message, Handler in this.WindowMessageListeners
+						Messages.Insert(Message)
+				for index, CurrentMessage in Messages ;Process all messages that are affected
+				{
+					;Make sure the window is actually registered right now so it doesn't get unregistered multiple times if this function happens to be called more than once with the same parameters
+					if(this.WindowMessageListeners.HasKey(CurrentMessage) && this.WindowMessageListeners[CurrentMessage].Listeners.HasKey(hwnd))
+					{
+						;Remove this window from the listener array
+						this.WindowMessageListeners[CurrentMessage].Listeners.Remove(hwnd, "")
+						
+						;Decrease count of window class instances that listen to this message
+						this.WindowMessageListeners[CurrentMessage].ListenerCount--						
+						
+						;If no more instances listening to a window message, remove the CWindowMessageHandler object from WindowMessageListeners and deactivate the OnMessage callback for the current message				
+						if(this.WindowMessageListeners[CurrentMessage].ListenerCount = 0)
+						{
+							this.WindowMessageListeners.Remove(CurrentMessage, "")
+							OnMessage(CurrentMessage, "")
+						}
+					}
+				}
+			}
+		}
+	}
 	__Delete()
 	{
+	}
+	
+	/*
+	Function: OnGUIMessage()
+	Registers a window instance as a listener for a specific window message.
+	
+	Parameters:
+		Message - The number of the window message
+		FunctionName - The name of the function contained in the instance of the window class that will be called when the message is received.
+		To stop listening, skip this parameter or leave it empty. To change to another function, simply specify another name (stopping first isn't required). The function won't be called anymore after the window is destroyed. DON'T USE GUI, DESTROY ON ANY WINDOWS CREATED WITH THIS LIBRARY THOUGH. Instaed use window.Destroy() or window.Close() when window.DestroyOnClose is enabled.
+		The function accepts three parameters, Message, wParam and lParam (in this order).
+	*/
+	OnGUIMessage(Message, FunctionName = "")
+	{
+		if(this.IsDestroyed)
+			return
+		outputdebug onguimessage(%Message%, %FunctionName%)
+		if(FunctionName)
+			this.WindowMessageHandler.RegisterListener(Message, this.hwnd, FunctionName)
+		else
+			this.WindowMessageHandler.UnregisterListener(this.hwnd, Message)
 	}
 	
 	/*
@@ -84,10 +181,13 @@ Class CGUI
 			return
 		;~ for hwnd, Control in this.Private.Controls ;Break circular references to allow object release
 			;~ Control.GUI := ""
+		;Remove it from GUI list
 		CGUI.GUIList.Remove(this.GUINum, "") ;make sure not to alter other GUIs here
 		this.IsDestroyed := true		
-		;Destroy the GUI and remove it from gui lists
+		this.WindowMessageHandler.UnregisterListener(this.hwnd) ;Unregister all registered window message listener functions
+		;Destroy the GUI
 		Gui, % this.GUINum ":Destroy"
+		;Call PostDestroy function
 		if(IsFunc(this.PostDestroy))
 			this.PostDestroy()
 	}
@@ -355,7 +455,7 @@ Class CGUI
 	}
 	
 	/*
-	Function: ControlFromHWND
+	Function: ControlFromHWND()
 	Returns the object that belongs to a control with a specific window handle.
 	Parameters:
 		HWND - The window handle.
@@ -368,10 +468,20 @@ Class CGUI
 	}
 	
 	/*
-	Function: ControlFromHWND
-	Returns the object that belongs to a control with a specific window handle.
+	Function: GUIFromHWND()
+	Returns the GUI object with a specific hwnd
+	*/
+	GUIFromHWND(hwnd)
+	{
+		for GUINum, GUI in this.GUIList
+			if(GUI.hwnd = hwnd)
+				return GUI
+	}
+	/*
+	Function: ControlFromGUINumAndName()
+	Returns the object that belongs to a window with a specific gui number and a control with a specific name.
 	Parameters:
-		HWND - The window handle.
+		GUINum - The GUI number
 	*/
 	ControlFromGUINumAndName(GUINum, Name)
 	{
@@ -886,7 +996,19 @@ CGUI_ShellMessage(wParam, lParam, msg, hwnd)
 	  %ShellHook%(wParam, lParam, msg, hwnd) ;This is allowed even if the function uses less parameters 
    } 
 }
-
+;Global window message handler for CGUI library that reroutes all registered window messages to the window instances.
+CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
+{
+	global CGUI
+	outputdebug message handler
+	GUI := CGUI.GUIFromHWND(hwnd)
+	if(GUI)
+	{
+		func := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[hwnd]
+		outputdebug func %func%
+		return GUI[func](Msg, wParam, lParam)
+	}
+}
 Class CFont
 {
 	__New(GUINum, hwnd)
