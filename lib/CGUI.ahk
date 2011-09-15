@@ -1021,7 +1021,7 @@ CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
 		if(CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners.HasKey(0))
 		{
 			internalfunc := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[0]
-			GUI[internalfunc](Msg, wParam, lParam)
+			GUI.base.base[internalfunc](Msg, wParam, lParam)
 		}
 		func := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[hwnd]
 		return GUI[func](Msg, wParam, lParam)
