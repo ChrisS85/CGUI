@@ -1,3 +1,4 @@
+SetBatchlines, -1
 MyWindow := new CMyWindow("first") ;Create an instance of this window class
 ;~ MySecondWindow := new CMyWindow("second") ;Create a second instance of this window class
 return
@@ -146,9 +147,6 @@ Class CMyWindow Extends CGUI
 	btnLoad_Click()
 	{
 		global CFileDialog
-		for rownumber, row in this.lvItems.Items
-			for columnnumber, column in row
-				msgbox %rownumber% %columnnumber% %column%
 		FileDialog := new CFileDialog("Open")
 		FileDialog.Filter := "Comma separated value(*.csv;*.dat)"
 		if(FileDialog.Show())
@@ -234,8 +232,3 @@ ExploreObj(Obj, NewRow="`n", Equal="  =  ", Indent="`t", Depth=12, CurIndent="")
         ToReturn .= CurIndent . k . (IsObject(v) && depth>1 ? NewRow . ExploreObj(v, NewRow, Equal, Indent, Depth-1, CurIndent . Indent) : Equal . v) . NewRow 
     return RTrim(ToReturn, NewRow) 
 }
-
-#t::
-MyWindow.Owner := WinExist("A")
-MyWindow.OwnerAutoClose := 1
-return

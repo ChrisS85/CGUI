@@ -375,7 +375,10 @@ Class CControl ;Never created directly
 		if(this._.RegisteredEvents.HasKey(Name))
 			`(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)
 		else if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_" Name]))
+		{
+			;~ outputdebug % "call " this.Name "_" name
 			`(CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)
+		}
 	}
 	ProcessSubControlState(From, To)
 	{

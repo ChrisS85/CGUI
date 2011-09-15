@@ -872,12 +872,14 @@ Class CListViewControl Extends CControl
 					this._.PreviouslySelectedItem := ""
 				}
 			}
-			
 			Mapping := { Sa : "ItemSelected", sb : "ItemDeselected", Fa : "ItemFocused", fb : "ItemDefocused", Ca : "ItemChecked", cb : "ItemUnChecked"} ;Case insensitivity strikes back!
 			for EventIndex, Function in Mapping
 				if(InStr(Event.Errorlevel, SubStr(EventIndex, 1, 1), true))
+				{
 					this.CallEvent(Function, Row)
-			else if(EventName :=  {S : "SelectionChanged", C : "CheckedChanged", F : "FocusedChanged"}[Event.Errorlevel])
+					break
+				}
+			if(EventName :=  {S : "SelectionChanged", C : "CheckedChanged", F : "FocusedChanged"}[Event.Errorlevel])
 				this.CallEvent(EventName, Row)
 		}
 	}

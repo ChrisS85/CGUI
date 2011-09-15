@@ -717,20 +717,24 @@ Class CGUI
 	0: The window has been restored, or resized normally such as by dragging its edges.
 	1: The window has been minimized.
 	2: The window has been maximized.
+	*/
+	
 	/*
 	Main event rerouting function. It identifies the associated window/control and calls the related event function if it is defined. It also handles some things on its own, such as window closing.
 	*/
 	HandleEvent()
 	{
 		global CGUI
-		WasCritical := A_IsCritical
+		;~ WasCritical := A_IsCritical
 		Critical
-		if(this.IsDestroyed)
-			return
+		;~ if(this.IsDestroyed)
+			;~ return
+		if(A_ThisLabel ="CGUI_CLose")
+			outputdebug % "insert " A_ThisLabel
 		CGUI.EventQueue.Insert({Label : A_ThisLabel, Errorlevel : Errorlevel, GUI : A_GUI, EventInfo : A_EventInfo, GUIEvent : A_GUIEvent})
 		SetTimer, CGUI_HandleEvent, -10
-		if(!WasCritical)
-			Critical, Off
+		;~ if(!WasCritical)
+			;~ Critical, Off
 	}
 	
 	RerouteEvent(Event)
@@ -835,6 +839,8 @@ CGUI_HandleEvent:
 while(CGUI.EventQueue.MaxIndex())
 {
 	SetTimer, CGUI_HandleEvent, Off
+	if(CGUI.EventQueue[1].Label = "CGUI_Close")
+		outputdebug processing close
 	CGUI.GUIList[CGUI.EventQueue[1].GUI].RerouteEvent(CGUI.EventQueue[1])
 	CGUI.EventQueue.Remove(1)
 	SetTimer, CGUI_HandleEvent, -10
