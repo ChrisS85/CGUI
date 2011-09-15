@@ -81,6 +81,7 @@ Class CGUI
 		}
 		/*
 		Registers a window instance as a listener to a window message.
+		If hwnd is an object, it represents a window object that is handled separately for internal messages.
 		*/
 		RegisterListener(Message, hwnd, FunctionName)
 		{
@@ -88,8 +89,15 @@ Class CGUI
 			;Don't allow calling this function on the contained instances
 			if(this.Base.__Class = this.__Class)
 				return
+			if(hwnd > 0)
+				GUI := CGUI.GUIFromHWND(hwnd)
+			else if(IsObject(hwnd)) ;Support internal window messages by storing them with a hwnd value of zero.
+			{
+				GUI := hwnd
+				hwnd := 0
+			}
+			
 			;if parameters are valid and the listener isn't registered yet, add it and possibly set up the OnMessage Callback
-			GUI := CGUI.GUIFromHWND(hwnd)
 			if(Message && GUI && FunctionName && IsFunc(GUI[FunctionName]))
 			{
 				;If the current message hasn't been registered anywhere
@@ -120,24 +128,29 @@ Class CGUI
 				;Remove one or all registered listeners associated with the window handle
 				Messages := Message ? [Message]  : []
 				if(!Message)
-					for Message, Handler in this.WindowMessageListeners
-						Messages.Insert(Message)
+					for Msg, Handler in this.WindowMessageListeners
+						Messages.Insert(MSG)
 				for index, CurrentMessage in Messages ;Process all messages that are affected
 				{
-					;Make sure the window is actually registered right now so it doesn't get unregistered multiple times if this function happens to be called more than once with the same parameters
-					if(this.WindowMessageListeners.HasKey(CurrentMessage) && this.WindowMessageListeners[CurrentMessage].Listeners.HasKey(hwnd))
+					;If removing all handlers, also remove the internal handlers
+					hwnds := Message ? [hwnd] : [0, hwnd]
+					for index, CurrentHWND in hwnds
 					{
-						;Remove this window from the listener array
-						this.WindowMessageListeners[CurrentMessage].Listeners.Remove(hwnd, "")
-						
-						;Decrease count of window class instances that listen to this message
-						this.WindowMessageListeners[CurrentMessage].ListenerCount--						
-						
-						;If no more instances listening to a window message, remove the CWindowMessageHandler object from WindowMessageListeners and deactivate the OnMessage callback for the current message				
-						if(this.WindowMessageListeners[CurrentMessage].ListenerCount = 0)
+						;Make sure the window is actually registered right now so it doesn't get unregistered multiple times if this function happens to be called more than once with the same parameters
+						if(this.WindowMessageListeners.HasKey(CurrentMessage) && this.WindowMessageListeners[CurrentMessage].Listeners.HasKey(CurrentHWND))
 						{
-							this.WindowMessageListeners.Remove(CurrentMessage, "")
-							OnMessage(CurrentMessage, "")
+							;Remove this window from the listener array
+							this.WindowMessageListeners[CurrentMessage].Listeners.Remove(CurrentHWND, "")
+							
+							;Decrease count of window class instances that listen to this message
+							this.WindowMessageListeners[CurrentMessage].ListenerCount--						
+							
+							;If no more instances listening to a window message, remove the CWindowMessageHandler object from WindowMessageListeners and deactivate the OnMessage callback for the current message				
+							if(this.WindowMessageListeners[CurrentMessage].ListenerCount = 0)
+							{
+								this.WindowMessageListeners.Remove(CurrentMessage, "")
+								OnMessage(CurrentMessage, "")
+							}
 						}
 					}
 				}
@@ -1004,8 +1017,13 @@ CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
 	GUI := CGUI.GUIFromHWND(hwnd)
 	if(GUI)
 	{
+		;Internal message handlers are processed first.
+		if(CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners.HasKey(0))
+		{
+			internalfunc := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[0]
+			GUI[internalfunc](Msg, wParam, lParam)
+		}
 		func := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[hwnd]
-		outputdebug func %func%
 		return GUI[func](Msg, wParam, lParam)
 	}
 }
