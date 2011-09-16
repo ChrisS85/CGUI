@@ -173,9 +173,9 @@ Class CGUI
 	*/
 	OnMessage(Message, FunctionName = "")
 	{
+		outputdebug OnMessage(%Message%, %FunctionName%)
 		if(this.IsDestroyed)
 			return
-		outputdebug OnMessage(%Message%, %FunctionName%)
 		if(FunctionName)
 			this.WindowMessageHandler.RegisterListener(Message, this.hwnd, FunctionName)
 		else
@@ -464,6 +464,10 @@ Class CGUI
 			Control._.Events := new Control.CEvents(Control.GUINum, Control.Name, Control.hwnd)
 			ComObjConnect(object, Control._.Events)
 		}
+		
+		;Check if Focus change messages should be registered automatically
+		if(IsFunc(this[Name "_Enter"]) || IsFunc(this[Name "_Leave"]))
+			this.OnMessage(0x004E, "OnNotifyInternal")
 		return Control
 	}
 	
@@ -943,6 +947,17 @@ Class CGUI
 				}
 			}
 		}
+	}
+	
+	OnNotifyInternal(Msg, wParam, lParam)
+	{
+		hwndFrom := NumGet(lParam+0, 0, "UPTR")
+		Control := this.Controls[hwndFrom]
+		Code := NumGet(lParam+0, 2*A_PtrSize, "UINT") ;NM_KILLFOCUS := 0xFFFFFFF8, NM_SETFOCUS := 0xFFFFFFF9
+		if(Code = 0xFFFFFFF9)
+			Control.CallEvent("Enter" )
+		else if(Code = 0xFFFFFFF8)
+			Control.CallEvent("Leave")
 	}
 }
 

@@ -92,6 +92,10 @@ Class CMyWindow Extends CGUI
 		this.Show("")
 		return this
 	}
+	lvItems_Enter()
+	{
+		tooltip Enter
+	}
 	MouseMove(Msg, wParam, lParam)
 	{
 		tooltip mousemove
