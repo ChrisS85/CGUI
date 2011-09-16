@@ -19,7 +19,7 @@ Class CWindowMessageDemo Extends CGUI
 		this.Add("Edit", "editY", "x+10", "")
 		this.CloseOnEscape := true
 		this.DestroyOnClose := true
-		this.OnGUIMessage(0x200, "MouseMove")
+		this.OnMessage(0x200, "MouseMove")
 		this.Show("")
 		return this
 	}

@@ -29,6 +29,7 @@ Class CTreeViewControl Extends CControl
 	
 	PostCreate()
 	{
+		Base.PostCreate()
 		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
 		this._.Insert("Items", new this.CItem(0, this.GUINum, this.hwnd))
 	}

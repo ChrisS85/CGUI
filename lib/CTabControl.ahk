@@ -16,6 +16,7 @@ Class CTabControl Extends CControl
 	
 	PostCreate()
 	{
+		Base.PostCreate()
 		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
 		this._.Tabs := new this.CTabs(this.GUINum, this.hwnd)
 		Content := this.Content

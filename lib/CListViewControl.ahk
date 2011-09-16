@@ -29,7 +29,8 @@ Class CListViewControl Extends CControl
 	}
 	
 	PostCreate()
-	{		
+	{
+		Base.PostCreate()
 		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
 		this._.Insert("Items", new this.CItems(this.GUINum, this.hwnd))
 	}

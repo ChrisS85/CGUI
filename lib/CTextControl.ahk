@@ -19,6 +19,7 @@ Class CTextControl Extends CControl
 	*/
 	__Set(Name, Value)
 	{
+		global CGUI
 		if(Name = "Link")
 		{
 			WM_SETCURSOR := 0x20
@@ -27,8 +28,8 @@ Class CTextControl Extends CControl
 			WM_MOUSELEAVE := 0x2A3
 			if(Value)
 			{
-				OnMessage(WM_SETCURSOR, "CGUI.HandleMessage")
-				OnMessage(WM_MOUSEMOVE, "CGUI.HandleMessage")
+				CGUI.GUIList[this.GUINum].OnMessage(WM_SETCURSOR, "HandleInternalMessage")
+				CGUI.GUIList[this.GUINum].OnMessage(WM_MOUSEMOVE, "HandleInternalMessage")
 			}
 			this._.Link := Value > 0
 			this.Font.Options := "cBlue"
@@ -38,47 +39,6 @@ Class CTextControl Extends CControl
 	{
 		if(Name = "Link")
 			return this._.Link
-	}
-	HandleMessage(wParam, lParam, msg)
-	{
-		static WM_SETCURSOR := 0x20, WM_MOUSEMOVE := 0x200, WM_NCMOUSELEAVE := 0x2A2, WM_MOUSELEAVE := 0x2A3
-		static   URL_hover, h_cursor_hand, CtrlIsURL, LastCtrl
-		if(!this.Link)
-			return
-		If (msg = WM_SETCURSOR)
-		{
-			tooltip setcursor
-			If(this._.Hovering)
-				Return true
-		}
-		Else If (p_m = WM_MOUSEMOVE)
-		{
-			; Mouse cursor hovers URL text control
-			If URL_hover=
-			{
-				Gui, 1:Font, cBlue underline
-				GuiControl, 1:Font, %A_GuiControl%
-				LastCtrl = %A_GuiControl%
-
-				h_cursor_hand := DllCall("LoadCursor", "Ptr", 0, "uint", 32649, "Ptr")
-
-				URL_hover := true
-			}
-			this._.h_old_cursor := DllCall("SetCursor", "Ptr", h_cursor_hand, "Ptr")
-			; Mouse cursor doesn't hover URL text control
-			;~ Else
-			;~ {
-				;~ If URL_hover
-				;~ {
-					;~ Gui, 1:Font, norm cBlue
-					;~ GuiControl, 1:Font, %LastCtrl%
-
-					;~ DllCall("SetCursor", "Ptr", h_old_cursor)
-
-					;~ URL_hover=
-				;~ }
-			;~ }
-		}
 	}
 	/*
 	Event: Introduction

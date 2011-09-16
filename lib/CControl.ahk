@@ -12,8 +12,12 @@ Class CControl ;Never created directly
 		this.Insert("Content", Text)
 		this.Insert("GUINum", GUINum) ;Store link to gui for GuiControl purposes (and possibly others later
 		this.Insert("_", {}) ;Create proxy object to enable __Get and __Set calls for existing keys (like ClassNN which stores a cached value in the proxy)
-		this.Insert("Font", new CFont(GUINum, Name))
+		this.Insert("Font", new CFont(GUINum))
 		this._.Insert("RegisteredEvents")
+	}
+	PostCreate()
+	{
+		this.Font._.hwnd := this.hwnd
 	}
 	/*
 	Function: Show

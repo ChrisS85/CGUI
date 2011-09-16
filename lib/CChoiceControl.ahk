@@ -19,7 +19,8 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		this._.Insert("Events", ["SelectionChanged"])
 	}
 	PostCreate()
-	{		
+	{
+		Base.PostCreate()
 		this._.Items := new this.CItems(this.GUINum, this.hwnd)
 		Content := this.Content
 		Loop, Parse, Content, |

@@ -162,7 +162,7 @@ Class CGUI
 	}
 	
 	/*
-	Function: OnGUIMessage()
+	Function: OnMessage()
 	Registers a window instance as a listener for a specific window message.
 	
 	Parameters:
@@ -171,11 +171,11 @@ Class CGUI
 		To stop listening, skip this parameter or leave it empty. To change to another function, simply specify another name (stopping first isn't required). The function won't be called anymore after the window is destroyed. DON'T USE GUI, DESTROY ON ANY WINDOWS CREATED WITH THIS LIBRARY THOUGH. Instaed use window.Destroy() or window.Close() when window.DestroyOnClose is enabled.
 		The function accepts three parameters, Message, wParam and lParam (in this order).
 	*/
-	OnGUIMessage(Message, FunctionName = "")
+	OnMessage(Message, FunctionName = "")
 	{
 		if(this.IsDestroyed)
 			return
-		outputdebug onguimessage(%Message%, %FunctionName%)
+		outputdebug OnMessage(%Message%, %FunctionName%)
 		if(FunctionName)
 			this.WindowMessageHandler.RegisterListener(Message, this.hwnd, FunctionName)
 		else
@@ -901,43 +901,43 @@ Class CGUI
 			}
 		}
 	}
-	HandleMessage(lParam, msg, hwnd)
+	
+	;As of now, this function handles WM_MOUSEMOVE and WM_SETCURSOR to allow text controls to act as links
+	HandleInternalMessage(Msg, wParam, lParam)
 	{
 		global CGUI
 		static WM_SETCURSOR := 0x20, WM_MOUSEMOVE := 0x200, h_cursor_hand
-		wParam := this ;Fix parameter offset caused by this being a class method
-		GUI := CGUI.GUIList[A_GUI]
 		if(msg = WM_SETCURSOR || msg = WM_MOUSEMOVE) ;Text control Link support, thanks Shimanov!
 		{
 			if(msg = WM_SETCURSOR)
 			{
-				If(GUI._.Hovering)
+				If(this._.Hovering)
 					Return true
 			}
 			else if(msg = WM_MOUSEMOVE)
 			{
 				MouseGetPos,,,,ControlHWND, 2
-				if(GUI.Controls.HasKey(ControlHWND) && GUI.Controls[ControlHWND].Link)
+				if(this.Controls.HasKey(ControlHWND) && this.Controls[ControlHWND].Link)
 				{
-					if(!GUI._.Hovering)
+					if(!this._.Hovering)
 					{
-						Control.Font.Options := "cBlue underline"
-						Gui._.LastHoveredControl := Control.hwnd
+						this.Controls[ControlHWND].Font.Options := "cBlue underline"
+						this._.LastHoveredControl := this.Controls[ControlHWND].hwnd
 						h_cursor_hand := DllCall("LoadCursor", "Ptr", 0, "uint", 32649, "Ptr")
-						GUI._.Hovering := true
+						this._.Hovering := true
 					}
-					GUI._.h_old_cursor := DllCall("SetCursor", "Ptr", h_cursor_hand, "Ptr")
+					this._.h_old_cursor := DllCall("SetCursor", "Ptr", h_cursor_hand, "Ptr")
 				}
 				; Mouse cursor doesn't hover URL text control
 				else
 				{
-					if(GUI._.Hovering)
+					if(this._.Hovering)
 					{
-						if(GUI.Controls.HasKey(GUI._.LastHoveredControl) && GUI.Controls[GUI._.LastHoveredControl].Link)
+						if(this.Controls.HasKey(this._.LastHoveredControl) && this.Controls[this._.LastHoveredControl].Link)
 						{
-							Control.Font.Options := "norm cBlue"
+							this.Controls[this._.LastHoveredControl].Font.Options := "norm cBlue"
 							DllCall("SetCursor", "Ptr", GUI._.h_old_cursor)
-							GUI._.Hovering := false
+							this._.Hovering := false
 						}					
 					}
 				}
@@ -962,8 +962,6 @@ CGUI_HandleEvent:
 while(CGUI.EventQueue.MaxIndex())
 {
 	SetTimer, CGUI_HandleEvent, Off
-	if(CGUI.EventQueue[1].Label = "CGUI_Close")
-		outputdebug processing close
 	CGUI.GUIList[CGUI.EventQueue[1].GUI].RerouteEvent(CGUI.EventQueue[1])
 	CGUI.EventQueue.Remove(1)
 	SetTimer, CGUI_HandleEvent, -10
@@ -979,7 +977,6 @@ This callback function will only be used when there are owned windows which have
 CGUI_ShellMessage(wParam, lParam, msg, hwnd) 
 { 
    global CGUI 
-   outputdebug shellmessage %wparam% %lparam%
    if(wParam = 2) ;Window Destroyed 
    {
 	  Loop % CGUI.GUIList.MaxIndex() 
@@ -1013,7 +1010,6 @@ CGUI_ShellMessage(wParam, lParam, msg, hwnd)
 CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
 {
 	global CGUI
-	outputdebug message handler
 	GUI := CGUI.GUIFromHWND(hwnd)
 	if(GUI)
 	{
@@ -1021,7 +1017,7 @@ CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
 		if(CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners.HasKey(0))
 		{
 			internalfunc := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[0]
-			GUI.base.base[internalfunc](Msg, wParam, lParam)
+			`(GUI.base.base)[internalfunc](Msg, wParam, lParam)
 		}
 		func := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[hwnd]
 		return GUI[func](Msg, wParam, lParam)
@@ -1029,7 +1025,7 @@ CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
 }
 Class CFont
 {
-	__New(GUINum, hwnd)
+	__New(GUINum)
 	{
 		this.Insert("_", {})
 		this._.GUINum := GUINum
@@ -1045,7 +1041,7 @@ Class CFont
 				GUI := CGUI.GUIList[this._.GUINum]
 				Control := GUI.Controls[this._.hwnd]
 				Gui, % this._.GUINum ":Font", %Value%
-				GuiControl, % this.GUINum ":Font", % Control.ClassNN
+				GuiControl, % this._.GUINum ":Font", % Control.ClassNN
 				Gui, % this._.GUINum ":Font", % GUI.Font.Options ;Restore current font
 			}
 			else ;belonging to a window

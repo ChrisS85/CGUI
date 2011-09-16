@@ -14,7 +14,8 @@ Class CStatusBarControl Extends CControl
 		this._.Insert("Events", ["Click", "DoubleClick", "RightClick", "DoubleRightClick"])
 	}
 	PostCreate()
-	{		
+	{
+		Base.PostCreate()
 		this._.Parts := new this.CParts(this.GUINum, this.hwnd)
 		if(this.Content)
 			this._.Parts._.Insert(1, new this.CParts.CPart(Text, 1, "", "", "", "", this.GUINum, this.hwnd))

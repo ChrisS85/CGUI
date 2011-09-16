@@ -47,7 +47,7 @@ Class CMyWindow Extends CGUI
 		this.btnLoad.Tooltip := "LOOOOAAAAAD"
 		this.Add("StatusBar", "statBar", "", "test")
 		this.Add("Tab", "sometab", "x20 y200 w200 h200", "tab1|tab2|tab3")
-		this.sometab.Tabs[1].Add("Text", "tabtext", "", "text")
+		this.sometab.Tabs[1].AddControl("Text", "tabtext", "", "text")
 		this.sometab.Tabs[1].Controls.tabtext.Link := 1
 		;~ msgbox % this.sometab.Tabs[1]._.TabNumber
 		this.sometab.Tabs[1].Icon := "C:\Program Files\Autohotkey\SciTE_beta5\AutoHotkey.exe"
