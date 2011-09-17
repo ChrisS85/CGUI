@@ -1,4 +1,3 @@
-/*
 Class: CStatusBarControl
 The status bar. Can only be used once per window.
 
@@ -10,13 +9,10 @@ Class CStatusBarControl Extends CControl
 	{
 		base.__New(Name, Options, Text, GUINum)
 		this.Type := "StatusBar"
-		this._.Insert("ControlStyles", {SizingGrip : 0x100})
 		this._.Insert("Events", ["Click", "DoubleClick", "RightClick", "DoubleRightClick"])
 	}
-	PostCreate()
 	{
 		Base.PostCreate()
-		this._.Parts := new this.CParts(this.GUINum, this.hwnd)
 		if(this.Content)
 			this._.Parts._.Insert(1, new this.CParts.CPart(Text, 1, "", "", "", "", this.GUINum, this.hwnd))
 	}
@@ -135,7 +131,7 @@ Class CStatusBarControl Extends CControl
 			}
 		}
 		/*
-		Function: MaxIndex()
+		Function: MaxIndex
 		Returns the number of parts.
 		*/
 		MaxIndex()
@@ -165,7 +161,7 @@ Class CStatusBarControl Extends CControl
 			}
 		}
 		/*
-		Function: Add()
+		Function: Add
 		Adds a part.
 		
 		Parameters:
@@ -188,7 +184,7 @@ Class CStatusBarControl Extends CControl
 		}
 		
 		/*
-		Function: Remove()
+		Function: Remove
 		Removes a part.
 		
 		Parameters:

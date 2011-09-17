@@ -1,6 +1,5 @@
 /*
 Class: CControl
-Basic control class from which all controls extend.
 */
 Class CControl ;Never created directly
 {
@@ -31,7 +30,6 @@ Class CControl ;Never created directly
 		Control, Show,,,% "ahk_id " this.hwnd
 	}
 	
-	/*
 	Function: Hide
 	Hides the control if it was previously visible.
 	*/
@@ -346,7 +344,7 @@ Class CControl ;Never created directly
 		}
     }
 	/*
-	Function: RegisterEvent()
+	Function: RegisterEvent
 	Assigns (or unassigns) a function to a specific event of this control so that the function will be called when the event occurs.
 	This is normally not necessary because functions in the GUI class with the name ControlName_EventName()
 	will be called automatically without needing to be registered. However this can be useful if you want to handle

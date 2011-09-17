@@ -1,6 +1,4 @@
 /*
-Class: CTreeViewControl
-A TreeView control.
 
 This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
 */
@@ -18,7 +16,6 @@ Class CTreeViewControl Extends CControl
 				{
 					Options .= " AltSubmit"
 					break
-				}
 			}
 		}
 		base.__New(Name, Options, Text, GUINum)
@@ -33,7 +30,6 @@ Class CTreeViewControl Extends CControl
 		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
 		this._.Insert("Items", new this.CItem(0, this.GUINum, this.hwnd))
 	}
-	/*
 	Function: FindItem
 	Finds an item by its ID.
 	
@@ -209,7 +205,7 @@ Class CTreeViewControl Extends CControl
 		}
 		
 		/*
-		Function: AddControl()
+		Function: AddControl
 		Adds a control to this tree node that will be visible only when this node is selected. The parameters correspond to the Add() function of CGUI.
 		
 		Parameters:
@@ -359,7 +355,7 @@ Class CTreeViewControl Extends CControl
 			this._.IconNumber := IconNumberOrTransparencyColor
 		}
 		/*
-		Function: MaxIndex()
+		Function: MaxIndex
 		Returns the number of child nodes.		
 		*/
 		MaxIndex()

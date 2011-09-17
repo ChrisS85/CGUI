@@ -1,4 +1,3 @@
-/*
 Class: CEditControl
 An edit control.
 
@@ -14,7 +13,7 @@ Class CEditControl Extends CControl
 		this._.Insert("Events", ["TextChanged"])
 	}
 	/*
-	Function: AddUpDown()
+	Function: AddUpDown
 	Adds an UpDown control to this text field. This function needs to be called immediately after adding the edit control to the window.
 	
 	Parameters:

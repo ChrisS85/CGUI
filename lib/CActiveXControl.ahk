@@ -6,7 +6,6 @@ This control extends <CControl>. All basic properties and functions are implemen
 
 Variable: Accessing the properties of the ActiveX object
 The specific properties of the ActiveX control can simply be accessed through this control object as if it were the ActiveX object itself.
-However if you need to access the ActiveX object directly you can do so by using Control._.Object .
 */
 Class CActiveXControl Extends CControl
 {
@@ -94,7 +93,7 @@ Class CActiveXControl Extends CControl
 		}	
 	}
 	/*
-	Function: IsMemberOf()
+	Function: IsMemberOf
 	Checks if the ActiveX object supports a parameter. This does not check if it is read/write/call-able.
 	Thanks to jethrow, Lexikos and Sean for this function!
 	

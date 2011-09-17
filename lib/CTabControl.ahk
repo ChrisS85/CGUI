@@ -1,5 +1,3 @@
-/*
-Class: CTabControl
 A tab container control. The controls added to a tab panel can be accessed through this object.
 
 This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
@@ -10,14 +8,11 @@ Class CTabControl Extends CControl
 	{
 		base.__New(Name, Options, Text, GUINum)
 		this.Type := "Tab"
-		this._.Insert("ControlStyles", {Bottom : 0x2, HotTrack : 0x40, Buttons : 0x100, MultiLine : 0x200})
 		this._.Insert("Events", ["Click", "DoubleClick", "RightClick", "DoubleRightClick"])
 	}
-	
 	PostCreate()
 	{
 		Base.PostCreate()
-		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
 		this._.Tabs := new this.CTabs(this.GUINum, this.hwnd)
 		Content := this.Content
 		Loop, Parse, Content, |
@@ -128,7 +123,7 @@ Class CTabControl Extends CControl
 			}
 		}
 		/*
-		Function: MaxIndex()
+		Function: MaxIndex
 		Returns the number of tabs.
 		*/
 		MaxIndex()
@@ -160,7 +155,7 @@ Class CTabControl Extends CControl
 		}
 		
 		/*
-		Function: Add()
+		Function: Add
 		Adds a tab.
 		
 		Parameters:
@@ -206,7 +201,7 @@ Class CTabControl Extends CControl
 			}
 			
 			/*
-			Function: AddControl()
+			Function: AddControl
 			Adds a control to this tab. The parameters correspond to the Add() function of CGUI.
 			
 			Parameters:

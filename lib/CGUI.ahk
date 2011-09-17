@@ -1,19 +1,14 @@
-#NoEnv ;Leave this here if you don't want weird ListView icon behavior (and possibly other side effects)
 /*
    Class: CGUI
-   The main GUI class. User created GUIs need to extend this class and call Base.__New() in their constructor before doing anything related to this class.
-   
    Variable: Accessing Controls
    Controls may be accessed by their name by using GUI.Name or by their window handle by using GUI.Controls[hwnd] (assuming Name is a string and hwnd is a variable).
    The difference between these two methods is that controls which are added as sub-controls to other controls are not accessible by their name through the main GUI object. They can either be accessed by hwnd like described above or by GUI.ParentControl.Controls.SubControlName (again assuming that SubControlName is a string).
-*/
 Class CGUI
 {
 	static GUIList := Object()
 	;~ _ := Object() ;Proxy object
 	/*	
 	Get only:
-	var Controls := Object()
 	var hwnd := 0
 	var GUINum := 0
 	MinMax
@@ -44,10 +39,7 @@ Class CGUI
 	__New()
 	{
 		global CGUI, CFont
-		this.Insert("_", {})
 		CGUI.Insert("EventQueue", [])
-		CGUI._.Insert("WindowMessageListeners", []) 
-		start := 10 ;Let's keep some gui numbers free for other uses
 		loop {
 			Gui %start%:+LastFoundExist
 			IfWinNotExist
@@ -96,7 +88,6 @@ Class CGUI
 				GUI := hwnd
 				hwnd := 0
 			}
-			
 			;if parameters are valid and the listener isn't registered yet, add it and possibly set up the OnMessage Callback
 			if(Message && GUI && FunctionName && IsFunc(GUI[FunctionName]))
 			{
@@ -162,7 +153,7 @@ Class CGUI
 	}
 	
 	/*
-	Function: OnMessage()
+	Function: OnMessage
 	Registers a window instance as a listener for a specific window message.
 	
 	Parameters:
@@ -474,7 +465,7 @@ Class CGUI
 	}
 	
 	/*
-	Function: ControlFromHWND()
+	Function: ControlFromHWND
 	Returns the object that belongs to a control with a specific window handle.
 	Parameters:
 		HWND - The window handle.
@@ -487,7 +478,7 @@ Class CGUI
 	}
 	
 	/*
-	Function: GUIFromHWND()
+	Function: GUIFromHWND
 	Returns the GUI object with a specific hwnd
 	*/
 	GUIFromHWND(hwnd)
@@ -497,7 +488,7 @@ Class CGUI
 				return GUI
 	}
 	/*
-	Function: ControlFromGUINumAndName()
+	Function: ControlFromGUINumAndName
 	Returns the object that belongs to a window with a specific gui number and a control with a specific name.
 	Parameters:
 		GUINum - The GUI number
@@ -994,7 +985,7 @@ while(CGUI.EventQueue.MaxIndex())
 }
 return
 /*
-Function: CGUI_ShellMessage()
+Function: CGUI_ShellMessage
 This internal function is used to monitor closing of the parent windows of owned GUIs. It must not need to be called directly by a user of this library.
 It is still possible to use a shell message hook as usual in your script as long as it gets initialized before setting GUI.OwnerAutoClose := 1.
 This library will intercept all ShellMessage calls and forward it to the previously used ShellMessage callback function.

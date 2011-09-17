@@ -1,17 +1,13 @@
-/*
 Class: CCheckboxControl
 A checkbox/radio control.
 
 This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
-*/
 Class CCheckBoxControl Extends CControl ;This class is a radio control as well
-{
 	__New(Name, Options, Text, GUINum, Type)
 	{
 		Base.__New(Name, Options, Text, GUINum)
 		this.Type := Type
 		this._.Insert("ControlStyles", {Center : 0x300, Left : 0x100, Right : 0x200, RightButton : 0x20, Default : 0x1, Wrap : 0x2000, Flat : 0x8000})
-		this._.Insert("Events", ["CheckedChanged"])
 		this._.Insert("Controls", {})
 	}
 	/*
@@ -60,7 +56,7 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 		}
 	}
 	/*
-	Function: AddControl()
+	Function: AddControl
 	Adds a control to this control that will be visible/enabled only when this checkbox/radio button is checked. The parameters correspond to the Add() function of CGUI.
 	
 	Parameters:
@@ -81,7 +77,7 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 		return Control
 	}
 	/*
-	Function: GetRadioButtonGroup()
+	Function: GetRadioButtonGroup
 	Returns the group of radio buttons this radio button belongs to as an array of controls.
 	*/
 	GetRadioButtonGroup()
@@ -140,7 +136,7 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 	}
 	
 	/*
-	Function: GetSelectedRadioButton()
+	Function: GetSelectedRadioButton
 	Returns the radio button control of the current group which is currently selected. Returns 0 if no button is selected.
 	*/
 	GetSelectedRadioButton()

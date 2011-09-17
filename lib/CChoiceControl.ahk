@@ -1,6 +1,4 @@
 /*
-Class: CChoiceControl
-This class implements DropDownList, ComboBox and ListBox controls.
 
 This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
 */
@@ -20,18 +18,14 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	}
 	PostCreate()
 	{
-		Base.PostCreate()
 		this._.Items := new this.CItems(this.GUINum, this.hwnd)
 		Content := this.Content
-		Loop, Parse, Content, |
 			this._.Items.Insert(new this.CItems.CItem(A_Index, this.GUINum, this.hwnd))
 		this._.PreviouslySelectedItem := this.SelectedItem
 	}
-	/*
 	Variable: SelectedItem
 	The text of the selected item.
 	
-	Variable: SelectedIndex
 	The index of the selected item.
 	
 	Variable: Items
@@ -231,7 +225,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				return
 		}
 		/*
-		Function: Add()
+		Function: Add
 		Adds an item to the list of choices.
 		
 		Parameters:
@@ -263,7 +257,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			GuiControl, % this.GUINum ":Choose", % Control.ClassNN, % (Position != -1 && Selected < Position ? Selected : Selected + 1)
 		}
 		/*
-		Function: Remove()
+		Function: Remove
 		Removes an item to the list of choices.
 		
 		Parameters:
@@ -303,7 +297,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			}
 		}
 		/*
-		Function: MaxIndex()
+		Function: MaxIndex
 		Returns the number of items in this control.
 		*/
 		MaxIndex()
@@ -341,7 +335,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				this._.Insert("Controls", {})
 			}
 			/*
-			Function: AddControl()
+			Function: AddControl
 			Adds a control to this item that will be visible only when this item is selected. The parameters correspond to the Add() function of CGUI.
 			
 			Parameters:
