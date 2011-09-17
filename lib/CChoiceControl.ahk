@@ -185,6 +185,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
 	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
 	For better readability labels may be chained since they all execute the same code.
+	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent()> on a control instance to register a different event function name.
 	
 	Event: SelectionChanged(SelectedIndex)
 	Invoked when the selection was changed.

@@ -384,6 +384,10 @@ Class CControl ;Never created directly
 			`(CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)
 		}
 	}
+	/*
+	Changes the state of controls assigned to an item of another control, making them (in)visible or (de)activating them.
+	The parameters are the previously selected item object (containing a controls array of controls assigned to it and the new selected item object.
+	*/
 	ProcessSubControlState(From, To)
 	{
 		global CGUI
@@ -404,6 +408,24 @@ Class CControl ;Never created directly
 					Control.Show()
 		}
 	}
+	
+	
+	/*
+	Event: Introduction
+	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
+	The parameters depend on the event and there may not be params at all in some cases.
+	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
+	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
+	For better readability labels may be chained since they all execute the same code.
+	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent()> on a control instance to register a different event function name.
+	
+	Event: Enter()
+	Invoked when the control receives keyboard focus. This event does not require that the control has a matching g-label since it is implemented through window messages.
+	
+	Event: Leave()
+	Invoked when the control loses keyboard focus. This event does not require that the control has a matching g-label since it is implemented through window messages.
+	*/
+	
 	
 	/*
 	Class: CImageListManager
@@ -479,15 +501,6 @@ Class CControl ;Never created directly
 			}
 		}
 	}
-	
-	/*
-	Event: Introduction
-	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
-	The parameters depend on the event and there may not be params at all in some cases.
-	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
-	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
-	For better readability labels may be chained since they all execute the same code.
-	*/
 }
 
 #include <CTextControl>

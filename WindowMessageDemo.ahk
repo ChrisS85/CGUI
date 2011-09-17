@@ -29,4 +29,8 @@ Class CWindowMessageDemo Extends CGUI
 		this.editY.text := (lParam & 0xFFFF0000) >> 16
 		return 0
 	}
+	editX_Leave()
+	{
+		tooltip editX leave
+	}
 }

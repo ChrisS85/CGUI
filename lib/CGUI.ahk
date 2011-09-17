@@ -293,11 +293,12 @@ Class CGUI
 	}
 	
 	/*
-	Function: Font
+	Disable this stuff
+	a Function: Font
 	
 	Changes the default font used for controls from here on.
 	
-	Parameters:
+	a Parameters:
 		Options - Font options, size etc. See http://www.autohotkey.com/docs/commands/Gui.htm#Font
 		Fontname - Name of the font. See http://www.autohotkey.com/docs/commands/Gui.htm#Font
 	*/
@@ -391,6 +392,7 @@ Class CGUI
 					- GroupBox
 					- Picture
 					- Progress
+					- ActiveXControl
 		Name - The name of the control. The control can be accessed by its name directly from the GUI object, i.e. GUI.MyEdit1 or similar. Names must be unique and must not be empty.
 		Options - Default options to be used for the control. These are in default AHK syntax according to <http://www.autohotkey.com/docs/commands/Gui.htm#OtherOptions> and <http://www.autohotkey.com/docs/commands/GuiControls.htm>. Do not use GUI variables (v option) and g-labels (g option).
 		Text - Text of the control. For some controls, this parameter has a special meaning. It can be a list of items or a collection of column headers separated by "|".
@@ -466,7 +468,7 @@ Class CGUI
 		}
 		
 		;Check if Focus change messages should be registered automatically
-		if(IsFunc(this[Name "_Enter"]) || IsFunc(this[Name "_Leave"]))
+		if(IsFunc(this[Name "_FocusEnter"]) || IsFunc(this[Name "_FocusLeave"]))
 			this.OnMessage(0x004E, "OnNotifyInternal")
 		return Control
 	}
@@ -823,6 +825,7 @@ Class CGUI
 	/*
 	Event: Introduction
 	Events are used by implementing the specific event function in the class that extends CGUI. No g-labels are required nor anything else.
+	On a related note, you can listen to window messages by calling <CGUI.OnMessage()> on a window instance.
 	
 	Event: ContextMenu()
 	Invoked when the user right clicks on a control of this window.
@@ -847,7 +850,8 @@ Class CGUI
 	*/
 	
 	/*
-	Main event rerouting function. It identifies the associated window/control and calls the related event function if it is defined. It also handles some things on its own, such as window closing.
+	Main event rerouting function. It identifies the associated window/control
+	and calls the related event function if it is defined. It also handles some things on its own, such as window closing.
 	*/
 	HandleEvent()
 	{
@@ -864,6 +868,11 @@ Class CGUI
 			;~ Critical, Off
 	}
 	
+	/*
+	Called by a timer that processes the event queue of all g-label notifications
+	and reroutes specific events to gui event functions and control classes
+	to allow them to split the g-label notification up into single events.
+	*/
 	RerouteEvent(Event)
 	{
 		global CGUI
@@ -948,16 +957,19 @@ Class CGUI
 			}
 		}
 	}
-	
+	/*
+	This function gets called when a window receives the WM_NOTIFY message.
+	It is currently handles NM_SETFOCUS and NM_KILLFOCUS and calls FocusEnter() and FocusLeave() event functions in window classes.
+	*/
 	OnNotifyInternal(Msg, wParam, lParam)
 	{
 		hwndFrom := NumGet(lParam+0, 0, "UPTR")
 		Control := this.Controls[hwndFrom]
 		Code := NumGet(lParam+0, 2*A_PtrSize, "UINT") ;NM_KILLFOCUS := 0xFFFFFFF8, NM_SETFOCUS := 0xFFFFFFF9
 		if(Code = 0xFFFFFFF9)
-			Control.CallEvent("Enter" )
+			Control.CallEvent("FocusEnter" )
 		else if(Code = 0xFFFFFFF8)
-			Control.CallEvent("Leave")
+			Control.CallEvent("FocusLeave")
 	}
 }
 
@@ -968,7 +980,6 @@ CGUI_ContextMenu:
 CGUI_DropFiles:
 CGUI_Close:
 CGUI_Escape:
-CControl_Event:
 CGUI.HandleEvent()
 return
 
@@ -984,8 +995,8 @@ while(CGUI.EventQueue.MaxIndex())
 return
 /*
 Function: CGUI_ShellMessage()
-This function is used to monitor closing of the parent windows of owned GUIs. It does not need to be called directly.
-It is still possible to use a shell message hook as usual in your script as long as you initialize it before setting GUI.OwnerAutoClose := 1.
+This internal function is used to monitor closing of the parent windows of owned GUIs. It must not need to be called directly by a user of this library.
+It is still possible to use a shell message hook as usual in your script as long as it gets initialized before setting GUI.OwnerAutoClose := 1.
 This library will intercept all ShellMessage calls and forward it to the previously used ShellMessage callback function.
 This callback function will only be used when there are owned windows which have OwnerAutoClose activated. In all other cases it won't be used and can safely be ignored.
 */
@@ -1038,6 +1049,10 @@ CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
 		return GUI[func](Msg, wParam, lParam)
 	}
 }
+/*
+Class: CFont
+A class managing the font of a gui or a control. As of now, this class can not be used to retrieve the current value of the font before they have been set to a custom value by using the properties of this class.
+*/
 Class CFont
 {
 	__New(GUINum)
@@ -1046,6 +1061,13 @@ Class CFont
 		this._.GUINum := GUINum
 		this._.hwnd := hwnd
 	}
+	/*
+	Variable: Options
+	An options string used for describing the font. Syntax is identical to GUI, Font command in AHK.
+	
+	Variable: Font
+	The name of the font.
+	*/
 	__Set(Name, Value)
 	{
 		global CGUI
