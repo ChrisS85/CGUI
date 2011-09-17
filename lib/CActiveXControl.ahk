@@ -6,6 +6,7 @@ This control extends <CControl>. All basic properties and functions are implemen
 
 Variable: Accessing the properties of the ActiveX object
 The specific properties of the ActiveX control can simply be accessed through this control object as if it were the ActiveX object itself.
+However if you need to access the ActiveX object directly you can do so by using Control._.Object .
 */
 Class CActiveXControl Extends CControl
 {
@@ -100,7 +101,7 @@ Class CActiveXControl Extends CControl
 	Parameters:
 		name - the parameter to check for.
 	*/
-	IsMemberOf(name) { 
+	IsMemberOf(name) {
 	   out := DllCall(NumGet(NumGet(1*p:=ComObjUnwrap(this._.Object))+A_PtrSize*5), "Ptr",p, "Ptr",VarSetCapacity(iid,16,0)*0+&iid, "Ptr*",&name, "UInt",1, "UInt",1024, "Int*",dispID)=0 && dispID+1
 	   ObjRelease(p)
 	   return out

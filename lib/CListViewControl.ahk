@@ -1,4 +1,9 @@
 /*
+Class: CListViewControl
+A ListView control. Additionally to its features present in AHK it can use sorting-independent indexing for synchronizing its fields with an array.
+
+This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
+*/
 Class CListViewControl Extends CControl
 {
 	__New(Name, ByRef Options, Text, GUINum)
@@ -19,15 +24,20 @@ Class CListViewControl Extends CControl
 		base.__New(Name, Options, Text, GUINum)
 		this._.Insert("ControlStyles", {ReadOnly : -0x200, Header : -0x4000, NoSortHdr : 0x8000, AlwaysShowSelection : 0x8, Multi : -0x4, Sort : 0x10, SortDescending : 0x20})
 		this._.Insert("ControlExStyles", {Checked : 0x4, FullRowSelect : 0x20, Grid : 0x1, AllowHeaderReordering : 0x10, HotTrack : 0x8})
+		this._.Insert("Events", ["DoubleClick", "DoubleRightClick", "ColumnClick", "EditingEnd", "Click", "RightClick", "ItemActivate", "EditingStart", "KeyPress", "FocusReceived", "FocusLost", "Marquee", "ScrollingStart", "ScrollingEnd", "ItemSelected", "ItemDeselected", "ItemFocused", "ItemDefocused", "ItemChecked", "ItemUnChecked", "SelectionChanged", "CheckedChanged", "FocusedChanged"])
 		this.Type := "ListView"
+	}
 	
 	PostCreate()
+	{
 		Base.PostCreate()
 		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
 		this._.Insert("Items", new this.CItems(this.GUINum, this.hwnd))
 	}
+	/*
 	Function: ModifyCol
 	Modifies a column. See AHK help on LV_ModifyCol for details.
+	*/
 	ModifyCol(ColumnNumber="", Options="", ColumnTitle="")
 	{
 		global CGUI
@@ -38,6 +48,7 @@ Class CListViewControl Extends CControl
 		LV_ModifyCol(ColumnNumber, Options, ColumnTitle)
 	}
 	/*
+	Function: InsertCol
 	Inserts a column. See AHK help on LV_InsertCol for details.
 	*/
 	InsertCol(ColumnNumber, Options="", ColumnTitle="")
@@ -48,6 +59,7 @@ Class CListViewControl Extends CControl
 		Gui, % this.GUINum ":Default"
 		Gui, ListView, % this.ClassNN
 		LV_InsertCol(ColumnNumber, Options, ColumnTitle)
+	}
 	/*
 	Function: DeleteCol
 	Deletes a column. See AHK help on LV_DeleteCol for details.
@@ -760,7 +772,7 @@ Class CListViewControl Extends CControl
 	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
 	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
 	For better readability labels may be chained since they all execute the same code.
-	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent()> on a control instance to register a different event function name.
+	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
 	Event: Click(RowIndex)
 	Invoked when the user clicked on the control.

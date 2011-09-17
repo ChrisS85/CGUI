@@ -1,14 +1,19 @@
+#NoEnv ;Leave this here if you don't want weird ListView icon behavior (and possibly other side effects)
 /*
    Class: CGUI
+   The main GUI class. User created GUIs need to extend this class and call Base.__New() in their constructor before doing anything related to this class.
+   
    Variable: Accessing Controls
    Controls may be accessed by their name by using GUI.Name or by their window handle by using GUI.Controls[hwnd] (assuming Name is a string and hwnd is a variable).
    The difference between these two methods is that controls which are added as sub-controls to other controls are not accessible by their name through the main GUI object. They can either be accessed by hwnd like described above or by GUI.ParentControl.Controls.SubControlName (again assuming that SubControlName is a string).
+*/
 Class CGUI
 {
 	static GUIList := Object()
 	;~ _ := Object() ;Proxy object
 	/*	
 	Get only:
+	var Controls := Object()
 	var hwnd := 0
 	var GUINum := 0
 	MinMax
@@ -18,7 +23,7 @@ Class CGUI
 	var CloseOnEscape := 0 ;If true, pressing escape will call the Close() event function if defined. Otherwise, it will call Escape() if it is defined.
 	var DestroyOnClose := 0 ;If true, the gui will be destroyed instead of being hidden when it gets closed by the user.
 		
-	Not supported:	
+	Not supported:
 	var Delimiter := "|" ;It's always | for now
 	var Label := "CGUI_" ;Labels are handled internally and get rerouted to event functions defined in the class which extends CGUI
 	var LastFoundExist := 0 ;This is not needed because the GUI is created anyway when the class gets instantiated.
@@ -39,7 +44,10 @@ Class CGUI
 	__New()
 	{
 		global CGUI, CFont
+		this.Insert("_", {})
 		CGUI.Insert("EventQueue", [])
+		CGUI._.Insert("WindowMessageListeners", []) 
+		start := 10 ;Let's keep some gui numbers free for other uses
 		loop {
 			Gui %start%:+LastFoundExist
 			IfWinNotExist
@@ -88,6 +96,7 @@ Class CGUI
 				GUI := hwnd
 				hwnd := 0
 			}
+			
 			;if parameters are valid and the listener isn't registered yet, add it and possibly set up the OnMessage Callback
 			if(Message && GUI && FunctionName && IsFunc(GUI[FunctionName]))
 			{
@@ -465,6 +474,17 @@ Class CGUI
 	}
 	
 	/*
+	Function: Validate
+	Validates the contents of controls containing text fields by calling <Control.Validate> for each fitting control.
+	The control can then make adjustments to the passed value and return an adjusted or same value which is then used as its text.
+	*/
+	Validate()
+	{
+		for hwnd, Control in this.Controls
+			if(["Edit", "ComboBox"].HasKey(Control.Type))
+				Control.Validate()
+	}
+	/*
 	Function: ControlFromHWND
 	Returns the object that belongs to a control with a specific window handle.
 	Parameters:
@@ -816,7 +836,7 @@ Class CGUI
 	/*
 	Event: Introduction
 	Events are used by implementing the specific event function in the class that extends CGUI. No g-labels are required nor anything else.
-	On a related note, you can listen to window messages by calling <CGUI.OnMessage()> on a window instance.
+	On a related note, you can listen to window messages by calling <CGUI.OnMessage> on a window instance.
 	
 	Event: ContextMenu()
 	Invoked when the user right clicks on a control of this window.

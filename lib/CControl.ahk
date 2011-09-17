@@ -1,5 +1,6 @@
 /*
 Class: CControl
+Basic control class from which all controls extend.
 */
 Class CControl ;Never created directly
 {
@@ -30,6 +31,7 @@ Class CControl ;Never created directly
 		Control, Show,,,% "ahk_id " this.hwnd
 	}
 	
+	/*
 	Function: Hide
 	Hides the control if it was previously visible.
 	*/
@@ -79,6 +81,83 @@ Class CControl ;Never created directly
 		;~ GuiControl, % this.GUINum ":Font", % this.ClassNN
 		;~ Gui, % this.GUINum ":Font", % CGUI.GUIList[this.GUINum].Font.Options, % CGUI.GUIList[this.GUINum].Font.Font ;Restore current font
 	;~ }
+	
+	
+	/*
+	Validates the text value of this control by calling a <Control.Validate> event function which needs to return the validated (or same) value.
+	This value is then used as text for the control if it differs.
+	*/
+	Validate()
+	{
+		output := this.CallEvent("Validate")
+		if(output.Handled && output.Result != this.Text)
+			this.Text := output.result
+	}
+	/*
+	Function: RegisterEvent
+	Assigns (or unassigns) a function to a specific event of this control so that the function will be called when the event occurs.
+	This is normally not necessary because functions in the GUI class with the name ControlName_EventName()
+	will be called automatically without needing to be registered. However this can be useful if you want to handle
+	multiple events with a single function, e.g. for a group of radio controls. Right now only one registered function per event
+	is supported, let me know if you need more.
+	
+	Parameters:
+		Type - The event name for which the function should be registered. If a control normally calls "GUI.ControlName_TextChanged()", specify "TextChanged" here.
+		FunctionName - The name of the function specified in the window class that is supposed to handle the event. Specify only the name of the function, skip the class.
+	*/
+	RegisterEvent(Type, FunctionName)
+	{
+		global CGUI
+		if(FunctionName)
+		{
+			;Make sure function name is valid (or tell the developer about it)
+			if(CGUI_Assert(IsFunc(this[FunctionName]), "Invalid function name passed to CControl.RegisterEvent()"), -2)
+				this._.RegisteredEvents[Type] := FunctionName
+		}
+		else
+			this._.RegisteredEvents.Remove(Type)
+	}
+	
+	/*
+	Calls an event with a specified name by looking up a possibly registered event handling function or calling the function with the default name.
+	Returns an object with Handled and Result keys, where Handled indicates if the function was successfully called and Result is the return value of the function.
+	*/
+	CallEvent(Name, Params*)
+	{
+		global CGUI
+		if(CGUI.GUIList[this.GUINum].IsDestroyed)
+			return
+		if(this._.RegisteredEvents.HasKey(Name))
+			return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)}
+		else if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_" Name]))
+			return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)}
+		else
+			return {Handled : false}
+	}
+	/*
+	Changes the state of controls assigned to an item of another control, making them (in)visible or (de)activating them.
+	The parameters are the previously selected item object (containing a controls array of controls assigned to it and the new selected item object.
+	*/
+	ProcessSubControlState(From, To)
+	{
+		global CGUI
+		if(From != To && !CGUI.GUIList[this.GUINum].IsDestroyed)
+		{
+			if(From)
+				for index, Control in From.Controls
+				{
+					if(Control._.UseEnabledState)
+						Control.Disable()
+					else
+						Control.Hide()
+				}
+			for index, Control in To.Controls
+				if(Control._.UseEnabledState)
+					Control.Enable()
+				else
+					Control.Show()
+		}
+	}
 	
 	/*
 	Variable: x
@@ -159,6 +238,7 @@ Class CControl ;Never created directly
         if this.__GetEx(Result, Name, Params*) 
             return Result 
     }
+	
 	__GetEx(ByRef Result, Name, Params*)
     {
 		global CGUI
@@ -260,6 +340,7 @@ Class CControl ;Never created directly
 			}
 		return Handled
     }
+	
     __Set(Name, Value)
     {
 		global CGUI
@@ -343,70 +424,6 @@ Class CControl ;Never created directly
 				return Value
 		}
     }
-	/*
-	Function: RegisterEvent
-	Assigns (or unassigns) a function to a specific event of this control so that the function will be called when the event occurs.
-	This is normally not necessary because functions in the GUI class with the name ControlName_EventName()
-	will be called automatically without needing to be registered. However this can be useful if you want to handle
-	multiple events with a single function, e.g. for a group of radio controls. Right now only one registered function per event
-	is supported, let me know if you need more.
-	
-	Parameters:
-		Type - The event name for which the function should be registered. If a control normally calls "GUI.ControlName_TextChanged()", specify "TextChanged" here.
-		FunctionName - The name of the function specified in the window class that is supposed to handle the event. Specify only the name of the function, skip the class.
-	*/
-	RegisterEvent(Type, FunctionName)
-	{
-		global CGUI
-		if(FunctionName)
-		{
-			;Make sure function name is valid (or tell the developer about it)
-			if(CGUI_Assert(IsFunc(this[FunctionName]), "Invalid function name passed to CControl.RegisterEvent()"), -2)
-				this._.RegisteredEvents[Type] := FunctionName
-		}
-		else
-			this._.RegisteredEvents.Remove(Type)
-	}
-	
-	;Calls an event with a specified name by looking up a possibly registered event handling function or calling the function with the default name.
-	CallEvent(Name, Params*)
-	{
-		global CGUI
-		if(CGUI.GUIList[this.GUINum].IsDestroyed)
-			return
-		if(this._.RegisteredEvents.HasKey(Name))
-			`(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)
-		else if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_" Name]))
-		{
-			;~ outputdebug % "call " this.Name "_" name
-			`(CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)
-		}
-	}
-	/*
-	Changes the state of controls assigned to an item of another control, making them (in)visible or (de)activating them.
-	The parameters are the previously selected item object (containing a controls array of controls assigned to it and the new selected item object.
-	*/
-	ProcessSubControlState(From, To)
-	{
-		global CGUI
-		if(From != To && !CGUI.GUIList[this.GUINum].IsDestroyed)
-		{
-			if(From)
-				for index, Control in From.Controls
-				{
-					if(Control._.UseEnabledState)
-						Control.Disable()
-					else
-						Control.Hide()
-				}
-			for index, Control in To.Controls
-				if(Control._.UseEnabledState)
-					Control.Enable()
-				else
-					Control.Show()
-		}
-	}
-	
 	
 	/*
 	Event: Introduction
@@ -415,15 +432,20 @@ Class CControl ;Never created directly
 	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
 	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
 	For better readability labels may be chained since they all execute the same code.
-	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent()> on a control instance to register a different event function name.
+	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
-	Event: Enter()
+	Event: Enter
 	Invoked when the control receives keyboard focus. This event does not require that the control has a matching g-label since it is implemented through window messages.
 	
-	Event: Leave()
+	Event: Leave
 	Invoked when the control loses keyboard focus. This event does not require that the control has a matching g-label since it is implemented through window messages.
-	*/
 	
+	Event: Validate
+	Invoked when the control is asked to validate its (textual) contents. This event is only valid for controls containing text, which are only Edit and ComboBox controls as of now.
+	
+	Parameters:
+		Text - The current text of the control that should be validated. The function can return this value if it is valid or another valid value.
+	*/	
 	
 	/*
 	Class: CImageListManager

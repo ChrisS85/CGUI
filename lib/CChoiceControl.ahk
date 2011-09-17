@@ -1,4 +1,6 @@
 /*
+Class: CChoiceControl
+This class implements DropDownList, ComboBox and ListBox controls.
 
 This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
 */
@@ -18,14 +20,18 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	}
 	PostCreate()
 	{
+		Base.PostCreate()
 		this._.Items := new this.CItems(this.GUINum, this.hwnd)
 		Content := this.Content
+		Loop, Parse, Content, |
 			this._.Items.Insert(new this.CItems.CItem(A_Index, this.GUINum, this.hwnd))
 		this._.PreviouslySelectedItem := this.SelectedItem
 	}
+	/*
 	Variable: SelectedItem
 	The text of the selected item.
 	
+	Variable: SelectedIndex
 	The index of the selected item.
 	
 	Variable: Items
@@ -179,7 +185,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
 	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
 	For better readability labels may be chained since they all execute the same code.
-	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent()> on a control instance to register a different event function name.
+	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
 	Event: SelectionChanged(SelectedIndex)
 	Invoked when the selection was changed.

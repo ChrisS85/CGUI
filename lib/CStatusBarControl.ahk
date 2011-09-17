@@ -1,3 +1,4 @@
+/*
 Class: CStatusBarControl
 The status bar. Can only be used once per window.
 
@@ -9,10 +10,13 @@ Class CStatusBarControl Extends CControl
 	{
 		base.__New(Name, Options, Text, GUINum)
 		this.Type := "StatusBar"
+		this._.Insert("ControlStyles", {SizingGrip : 0x100})
 		this._.Insert("Events", ["Click", "DoubleClick", "RightClick", "DoubleRightClick"])
 	}
+	PostCreate()
 	{
 		Base.PostCreate()
+		this._.Parts := new this.CParts(this.GUINum, this.hwnd)
 		if(this.Content)
 			this._.Parts._.Insert(1, new this.CParts.CPart(Text, 1, "", "", "", "", this.GUINum, this.hwnd))
 	}
@@ -279,7 +283,7 @@ Class CStatusBarControl Extends CControl
 	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
 	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
 	For better readability labels may be chained since they all execute the same code.
-	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent()> on a control instance to register a different event function name.
+	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
 	Event: Click(PartIndex)
 	Invoked when the user clicked on the control.

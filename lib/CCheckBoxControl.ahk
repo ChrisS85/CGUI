@@ -1,13 +1,17 @@
+/*
 Class: CCheckboxControl
 A checkbox/radio control.
 
 This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
+*/
 Class CCheckBoxControl Extends CControl ;This class is a radio control as well
+{
 	__New(Name, Options, Text, GUINum, Type)
 	{
 		Base.__New(Name, Options, Text, GUINum)
 		this.Type := Type
 		this._.Insert("ControlStyles", {Center : 0x300, Left : 0x100, Right : 0x200, RightButton : 0x20, Default : 0x1, Wrap : 0x2000, Flat : 0x8000})
+		this._.Insert("Events", ["CheckedChanged"])
 		this._.Insert("Controls", {})
 	}
 	/*
@@ -155,7 +159,7 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
 	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
 	For better readability labels may be chained since they all execute the same code.
-	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent()> on a control instance to register a different event function name.
+	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
 	Event: CheckedChanged()
 	Invoked when the checkbox/radio value changes.

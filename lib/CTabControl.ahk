@@ -1,3 +1,5 @@
+/*
+Class: CTabControl
 A tab container control. The controls added to a tab panel can be accessed through this object.
 
 This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
@@ -8,11 +10,14 @@ Class CTabControl Extends CControl
 	{
 		base.__New(Name, Options, Text, GUINum)
 		this.Type := "Tab"
+		this._.Insert("ControlStyles", {Bottom : 0x2, HotTrack : 0x40, Buttons : 0x100, MultiLine : 0x200})
 		this._.Insert("Events", ["Click", "DoubleClick", "RightClick", "DoubleRightClick"])
 	}
+	
 	PostCreate()
 	{
 		Base.PostCreate()
+		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
 		this._.Tabs := new this.CTabs(this.GUINum, this.hwnd)
 		Content := this.Content
 		Loop, Parse, Content, |
@@ -75,7 +80,7 @@ Class CTabControl Extends CControl
 	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
 	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
 	For better readability labels may be chained since they all execute the same code.
-	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent()> on a control instance to register a different event function name.
+	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
 	Event: Click(TabIndex)
 	Invoked when the user clicked on the control.
