@@ -474,6 +474,23 @@ Class CGUI
 	}
 	
 	/*
+	Function: Validate
+	This function validates the input of all controls which contain text data and have implemented ControlName_Validate() function (or registered another event function via <CControl.RegisterEvent()>).
+	It calls ControlName_Validate() and sets the text to a valid value where required.
+	*/
+	Validate()
+	{
+		for hwnd, Control in this.Controls
+		{
+			if(["Edit", "ComboBox"].HasKey(Control.Type)
+			{
+				output := Control.CallEvent("Validate", Control.Text)
+				if(output.Handled && output.Result != Control.Text)
+					Control.Text := output.Result
+			}
+		}
+	}
+	/*
 	Function: ControlFromHWND()
 	Returns the object that belongs to a control with a specific window handle.
 	Parameters:

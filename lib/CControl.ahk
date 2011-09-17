@@ -370,20 +370,25 @@ Class CControl ;Never created directly
 			this._.RegisteredEvents.Remove(Type)
 	}
 	
-	;Calls an event with a specified name by looking up a possibly registered event handling function or calling the function with the default name.
+	/*
+	Calls an event with a specified name by looking up a possibly registered event handling function or calling the function with the default name.
+	Returns an object with following members:
+	- "Result" of the event function.
+	- "Handled" value that determines if the event function was successfully called.
+	*/
 	CallEvent(Name, Params*)
 	{
 		global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		if(this._.RegisteredEvents.HasKey(Name))
-			`(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)
+			return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)}
 		else if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_" Name]))
-		{
-			;~ outputdebug % "call " this.Name "_" name
-			`(CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)
-		}
+			return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)}
+		else 
+			return {Handled: false}
 	}
+	
 	/*
 	Changes the state of controls assigned to an item of another control, making them (in)visible or (de)activating them.
 	The parameters are the previously selected item object (containing a controls array of controls assigned to it and the new selected item object.
