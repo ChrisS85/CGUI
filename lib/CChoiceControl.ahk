@@ -17,6 +17,10 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		else if(Type = "ListBox")
 			this._.Insert("ControlStyles", {Multi : 0x800, ReadOnly : 0x4000, Sort : 0x2, ToggleSelection : 0x8})
 		this._.Insert("Events", ["SelectionChanged"])
+		if(Type = "ListBox")
+			this._.Insert("Messages", {5 : "KillFocus", 4 : "SetFocus" }) ;Used for automatically registering message callbacks		
+		else if(Type = "ComboBox" || Type = "DropDownList")
+			this._.Insert("Messages", {4 : "KillFocus", 3 : "SetFocus" }) ;Used for automatically registering message callbacks
 	}
 	PostCreate()
 	{
@@ -155,6 +159,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			;~ }
 			else if(Name = "Text")
 			{
+				found := false
 				Loop % this.Items.MaxIndex()
 					if(this.Items[A_Index].Text = Value)
 					{
@@ -163,12 +168,13 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 						this._.PreviouslySelectedItem := this.SelectedItem
 						found := true
 					}
-				if(!found && this.type = "Combobox")
-				{
-					GuiControl, % this.GUINum ":ChooseString", % this.ClassNN, % Value
-					this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
-					this._.PreviouslySelectedItem := this.SelectedItem
-				}
+				if(!found && this.type = "ComboBox")
+					ControlSetText, , %Value%, % "ahk_id " this.hwnd
+				;~ {
+					;~ GuiControl, % this.GUINum ":ChooseString", % this.ClassNN, % Value
+					;~ this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
+					;~ this._.PreviouslySelectedItem := this.SelectedItem
+				;~ }
 			}
 			else
 				Handled := false

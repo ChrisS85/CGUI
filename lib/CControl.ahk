@@ -89,7 +89,7 @@ Class CControl ;Never created directly
 	*/
 	Validate()
 	{
-		output := this.CallEvent("Validate")
+		output := this.CallEvent("Validate", this.Text)
 		if(output.Handled && output.Result != this.Text)
 			this.Text := output.result
 	}
@@ -159,6 +159,10 @@ Class CControl ;Never created directly
 		}
 	}
 	
+	IsValidatableControlType()
+	{
+		return CGUI_IndexOf(["Edit", "ComboBox"], this.Type)
+	}
 	/*
 	Variable: x
 	x-Position of the control.
@@ -434,11 +438,13 @@ Class CControl ;Never created directly
 	For better readability labels may be chained since they all execute the same code.
 	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
-	Event: Enter
+	Event: FocusEnter
 	Invoked when the control receives keyboard focus. This event does not require that the control has a matching g-label since it is implemented through window messages.
+	This event is not supported for all input-capable controls unfortunately.
 	
-	Event: Leave
+	Event: FocusLeave
 	Invoked when the control loses keyboard focus. This event does not require that the control has a matching g-label since it is implemented through window messages.
+	This event is not supported for all input-capable controls unfortunately.
 	
 	Event: Validate
 	Invoked when the control is asked to validate its (textual) contents. This event is only valid for controls containing text, which are only Edit and ComboBox controls as of now.

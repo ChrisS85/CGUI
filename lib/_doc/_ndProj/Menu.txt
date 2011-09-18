@@ -46,17 +46,17 @@ Format: 1.4
 # --------------------------------------------------------------------------
 
 
+File: CGUI  (CGUI.ahk)
+File: CControl  (CControl.ahk)
 File: CActiveXControl  (CActiveXControl.ahk)
 File: CButtonControl  (CButtonControl.ahk)
 File: CCheckboxControl  (CCheckBoxControl.ahk)
 File: CChoiceControl  (CChoiceControl.ahk)
-File: CControl  (CControl.ahk)
 File: CEditControl  (CEditControl.ahk)
 File: CEnumerator  (CEnumerator.ahk)
 File: CFileDialog  (CFileDialog.ahk)
 File: CFolderDialog  (CFolderDialog.ahk)
 File: CGroupBoxControl  (CGroupBoxControl.ahk)
-File: CGUI  (CGUI.ahk)
 File: CHotkeyControl  (CHotkeyControl.ahk)
 File: CListViewControl  (CListViewControl.ahk)
 File: CPictureControl  (CPictureControl.ahk)

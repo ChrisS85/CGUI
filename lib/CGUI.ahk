@@ -44,7 +44,7 @@ Class CGUI
 	__New()
 	{
 		global CGUI, CFont
-		this.Insert("_", {})
+		this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set
 		CGUI.Insert("EventQueue", [])
 		CGUI._.Insert("WindowMessageListeners", []) 
 		start := 10 ;Let's keep some gui numbers free for other uses
@@ -62,12 +62,10 @@ Class CGUI
 		if(!this.GUINum)
 			return ""
 		this.Controls := Object()
-		;~ this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set
 		this.Font := new CFont(this.GUINum)
 		CGUI.GUIList[this.GUINum] := this
 		GUI, % this.GUINum ":+LabelCGUI_ +LastFound"		
 		this.hwnd := WinExist()
-		;~ this.Base.ImageListManager := new this.CImageListManager(GUINum) ;ImageListManager is stored in the base object of a gui class so that multiple instances of a gui may reuse the same Imagelist
 	}
 	;This class handles window message routing to the instances of window classes that register for a specific window message
 	Class WindowMessageHandler
@@ -132,8 +130,11 @@ Class CGUI
 						Messages.Insert(MSG)
 				for index, CurrentMessage in Messages ;Process all messages that are affected
 				{
+					/* THIS IS PROBLEMATIC because it would be removed from all windows and not just the current one
 					;If removing all handlers, also remove the internal handlers
 					hwnds := Message ? [hwnd] : [0, hwnd]
+					*/
+					hwnd := [hwnd]
 					for index, CurrentHWND in hwnds
 					{
 						;Make sure the window is actually registered right now so it doesn't get unregistered multiple times if this function happens to be called more than once with the same parameters
@@ -442,37 +443,32 @@ Class CGUI
 		Control.Remove("Content")
 		ControlList[Control.Name] := Control
 		this.Controls[hControl] := Control ;Add to list of controls
+		
 		;Check if the programmer missed a g-label
 		for index, Event in Control._.Events
-			if(!CGUI_Assert(!(IsFunc(this.__Class "." Control.Name "_" Event) && !IsLabel(this.__Class "_" Control.Name)), "Event notification function found for " Control.Name ", but the appropriate label " this.__Class "_" Control.Name " does not exist!", -2))
-				break
-		
-		if(type = "Tab2") ;Fix tab name
-		{
-			Gui, % this.GUINum ":Tab"
-			Control.Type := "Tab"
-		}
-		else if(type = "ActiveX")
-		{
-			GUINum := Control.GUINum
-			classnn := Control.ClassNN
-			GuiControlGet, object, % Control.GUINum ":", % Control.ClassNN
-			Control._.Object := object
-			;~ Events := {}
-			;~ for key, value in this.base
-				;~ if(InStr(key, Control.Name "_") = 1 && IsFunc(this[key]))
-					;~ Events.Insert(SubStr(key, StrLen(Control.Name "_") + 1), Value)
-			;~ Control._.Events := {base : Events}
-			Control._.Events := new Control.CEvents(Control.GUINum, Control.Name, Control.hwnd)
-			ComObjConnect(object, Control._.Events)
-		}
+			CGUI_Assert(!(IsFunc(this.__Class "." Control.Name "_" Event) && !IsLabel(this.__Class "_" Control.Name)), "Event notification function found for " Control.Name ", but the appropriate label " this.__Class "_" Control.Name " does not exist!", -2)
 		
 		;Check if Focus change messages should be registered automatically
 		if(IsFunc(this[Name "_FocusEnter"]) || IsFunc(this[Name "_FocusLeave"]))
-			this.OnMessage(0x004E, "OnNotifyInternal")
+			this.ActivateFocusChangeMessages(Control)
 		return Control
 	}
 	
+	;This function activates the message handling with the control-specific message numbers for SetFocus and KillFocus messages
+	ActivateFocusChangeMessages(Control)
+	{
+		;Old controls use WM_COMMAND with a custom code that differs between controls. 
+		;Because of this the control stores the WM_COMMAND parameters in the SetFocus and KillFocus keys. 
+		;They always appear in pairs so here only one is checked
+		if(Message := CGUI_IndexOf(Control._.Messages, "SetFocus"))
+			this.OnMessage(0x111, "InternalMessageHandling")
+		
+		;Newer Controls use WM_NOTIFY with NM_SETFOCUS and NM_KILLFOCUS
+		if(Message := CGUI_IndexOf(Control._.Messages, "Notify"))
+			this.OnMessage(Message, "InternalMessageHandling")
+		;~ this.OnMessage(0x004E, "InternalMessageHandling")
+		;~ this.OnMessage(0x111, "InternalMessageHandling")
+	}
 	/*
 	Function: Validate
 	Validates the contents of controls containing text fields by calling <Control.Validate> for each fitting control.
@@ -481,7 +477,7 @@ Class CGUI
 	Validate()
 	{
 		for hwnd, Control in this.Controls
-			if(["Edit", "ComboBox"].HasKey(Control.Type))
+			if(Control.IsValidatableControlType())
 				Control.Validate()
 	}
 	/*
@@ -627,6 +623,9 @@ Class CGUI
 	
 	Variable: CloseOnEscape
 	If set, the window will close itself when escape is pressed.	
+	
+	Variable: ValidateOnFocusLeave
+	If set, <CGUI.Validate> is called each time a text-containing variable loses focus.
 	*/
 	__Get(Name)
 	{
@@ -693,24 +692,8 @@ Class CGUI
 				if(GUI.__Class = this.__Class)
 					Value.Insert(GUI)
 		}
-		else if(Value = "" && Name = "MinSize")
-			Value := this._.MinSize
-		else if(Value = "" && Name = "MaxSize")
-			Value := this._.MaxSize
-		else if(Value = "" && Name = "Theme")
-			Value := this._.Theme
-		else if(Value = "" && Name = "ToolWindow")
-			Value := this._.ToolWindow
-		else if(Value = "" && Name = "Owner")
-			Value := this._.Owner
-		else if(Value = "" && Name = "OwnDialogs")
-			Value := this._.OwnDialogs
-		else if(Value = "" && Name = "Region")
-			Value := this._.Region
-		else if(Value = "" && Name = "WindowColor")
-			Value := this._.WindowColor
-		else if(Value = "" && Name = "ControlColor")
-			Value := this._.ControlColor
+		else if(Value = "" && CGUI_IndexOf(["MinSize", "MaxSize", "Theme", "ToolWindow", "Owner", "OwnDialogs", "Region", "WindowColor", "ControlColor", "ValidateOnFocusLeave"], Name))
+			Value := this._[Name]
 		if(!DetectHidden)
 			DetectHiddenWindows, Off
 		if(Value != "")
@@ -821,6 +804,14 @@ Class CGUI
 				this.Style := (Value ? "-" : "+") 0x8000000 ;WS_DISABLED
 			else if(Name = "Visible")
 				this.Style := (Value ? "+" : "-") 0x10000000 ;WS_VISIBLE			
+			else if(Name = "ValidateOnFocusLeave")
+			{
+				this._[Name] := Value = 1
+				if(Value = 1)
+					for hwnd, Control in this.Controls
+						if(Control.IsValidatableControlType())
+							this.ActivateFocusChangeMessages(Control)
+			}
 			else if(Name = "_") ;Prohibit setting the proxy object
 				Handled := true
 			else
@@ -969,18 +960,42 @@ Class CGUI
 		}
 	}
 	/*
-	This function gets called when a window receives the WM_NOTIFY message.
-	It is currently handles NM_SETFOCUS and NM_KILLFOCUS and calls FocusEnter() and FocusLeave() event functions in window classes.
+	This function gets called when a window receives internal messages that are handled through the library.
+	It is currently handles WM_COMMAND and WM_Notify to check for focus change events.
 	*/
-	OnNotifyInternal(Msg, wParam, lParam)
+	InternalMessageHandling(Msg, wParam, lParam)
 	{
-		hwndFrom := NumGet(lParam+0, 0, "UPTR")
-		Control := this.Controls[hwndFrom]
-		Code := NumGet(lParam+0, 2*A_PtrSize, "UINT") ;NM_KILLFOCUS := 0xFFFFFFF8, NM_SETFOCUS := 0xFFFFFFF9
-		if(Code = 0xFFFFFFF9)
-			Control.CallEvent("FocusEnter" )
-		else if(Code = 0xFFFFFFF8)
+		if(Msg = 0x004E)
+		{
+			hwndFrom := NumGet(lParam+0, 0, "UPTR")
+			Control := this.Controls[hwndFrom]
+			Code := NumGet(lParam+0, 2*A_PtrSize, "UINT") ;NM_KILLFOCUS := 0xFFFFFFF8, NM_SETFOCUS := 0xFFFFFFF9
+			if(Code = 0xFFFFFFF8)
+				Code := "KillFocus"
+			else if(Code = 0xFFFFFFF9)
+				Code := "SetFocus"
+		}
+		else if(Msg = 0x111)
+		{
+			if(lParam = 0) ;Only handle messages from controls
+				return
+			hwndFrom := lParam
+			Control := this.Controls[hwndFrom]
+			Code := CGUI_HighWord(wParam)
+			Code := Control._.Messages[Code] ;Translate to a common message name shared among all controls that support it to map different code numbers with same meaning from different controls to the same name
+			if(Control.Type = "Button")
+				OutputDebug Code %code%
+			if(!Code)
+				return
+		}
+		if(Code = "SetFocus")
+			Control.CallEvent("FocusEnter")
+		else if(Code = "KillFocus")
+		{
 			Control.CallEvent("FocusLeave")
+			if(this.ValidateOnFocusLeave && Control.IsValidatableControlType())
+				Control.Validate()
+		}
 	}
 }
 
@@ -1131,6 +1146,21 @@ CGUI_Assert(Condition, Message, CallStackLevel = -1)
 	return Condition
 }
 
+CGUI_HighWord(Value)
+{
+	return (Value & 0xFFFF0000) >> 16
+}
+CGUI_LowWord(Value)
+{
+	return Value & 0xFFFF
+}
+
+CGUI_IndexOf(Array, Value)
+{
+	Loop % Array.MaxIndex() ;Use a simple loop so that only numeric keys are used (and there is no chance that a key with "" or 0 is returned
+		if(Array[A_Index]=Value)
+			return A_Index
+}
 #include <gdip>
 #include <CControl>
 #include <CFileDialog>

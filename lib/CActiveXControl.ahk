@@ -14,7 +14,15 @@ Class CActiveXControl Extends CControl
 	{
 		Base.__New(Name, Options, Text, GUINum)
 		this.Insert("Type", "ActiveX")
-	}	
+	}
+	PostCreate()
+	{
+		;Acquire COM Object and connect its events with this instance
+		GuiControlGet, object, % this.GUINum ":", % this.ClassNN
+		this._.Object := object
+		this._.Events := new this.CEvents(this.GUINum, this.Name, this.hwnd)
+		ComObjConnect(object, this._.Events)
+	}
 	Class CEvents
 	{
 		__New(GUINum, ControlName, hwnd)

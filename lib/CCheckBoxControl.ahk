@@ -8,11 +8,13 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 {
 	__New(Name, Options, Text, GUINum, Type)
 	{
+		Options .= " +0x4000" ;BS_NOTIFY to allow receiving BN_SETFOCUS and BN_KILLFOCUS notifications in CGUI
 		Base.__New(Name, Options, Text, GUINum)
 		this.Type := Type
 		this._.Insert("ControlStyles", {Center : 0x300, Left : 0x100, Right : 0x200, RightButton : 0x20, Default : 0x1, Wrap : 0x2000, Flat : 0x8000})
 		this._.Insert("Events", ["CheckedChanged"])
 		this._.Insert("Controls", {})
+		this._.Insert("Messages", {7 : "KillFocus", 6 : "SetFocus" }) ;Used for automatically registering message callbacks
 	}
 	/*
 	Variable: Checked

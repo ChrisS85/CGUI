@@ -9,16 +9,22 @@ Class CTabControl Extends CControl
 	__New(Name, Options, Text, GUINum)
 	{
 		base.__New(Name, Options, Text, GUINum)
-		this.Type := "Tab"
+		this.Type := "Tab2" ;Use Tab2 initially but revert back to Tab in PostCreate to mask the real AHK type of the control.
 		this._.Insert("ControlStyles", {Bottom : 0x2, HotTrack : 0x40, Buttons : 0x100, MultiLine : 0x200})
 		this._.Insert("Events", ["Click", "DoubleClick", "RightClick", "DoubleRightClick"])
+		this._.Insert("Messages", {0x004E : "Notify"})
 	}
 	
 	PostCreate()
 	{
 		Base.PostCreate()
+		;Make sure future controls don't get added to this tab
+		Gui, % this.GUINum ":Tab"
+		this.Type := "Tab" ;Fix tab type value
 		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
 		this._.Tabs := new this.CTabs(this.GUINum, this.hwnd)
+		
+		;Parse Initial tabs
 		Content := this.Content
 		Loop, Parse, Content, |
 			this._.Tabs._.Insert(new this.CTabs.CTab(A_LoopField, A_Index, this.GUINum, this.hwnd))
@@ -81,6 +87,9 @@ Class CTabControl Extends CControl
 	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
 	For better readability labels may be chained since they all execute the same code.
 	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
+	
+	Event: Attention
+	The tab control does not support the FocusEnter and FocusLeave events.
 	
 	Event: Click(TabIndex)
 	Invoked when the user clicked on the control.
