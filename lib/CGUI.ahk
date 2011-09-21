@@ -174,7 +174,6 @@ Class CGUI
 	*/
 	OnMessage(Message, FunctionName = "")
 	{
-		outputdebug OnMessage(%Message%, %FunctionName%)
 		if(this.IsDestroyed)
 			return
 		if(FunctionName)
@@ -858,16 +857,14 @@ Class CGUI
 	HandleEvent()
 	{
 		global CGUI
-		;~ WasCritical := A_IsCritical
-		Critical
-		;~ if(this.IsDestroyed)
-			;~ return
-		if(A_ThisLabel ="CGUI_CLose")
-			outputdebug % "insert " A_ThisLabel
+		WasCritical := A_IsCritical
+		Critical ;Critical needs to be used to catch all events, especially from ListViews
+		if(this.IsDestroyed)
+			return
 		CGUI.EventQueue.Insert({Label : A_ThisLabel, Errorlevel : Errorlevel, GUI : A_GUI, EventInfo : A_EventInfo, GUIEvent : A_GUIEvent})
 		SetTimer, CGUI_HandleEvent, -10
-		;~ if(!WasCritical)
-			;~ Critical, Off
+		if(!WasCritical)
+			Critical, Off ;And it also needs to be disabled again, otherwise there can be some handlers that won't run until the window is reactivated (context menu g-label notification from ListView for example)
 	}
 	
 	/*
@@ -983,8 +980,6 @@ Class CGUI
 			Control := this.Controls[hwndFrom]
 			Code := CGUI_HighWord(wParam)
 			Code := Control._.Messages[Code] ;Translate to a common message name shared among all controls that support it to map different code numbers with same meaning from different controls to the same name
-			if(Control.Type = "Button")
-				OutputDebug Code %code%
 			if(!Code)
 				return
 		}
