@@ -193,14 +193,14 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	For better readability labels may be chained since they all execute the same code.
 	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
-	Event: SelectionChanged(SelectedIndex)
+	Event: SelectionChanged(SelectedItem)
 	Invoked when the selection was changed.
 	*/
 	HandleEvent(Event)
 	{
 		this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 		this._.PreviouslySelectedItem := this.SelectedItem
-		this.CallEvent("SelectionChanged")
+		this.CallEvent("SelectionChanged", this.SelectedItem)
 	}
 	/*
 	Class: CChoiceControl.CItems
@@ -248,25 +248,24 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		{
 			global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
-			Control := GUI.Controls[this.hwnd]
+			Control := GUI.Controls[this._.hwnd]
 			Selected := Control.SelectedIndex
 			ItemsString := ""
 			Pos := 1
 			Loop % this.MaxIndex()
 			{
-				
-				ItemsString .= "|" (Position = A_Index ? Text : this[pos])
+				ItemsString .= "|" (Position = A_Index ? Text : this[pos].Text)
 				if(Position = A_Index)
 					pos--
 				pos++
 			}
 			if(Position = -1)
 				ItemsString .= "|" Text
-			GuiControl, % this.GUINum ":", % Control.ClassNN, %ItemsString%
-			this._.Insert(Position = -1 ? this.MaxIndex() + 1 : Position, new this.CItems.CItem(Position, this.GUINum, this.Name))
-			for index, item in this
+			GuiControl, % this._.GUINum ":", % Control.ClassNN, %ItemsString%
+			this._.Insert(Position = -1 ? this.MaxIndex() + 1 : Position, new this.CItems.CItem(Position, this._.GUINum, this.Name)) ;Insert new item object
+			for index, item in this ;Move existing indices
 				item._.Index := index
-			GuiControl, % this.GUINum ":Choose", % Control.ClassNN, % (Position != -1 && Selected < Position ? Selected : Selected + 1)
+			GuiControl, % this._.GUINum ":Choose", % Control.ClassNN, % (Position != -1 && Selected < Position ? Selected : Selected + 1)
 		}
 		/*
 		Function: Remove
@@ -318,8 +317,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
 			GUI := CGUI.GUIList[this._.GUINum]
-			Control := GUI.Controls[this.hwnd]
-			ControlGet, List, List,,, % " ahk_id " Control.hwnd
+			ControlGet, List, List,,, % " ahk_id " this._.hwnd
 			count := 0
 			Loop, Parse, List, `n
 				count++

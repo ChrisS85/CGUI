@@ -368,7 +368,7 @@ Class CGUI
 	{
 		if(this.IsDestroyed)
 			return
-		Gui, % this.GUINum ":Menu", %Menname%
+		Gui, % this.GUINum ":Menu", %Menuname%
 	}
 	
 	/*

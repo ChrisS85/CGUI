@@ -38,6 +38,7 @@ Class CMyWindow Extends CGUI
 		;~ this.lvItems.Items[1].Icon := "D:\Projekte\Autohotkey\7plus\7+-128.ico" ;Use first icon.
 		;~ this.lvItems.Items[1].IconNumber := 2 ;Use 2nd icon. Beware that doing this will result in a second icon stored in the imagelist, so do not use this if you are concerned about memory
 		this.Add("ComboBox", "comboBox", "x100 y400", "a|b|c")
+		this.comboBox.Items.Add("d")
 		this.comboBox.Tooltip := "Blup" ;combobox consists of edit + drop down button control, this will show tooltip on both
 		this.comboBox.SelectedIndex := 3
 		this.combobox.text := "a"
