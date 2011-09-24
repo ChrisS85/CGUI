@@ -197,8 +197,6 @@ Class CGUI
 		global CGUI
 		if(this.IsDestroyed)
 			return
-		;~ for hwnd, Control in this.Private.Controls ;Break circular references to allow object release
-			;~ Control.GUI := ""
 		;Remove it from GUI list
 		CGUI.GUIList.Remove(this.GUINum) ;make sure not to alter other GUIs here
 		this.IsDestroyed := true		
@@ -363,7 +361,7 @@ Class CGUI
 	
 	/*
 	Function: Menu	
-	Attaches a menu bar to the window.
+	Attaches a menu bar to the window. The menu object can be accessed under the "Menu" property of the class instance deriving from CGUI.
 	
 	Parameters:
 		Menu - An instance of <CMenu> containing the menu information. Leave empty to remove the menu. If the menu object is attached as menu bar, it can not be used as a context menu anymore.
