@@ -13,7 +13,7 @@ D:\Projekte\Autohotkey\CGUI\lib\CProgressControl.ahk	1316257720	1	CProgressContr
 D:\Projekte\Autohotkey\CGUI\lib\CTabControl.ahk	1316386443	1	CTabControl
 D:\Projekte\Autohotkey\CGUI\lib\CEditControl.ahk	1316378477	1	CEditControl
 D:\Projekte\Autohotkey\CGUI\lib\CTreeViewControl.ahk	1316379942	1	CTreeViewControl
-D:\Projekte\Autohotkey\CGUI\lib\CGUI.ahk	1316789954	1	CGUI
+D:\Projekte\Autohotkey\CGUI\lib\CGUI.ahk	1316826762	1	CGUI
 D:\Projekte\Autohotkey\CGUI\lib\Regex.ahk	1311106768	0	D:\Projekte\Autohotkey\CGUI\lib\Regex.ahk
 D:\Projekte\Autohotkey\CGUI\lib\CHotkeyControl.ahk	1316386217	1	CHotkeyControl
 D:\Projekte\Autohotkey\CGUI\lib\CFolderDialog.ahk	1313567322	1	CFolderDialog
@@ -21,5 +21,6 @@ D:\Projekte\Autohotkey\CGUI\lib\CFileDialog.ahk	1313517750	1	CFileDialog
 D:\Projekte\Autohotkey\CGUI\lib\CStatusBarControl.ahk	1316263028	1	CStatusBarControl
 D:\Projekte\Autohotkey\CGUI\lib\json.ahk	1312018590	0	D:\Projekte\Autohotkey\CGUI\lib\json.ahk
 D:\Projekte\Autohotkey\CGUI\lib\CControl.ahk	1316386537	1	CControl
+D:\Projekte\Autohotkey\CGUI\lib\CMenu.ahk	1316823708	0	D:\Projekte\Autohotkey\CGUI\lib\CMenu.ahk
 D:\Projekte\Autohotkey\CGUI\lib\CActiveXControl.ahk	1316266569	1	CActiveXControl
 D:\Projekte\Autohotkey\CGUI\lib\CListViewControl.ahk	1316379945	1	CListViewControl

@@ -8,8 +8,6 @@ Class CMyWindow Extends CGUI
 {
 	__New(title)
 	{
-		;CGUI constructor should be called before doing anything else
-		base.__New()
 		this.Title := Title
 		this.Resize := true
 		this.MinSize := "500x"
@@ -91,8 +89,34 @@ Class CMyWindow Extends CGUI
 		this.DestroyOnClose := true
 		;~ this.ValidateOnFocusLeave := true
 		this.OnGUIMessage(0x200, "MouseMove")
+		this.Menu1 := New("CMenu", "Main")
+		this.Menu1.AddMenuItem("hallo", "hallo")
+		this.Menu1[1].Text := "Test"
+		this.Menu1.AddSubMenu("sub1", "Test")
+		this.Menu1[2].AddMenuItem("blup", "blup")
+		sub2 := New("CMenu", "sub2")
+		sub2.AddMenuItem("blah", "blah")
+		this.Menu1.AddSubMenu("sub2", sub2)
+		;~ this.Menu(this.Menu1.Name) ;It seems a menu can't be used for context and menu bar at once?
 		this.Show("")
 		return this
+	}
+	ContextMenu()
+	{
+		ToolTip context
+		this.ShowMenu(this.Menu1)
+	}
+	blup()
+	{
+		MsgBox blup
+	}
+	hallo()
+	{
+		MsgBox hallo
+	}
+	blah()
+	{
+		MsgBox blah
 	}
 	ComboBox_Validate(Text)
 	{

@@ -10,6 +10,9 @@
 Class CGUI
 {
 	static GUIList := Object()
+	static EventQueue := []
+	static WindowMessageListeners := []
+	_ := {}
 	;~ _ := Object() ;Proxy object
 	/*	
 	Get only:
@@ -41,31 +44,30 @@ Class CGUI
 	PostDestroy() ;Called when the window was destroyed. Attention: Many variables and functions in this object aren't usable anymore. This function is mostly used to release additional resources or to exit the program.
 	Escape() ;Called when escape is pressed and CloseOnEscape = false. The window is not automatically hidden/destroyed when CloseOnEscape = false.
 	*/
-	__New()
+	GUI := this.base.base.__New(this)
+	__New(instance)
 	{
 		global CGUI, CFont
-		this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set
-		CGUI.Insert("EventQueue", [])
-		CGUI._.Insert("WindowMessageListeners", []) 
-		start := 10 ;Let's keep some gui numbers free for other uses
+		if(!CGUI_Assert(IsObject(instance) && !instance.HasKey("hwnd"), "CGUI constructor must not be called!"))
+			return
+		;~ this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set		
+		start := 1
 		loop {
-			Gui %start%:+LastFoundExist
+			Gui % instance.__Class start ":", +LastFoundExist
 			IfWinNotExist
 			{
-				this.GUINum := start
+				instance.GUINum := instance.__Class start
 				break
 			}
 			start++
-			if(start = 100)
-				break
 		}
-		if(!this.GUINum)
-			return ""
-		this.Controls := Object()
-		this.Font := new CFont(this.GUINum)
-		CGUI.GUIList[this.GUINum] := this
-		GUI, % this.GUINum ":+LabelCGUI_ +LastFound"		
-		this.hwnd := WinExist()
+		if(!instance.GUINum) ;Should not happen unless instance uses a faulty __Set() mechanism
+			return
+		instance.Controls := Object()
+		instance.Font := new CFont(instance.GUINum)
+		CGUI.GUIList[instance.GUINum] := instance
+		GUI, % instance.GUINum ":+LabelCGUI_ +LastFound"		
+		instance.hwnd := WinExist()
 	}
 	;This class handles window message routing to the instances of window classes that register for a specific window message
 	Class WindowMessageHandler
@@ -371,6 +373,10 @@ Class CGUI
 		Gui, % this.GUINum ":Menu", %Menuname%
 	}
 	
+	ShowMenu(Menu, X="", Y="")
+	{
+		Menu.Show(this.GUINum, X, Y)
+	}
 	/*
 	Function: Add
 	
@@ -1156,8 +1162,23 @@ CGUI_IndexOf(Array, Value)
 		if(Array[A_Index]=Value)
 			return A_Index
 }
+CGUI_TypeOf(Object)
+{
+	return Object.__Class
+}
+New(Object, Params*)
+{
+	global
+	if(IsObject(%Object%))
+	{
+		instance := {base : %Object%}
+		instance.__New(Params*)
+		return instance
+	}
+}
 #include <gdip>
 #include <CControl>
 #include <CFileDialog>
 #include <CFolderDialog>
 #include <CEnumerator>
+#include <CMenu>
