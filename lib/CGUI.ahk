@@ -44,7 +44,10 @@ Class CGUI
 	PostDestroy() ;Called when the window was destroyed. Attention: Many variables and functions in this object aren't usable anymore. This function is mostly used to release additional resources or to exit the program.
 	Escape() ;Called when escape is pressed and CloseOnEscape = false. The window is not automatically hidden/destroyed when CloseOnEscape = false.
 	*/
-	GUI := this.base.base.__New(this)
+	
+	;The _Constructor key is never actually assigned (see __Set()). This line simply calls the __New() constructor of CGUI so that window classes deriving from CGUI do not need to call the base constructor.
+	_Constructor := this.base.base.__New(this) 
+	
 	__New(instance)
 	{
 		global CGUI, CFont
@@ -197,7 +200,7 @@ Class CGUI
 		;~ for hwnd, Control in this.Private.Controls ;Break circular references to allow object release
 			;~ Control.GUI := ""
 		;Remove it from GUI list
-		CGUI.GUIList.Remove(this.GUINum, "") ;make sure not to alter other GUIs here
+		CGUI.GUIList.Remove(this.GUINum) ;make sure not to alter other GUIs here
 		this.IsDestroyed := true		
 		this.WindowMessageHandler.UnregisterListener(this.hwnd) ;Unregister all registered window message listener functions
 		;Destroy the GUI
@@ -359,20 +362,29 @@ Class CGUI
 	}
 	
 	/*
-	Function: Menu
-	
+	Function: Menu	
 	Attaches a menu bar to the window.
 	
 	Parameters:
-		Menuname - The name of a menu which was previously created with the Menu (<http://www.autohotkey.com/docs/commands/Menu.htm>) command. Leave empty to remove the menu bar.
+		Menu - An instance of <CMenu> containing the menu information. Leave empty to remove the menu. If the menu object is attached as menu bar, it can not be used as a context menu anymore.
 	*/
-	Menu(Menuname="")
+	Menu(Menu)
 	{
 		if(this.IsDestroyed)
 			return
-		Gui, % this.GUINum ":Menu", %Menuname%
+		this.Menu := Menu
+		Gui, % this.GUINum ":Menu", % Menu.Name
 	}
 	
+	/*
+	Function: ShowMenu
+	Shows a menu. This function is the preferred way to show menus that use callback functions inside the gui class that derives from CGUI.
+	
+	Paramters:
+		Menu - The <CMenu> object which contains the menu information
+		X - X position of the menu.
+		Y - Y position of the menu.
+	*/
 	ShowMenu(Menu, X="", Y="")
 	{
 		Menu.Show(this.GUINum, X, Y)
@@ -692,7 +704,7 @@ Class CGUI
 		}
 		if(Value = "" && Name = "Instances") ;Returns a list of instances of this window class
 		{
-			Value := Array()
+			Value := []
 			for GuiNum,GUI in CGUI.GUIList
 				if(GUI.__Class = this.__Class)
 					Value.Insert(GUI)
@@ -817,6 +829,8 @@ Class CGUI
 						if(Control.IsValidatableControlType())
 							this.ActivateFocusChangeMessages(Control)
 			}
+			else if(Name = "_Constructor") ;_Constructor is just a temporary variable name for automatically calling the CGUI constructor
+				Handled := true
 			else if(Name = "_") ;Prohibit setting the proxy object
 				Handled := true
 			else

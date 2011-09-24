@@ -170,7 +170,7 @@ Class CListViewControl Extends CControl
 				return Value
 		}
 	}
-	__Set(Name, Value, Params*)
+	__Set(Name, Params*)
 	{
 		global CGUI
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
@@ -178,6 +178,8 @@ Class CListViewControl Extends CControl
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
 			Handled := true
+			Value := Params[Params.MaxIndex()]
+			Params.Remove(Params.MaxIndex())
 			if(Name = "SelectedIndices" || Name = "CheckedIndices")
 			{
 				Gui, % this.GUINum ":Default"
@@ -467,7 +469,7 @@ Class CListViewControl Extends CControl
 					return this.MaxIndex()
 			}
 		}
-		__Set(Name, Value, Params*)
+		__Set(Name, Params*)
 		{
 			global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]

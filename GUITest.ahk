@@ -77,7 +77,7 @@ Class CMyWindow Extends CGUI
 		T1[3].Bold := 1
 		;~ T1[3].Move(4)
 		this.tree.HotTrack := 1
-		this.Add("ActiveX", "explorer", "x400 y400 w200 h200", "Shell.Explorer")
+		;~ this.Add("ActiveX", "explorer", "x400 y400 w200 h200", "Shell.Explorer")
 		;~ this.explorer._.Object.Navigate("http://www.google.de")
 		this.explorer.Navigate("http://www.google.de")
 		;~ msgbox % this.picTest.Picture
@@ -92,12 +92,16 @@ Class CMyWindow Extends CGUI
 		this.Menu1 := New("CMenu", "Main")
 		this.Menu1.AddMenuItem("hallo", "hallo")
 		this.Menu1[1].Text := "Test"
+		this.Menu1[1].Checked := true
+		this.Menu1[1].Enabled := false
 		this.Menu1.AddSubMenu("sub1", "Test")
 		this.Menu1[2].AddMenuItem("blup", "blup")
 		sub2 := New("CMenu", "sub2")
 		sub2.AddMenuItem("blah", "blah")
 		this.Menu1.AddSubMenu("sub2", sub2)
-		;~ this.Menu(this.Menu1.Name) ;It seems a menu can't be used for context and menu bar at once?
+		sub2.Icon := "C:\Program Files\Autohotkey\SciTE_beta5\AutoHotkey.exe"
+		this.Menu1.DeleteMenuItem(1)
+		;~ this.Menu(this.Menu1) ;It seems a menu can't be used for context and menu bar at once?
 		this.Show("")
 		return this
 	}
