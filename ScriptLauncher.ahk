@@ -2,16 +2,13 @@ gui := new ScriptLauncher()
 #include <CGUI>
 Class ScriptLauncher Extends CGUI
 {
+	listView1			:= this.AddControl("ListView", "listView1", "x12 y40 w334 h217", "")
+	button1			:= this.AddControl("Button", "button1", "x271 y12 w75 h23", "Browse")
+	textBox1			:= this.AddControl("Edit", "textBox1", "x12 y14 w253 h20", "")
+	statusStrip1	:= this.AddControl("StatusBar", "statusStrip1", "w356 h22", "Double-click a script to launch it!")
+		
 	__New()
 	{
-		this.Add("ListView", "listView1", "x12 y40 w334 h217", "")
-		
-		this.Add("Button", "button1", "x271 y12 w75 h23", "Browse")
-		
-		this.Add("Edit", "textBox1", "x12 y14 w253 h20", "")
-		
-		this.Add("StatusBar", "statusStrip1", "w356 h22", "Double-click a script to launch it!")
-		
 		this.Title := "ScriptLauncher"
 		this.Show()
 	}

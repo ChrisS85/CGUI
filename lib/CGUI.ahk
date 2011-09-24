@@ -388,7 +388,7 @@ Class CGUI
 		Menu.Show(this.GUINum, X, Y)
 	}
 	/*
-	Function: Add
+	Function: AddControl
 	
 	Creates and adds a control to the window.
 	
@@ -409,11 +409,13 @@ Class CGUI
 					- Picture
 					- Progress
 					- ActiveXControl
-		Name - The name of the control. The control can be accessed by its name directly from the GUI object, i.e. GUI.MyEdit1 or similar. Names must be unique and must not be empty.
+		Name - The name of the control. Names must be unique and must not be empty. The returned control object is usually assigned to GUI.ControlName after calling this function and can then be accessed by its name directly from the GUI object, i.e. GUI.MyEdit1 or similar. Otherwise the control can be accessed by window handle through the GUI.Controls array.
 		Options - Default options to be used for the control. These are in default AHK syntax according to <http://www.autohotkey.com/docs/commands/Gui.htm#OtherOptions> and <http://www.autohotkey.com/docs/commands/GuiControls.htm>. Do not use GUI variables (v option) and g-labels (g option).
 		Text - Text of the control. For some controls, this parameter has a special meaning. It can be a list of items or a collection of column headers separated by "|".
+	
+	Returns: The created control object
 	*/
-	Add(Control, Name, Options, Text, ControlList="")
+	AddControl(Control, Name, Options, Text, ControlList="")
 	{
 		global
 		local hControl, type
@@ -421,8 +423,6 @@ Class CGUI
 			return
 		if(!CGUI_Assert(Name, "GUI.Add() : No name specified. Please supply a proper control name.", -2)) ;Validate name.
 			return
-		if(!ControlList)
-			ControlList := this
 		if(!CGUI_Assert(!IsObject(ControlList[Name]), "GUI.Add(): The control " Name " already exists. Please choose another name!", -2)) ;Make sure not to add a control with duplicate name.
 			return
 		type := Control
@@ -456,7 +456,8 @@ Class CGUI
 		Control.Insert("hwnd", hControl) ;Window handle is used for all further operations on this control
 		Control.PostCreate()
 		Control.Remove("Content")
-		ControlList[Control.Name] := Control
+		if(ControlList)
+			ControlList[Control.Name] := Control
 		this.Controls[hControl] := Control ;Add to list of controls
 		
 		;Check if the programmer missed a g-label

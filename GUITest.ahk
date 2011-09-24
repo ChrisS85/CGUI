@@ -6,36 +6,40 @@ return
 #include <CGUI>
 Class CMyWindow Extends CGUI
 {
+	lvItems			:= this.AddControl("ListView", "lvItems", "x12 y12 w301 h155 Checked", "Field 1|Field 2")
+	btnAdd				:= this.AddControl("Button", "btnAdd", "x319 y12 w75 h23", "Add")
+	btnRemove		:= this.AddControl("Button", "btnRemove", "x319 y41 w75 h23", "Remove")
+	chkChecked	:= this.AddControl("Radio", "chkChecked", "x13 y174 w69 h17 Disabled", "Checked")
+	chkChecked2	:= this.AddControl("Radio", "chkChecked2", "x313 y174 w69 h17", "Checked")
+	txtField1			:= this.AddControl("Edit", "txtField1", "x99 y174 w104 h20 Disabled", "")
+	txtField2			:= this.AddControl("Edit", "txtField2", "x209 y174 w104 h20 Disabled", "")
+	btnSave			:= this.AddControl("Button", "btnSave", "x319 y144 w75 h23", "Save")
+	btnLoad			:= this.AddControl("Button", "btnLoad", "x319 y115 w75 h23", "Load")
+	picTest			:= this.AddControl("Picture", "picTest", "x500 y500 w200 h-1", "D:\Projekte\Autohotkey\7plus\7+-128.ico")
+	prgTest			:= this.AddControl("Hotkey", "prgTest", "x300 y300 w100 h100", 50)
+	comboBox		:= this.AddControl("ComboBox", "comboBox", "x100 y400", "a|b|c")
+	statBar			:= this.AddControl("StatusBar", "statBar", "", "test")
+	sometab			:= this.AddControl("Tab", "sometab", "x20 y200 w200 h200", "tab1|tab2|tab3")
+	tree					:= this.AddControl("TreeView", "tree", "x300 y600 w100 h200 -Readonly", "")
 	__New(title)
 	{
 		this.Title := Title
 		this.Resize := true
 		this.MinSize := "500x"
-		this.Add("ListView", "lvItems", "x12 y12 w301 h155 Checked", "Field 1|Field 2")
-		this.Add("Button", "btnAdd", "x319 y12 w75 h23", "Add")
-		this.Add("Button", "btnRemove", "x319 y41 w75 h23", "Remove")
-		this.Add("Radio", "chkChecked", "x13 y174 w69 h17 Disabled", "Checked")
-		this.Add("Radio", "chkChecked2", "x313 y174 w69 h17", "Checked")
+	
 		this.chkChecked.AddControl("Text", "test1", "x400 y700", "bla", 1)
 		this.chkChecked2.AddControl("Text", "test1", "x400 y720", "bla", 1)
-		this.Add("Edit", "txtField1", "x99 y174 w104 h20 Disabled", "")
-		this.Add("Edit", "txtField2", "x209 y174 w104 h20 Disabled", "")
 		this.txtField2.AddUpDown(2, 40)
-		this.Add("Button", "btnSave", "x319 y144 w75 h23", "Save")
-		this.Add("Button", "btnLoad", "x319 y115 w75 h23", "Load")
-		this.Add("Picture", "picTest", "x500 y500 w200 h-1", "D:\Projekte\Autohotkey\7plus\7+-128.ico")
 		this.lvItems.IndependentSorting := true
 		this.lvItems.Items.Add("", "test2", "test2") ;variadic function
 		this.lvItems.Items[1].SetIcon("D:\Projekte\Autohotkey\7plus\7+-128.ico", 1) ;Set icon and icon number
 		this.lvItems.Items.Add("", "test3", "test3") ;variadic function
 		this.lvItems.Items[1].AddControl("Text", "test1", "x400 y600", "bla", 1)
 		this.lvItems.Items[2].AddControl("Text", "test1", "x500 y600", "bla", 1)
-		this.Add("Hotkey", "prgTest", "x300 y300 w100 h100", 50)
 		;~ GuiControl, % this.GUINum ":-Smooth", % this.prgTest.ClassNN
 		;~ this.prgTest.Vertical := 1
 		;~ this.lvItems.Items[1].Icon := "D:\Projekte\Autohotkey\7plus\7+-128.ico" ;Use first icon.
 		;~ this.lvItems.Items[1].IconNumber := 2 ;Use 2nd icon. Beware that doing this will result in a second icon stored in the imagelist, so do not use this if you are concerned about memory
-		this.Add("ComboBox", "comboBox", "x100 y400", "a|b|c")
 		this.comboBox.Items.Add("d")
 		this.comboBox.Tooltip := "Blup" ;combobox consists of edit + drop down button control, this will show tooltip on both
 		this.comboBox.SelectedIndex := 3
@@ -44,8 +48,6 @@ Class CMyWindow Extends CGUI
 		this.lvItems.tooltip := "List"
 		this.btnSave.Tooltip := "SAAAAAVEEEE"
 		this.btnLoad.Tooltip := "LOOOOAAAAAD"
-		this.Add("StatusBar", "statBar", "", "test")
-		this.Add("Tab", "sometab", "x20 y200 w200 h200", "tab1|tab2|tab3")
 		this.sometab.Tabs[1].AddControl("Text", "tabtext", "", "text")
 		this.sometab.Tabs[1].Controls.tabtext.Link := 1
 		;~ msgbox % this.sometab.Tabs[1]._.TabNumber
@@ -57,7 +59,6 @@ Class CMyWindow Extends CGUI
 		this.statBar.Parts[1] := {text : "blup", width : 50}
 		this.statBar.Parts := [{Text : "blup", Width : 200}, {Text : "bla"}]
 		this.picTest.Picture := "C:\Program Files\Autohotkey\SciTE_beta5\AutoHotkey.exe"
-		this.Add("TreeView", "tree", "x300 y600 w100 h200 -Readonly", "")
 		T1 := this.tree.Items.Add("T1")
 		T11 := T1.Add("T11")
 		T11.AddControl("Text", "test1", "x100 y600", "hallo11")
@@ -79,7 +80,7 @@ Class CMyWindow Extends CGUI
 		this.tree.HotTrack := 1
 		;~ this.Add("ActiveX", "explorer", "x400 y400 w200 h200", "Shell.Explorer")
 		;~ this.explorer._.Object.Navigate("http://www.google.de")
-		this.explorer.Navigate("http://www.google.de")
+		;~ this.explorer.Navigate("http://www.google.de")
 		;~ msgbox % this.picTest.Picture
 		;~ this.statBar.Parts.Remove(1)
 		;~ this.lvItems.Items[1].Checked := true

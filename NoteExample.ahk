@@ -6,23 +6,19 @@ gui := new NoteExample()
 #Commentflag ;
 Class NoteExample Extends CGUI
 {
+	treeNoteList				:= this.AddControl("TreeView", "treeNoteList", "x12 y12 w214 h400", "")
+	btnAddCategory			:= this.AddControl("Button", "btnAddCategory", "x12 y418 w79 h23", "Add category")		
+	btnDelete					:= this.AddControl("Button", "btnDelete", "x164 y418 w62 h23", "Delete")		
+	txtName						:= this.AddControl("Edit", "txtName", "x232 y12 w508 h23", "")		
+	txtNote							:= this.AddControl("Edit", "txtNote", "x232 y42 w508 h400", "")
+	btnAddNote					:=	this.AddControl("Button", "btnAddNote", "x97 y418 w61 h23", "Add note")
+	
 	__New()
 	{
 		j := FileExist(A_ScriptDir "\Notes.json") ? json_load(A_ScriptDir "\Notes.json") : {Categories : [], Notes : [], IsCategory : true} ;Load notes and categories
-		this.Add("TreeView", "treeNoteList", "x12 y12 w214 h400", "")
 		this.FillTreeView(j) ;Add loaded notes/categories to the TreeView
 		this.SelectedTreeItem := this.treeNoteList.Items
-		this.Add("Button", "btnAddCategory", "x12 y418 w79 h23", "Add category")
-		
-		this.Add("Button", "btnDelete", "x164 y418 w62 h23", "Delete")
-		
-		this.Add("Edit", "txtName", "x232 y12 w508 h23", "")
-		
-		this.Add("Edit", "txtNote", "x232 y42 w508 h400", "")
 		this.txtNote.Multi := 1
-		
-		this.Add("Button", "btnAddNote", "x97 y418 w61 h23", "Add note")
-		
 		this.Title := "NoteExample"
 		this.DestroyOnClose := true ;By Setting this the window will destroy itself when the user cloeses it
 		this.Show()

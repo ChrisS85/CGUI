@@ -3,9 +3,9 @@
 ; Licenced under the MIT license: http://www.opensource.org/licenses/mit-license.php
 class RegEx
 {
-	var Needle := "."
-	var EMAIL := "i)(?:\b|^)[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}(?:\b|$)"
-	var EMAIL2 := "[a-z0-9!#$%&'*+/=?^_``{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_``" 
+	Needle := "."
+	EMAIL := "i)(?:\b|^)[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}(?:\b|$)"
+	EMAIL2 := "[a-z0-9!#$%&'*+/=?^_``{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_``" 
 	. "{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|"
 	. "net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b"
 	

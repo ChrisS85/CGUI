@@ -5,8 +5,9 @@ return
 #include <CGUI>
 Class CBasicWindow Extends CGUI
 {
-	btnButton := this.Add("Button", "btnButton", "", "button") ;Defining controls like this is also possible now!
-	__New(title)
+	;Controls can be defined as class variables at the top of the class like this:
+	btnButton := this.AddControl("Button", "btnButton", "", "button") 
+	__New(Title)
 	{
 		;Set some window properties
 		this.Title := Title
@@ -15,8 +16,8 @@ Class CBasicWindow Extends CGUI
 		this.CloseOnEscape := true
 		this.DestroyOnClose := true
 		
-		;Add a control
-		this.Add("Edit", "editField", "w100", "Some data")
+		;Add a control dynamically
+		this.editField := this.AddControl("Edit", "editField", "w100", "Some data")
 		
 		;Show the window
 		this.Show("")

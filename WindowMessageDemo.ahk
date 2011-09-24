@@ -6,15 +6,15 @@ return
 #include <CGUI>
 Class CWindowMessageDemo Extends CGUI
 {
+	txtX 		:= this.AddControl("Text", "txtX", "x10", "X:")
+	editX 	:= this.AddControl("Edit", "editX", "x+10", "")
+	txtY		:= this.AddControl("Text", "txtY", "x10", "Y:")
+	editY	:= this.AddControl("Edit", "editY", "x+10", "")
 	__New()
 	{
 		this.Title := "Window message demo"
 		this.Resize := true
 		this.MinSize := "400x300"
-		this.Add("Text", "txtX", "x10", "X:")
-		this.Add("Edit", "editX", "x+10", "")
-		this.Add("Text", "txtY", "x10", "Y:")
-		this.Add("Edit", "editY", "x+10", "")
 		this.CloseOnEscape := true
 		this.DestroyOnClose := true
 		this.OnMessage(0x200, "MouseMove")

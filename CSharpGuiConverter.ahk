@@ -3,29 +3,25 @@ gui := new CSharpGuiConverter()
 #include <Regex>
 Class CSharpGuiConverter Extends CGUI
 {
+	label1			:= this.AddControl("Text", "label1", "x12 y15 w53 h13", "Input File:")
+	txtInput 		:= this.AddControl("Edit", "txtInput", "x71 y14 w274 h20", "")
+	btnInput		:= this.AddControl("Button", "btnInput", "x351 y12 w36 h23", "...")
+	label2			:= this.AddControl("Text", "label2", "x12 y41 w61 h13", "Output File:")
+	txtOutput		:= this.AddControl("Edit", "txtOutput", "x71 y40 w274 h20", "")
+	btnOutput	:= this.AddControl("Button", "btnOutput", "x351 y38 w36 h23", "...")
+	btnConvert	:= this.AddControl("Button", "btnConvert", "x15 y66 w120 h23", "Convert")
+	btnRun		:= this.AddControl("Button", "btnRun", "x141 y66 w120 h23", "Run Converted File")
+	btnEdit			:= this.AddControl("Button", "btnEdit", "x267 y66 w120 h23", "Edit Converted File")
 	__New()
 	{
 		IniRead, in, %A_ScriptName%.ini,Settings, In, %A_Space%
 		IniRead, out, %A_ScriptName%.ini,Settings, Out, %A_Space%
-		this.Add("Text", "label1", "x12 y15 w53 h13", "Input File:")
 		
-		this.Add("Edit", "txtInput", "x71 y14 w274 h20", in)
+		this.txtInput.Text := in
+		this.txtOutput.Text := out
 		
-		this.Add("Button", "btnInput", "x351 y12 w36 h23", "...")
-		
-		this.Add("Text", "label2", "x12 y41 w61 h13", "Output File:")
-		
-		this.Add("Edit", "txtOutput", "x71 y40 w274 h20", out)
-		
-		this.Add("Button", "btnOutput", "x351 y38 w36 h23", "...")
-		
-		this.Add("Button", "btnConvert", "x15 y66 w120 h23", "Convert")
-		this.btnConvert.Enabled := FileExist(in) && strlen(out) > 1
-		
-		this.Add("Button", "btnRun", "x141 y66 w120 h23", "Run Converted File")
-		this.btnRun.Enabled := 0
-		
-		this.Add("Button", "btnEdit", "x267 y66 w120 h23", "Edit Converted File")
+		this.btnConvert.Enabled := FileExist(in) && strlen(out) > 1		
+		this.btnRun.Enabled := 0			
 		this.btnEdit.Enabled := 0
 		
 		this.height := 116
@@ -245,7 +241,7 @@ Class CSharpGuiConverter Extends CGUI
 		}
 		
 		;Now that all info is available, write the file
-		OutputFile := "gui := new " Class "()`n#include <CGUI>`nClass " Class " Extends CGUI`n{`n`t__New()`n`t{`n`t`tBase.__New()`n"
+		OutputFile := "gui := new " Class "()`n#include <CGUI>`nClass " Class " Extends CGUI`n{`n`t__New()`n`t{`n"
 		for index, Control in Controls
 		{
 			Options := (Control.HasKey("x") ? "x" Control.x " " : "" ) (Control.HasKey("y") ? "y" Control.y " " : "" ) (Control.HasKey("width") ? "w" Control.width " " : "" ) (Control.HasKey("height") ? "h" Control.height : "" )

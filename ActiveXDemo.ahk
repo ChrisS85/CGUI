@@ -3,10 +3,10 @@ return
 #include <CGUI>
 Class CActiveXDemo Extends CGUI
 {
+	ie := this.AddControl("ActiveX", "ie", "w800 h600", "Shell.Explorer")
 	__New(title)
 	{
-		this.Title := Title
-		this.Add("ActiveX", "ie", "w800 h600", "Shell.Explorer")
+		this.Title := Title		
 		this.ie.Navigate("http://www.google.com")
 		this.DestroyOnClose := true
 		this.Show()

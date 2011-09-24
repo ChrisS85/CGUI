@@ -10,7 +10,7 @@ Class CMyWindow Extends CGUI
 	{
 		this.Title := Title
 		this.Resize := true
-		this.MinSize := "500x"
+		this.MinSize := "500x200"
 		this.CloseOnEscape := true
 		this.DestroyOnClose := true
 		this.Menu1 := New("CMenu", "Main")
