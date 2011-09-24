@@ -5,7 +5,6 @@ Class CActiveXDemo Extends CGUI
 {
 	__New(title)
 	{
-		base.__New()
 		this.Title := Title
 		this.Add("ActiveX", "ie", "w800 h600", "Shell.Explorer")
 		this.ie.Navigate("http://www.google.com")

@@ -8,7 +8,6 @@ Class NoteExample Extends CGUI
 {
 	__New()
 	{
-		Base.__New() ;init CGUI
 		j := FileExist(A_ScriptDir "\Notes.json") ? json_load(A_ScriptDir "\Notes.json") : {Categories : [], Notes : [], IsCategory : true} ;Load notes and categories
 		this.Add("TreeView", "treeNoteList", "x12 y12 w214 h400", "")
 		this.FillTreeView(j) ;Add loaded notes/categories to the TreeView

@@ -4,7 +4,6 @@ Class ScriptLauncher Extends CGUI
 {
 	__New()
 	{
-		Base.__New()
 		this.Add("ListView", "listView1", "x12 y40 w334 h217", "")
 		
 		this.Add("Button", "button1", "x271 y12 w75 h23", "Browse")

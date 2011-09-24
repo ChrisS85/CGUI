@@ -5,7 +5,6 @@ Class CSharpGuiConverter Extends CGUI
 {
 	__New()
 	{
-		Base.__New()
 		IniRead, in, %A_ScriptName%.ini,Settings, In, %A_Space%
 		IniRead, out, %A_ScriptName%.ini,Settings, Out, %A_Space%
 		this.Add("Text", "label1", "x12 y15 w53 h13", "Input File:")
@@ -33,8 +32,7 @@ Class CSharpGuiConverter Extends CGUI
 		this.Title := "C# GUI Converter"
 		this.Width := 401
 		this.DestroyOnClose := true
-		this.Show()
-		
+		this.Show()		
 	}
 	btnInput_Click()
 	{

@@ -8,8 +8,6 @@ Class CWindowMessageDemo Extends CGUI
 {
 	__New()
 	{
-		;CGUI constructor should be called before doing anything else
-		base.__New()
 		this.Title := "Window message demo"
 		this.Resize := true
 		this.MinSize := "400x300"
