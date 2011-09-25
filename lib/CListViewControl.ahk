@@ -8,7 +8,7 @@ Class CListViewControl Extends CControl
 {
 	__New(Name, ByRef Options, Text, GUINum)
 	{
-		global CGUI		
+		;~ global CGUI		
 		Events := ["Click", "RightClick", "ItemActivated", "MouseLeave", "EditingStart", "FocusReceived", "FocusLost", "ItemSelected", "ItemDeselected", "ItemFocused", "ItemDefocused", "ItemChecked", " ItemUnChecked", "SelectionChanged", "CheckedChanged", "FocusedChanged", "KeyPress", "Marquee", "ScrollingStart", "ScrollingEnd"]
 		if(!InStr(Options, "AltSubmit")) ;Automagically add AltSubmit when necessary
 		{
@@ -41,7 +41,7 @@ Class CListViewControl Extends CControl
 	*/
 	ModifyCol(ColumnNumber="", Options="", ColumnTitle="")
 	{
-		global CGUI
+		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		Gui, % this.GUINum ":Default"
@@ -54,7 +54,7 @@ Class CListViewControl Extends CControl
 	*/
 	InsertCol(ColumnNumber, Options="", ColumnTitle="")
 	{
-		global CGUI
+		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		Gui, % this.GUINum ":Default"
@@ -67,7 +67,7 @@ Class CListViewControl Extends CControl
 	*/
 	DeleteCol(ColumnNumber)
 	{
-		global CGUI
+		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		Gui, % this.GUINum ":Default"
@@ -118,7 +118,7 @@ Class CListViewControl Extends CControl
 	*/
 	__Get(Name, Params*)
 	{
-		global CGUI
+		;~ global CGUI
 		if(Name != "GUINum" && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -172,7 +172,7 @@ Class CListViewControl Extends CControl
 	}
 	__Set(Name, Params*)
 	{
-		global CGUI
+		;~ global CGUI
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -271,7 +271,7 @@ Class CListViewControl Extends CControl
 		}
 		_NewEnum()
 		{
-			global CEnumerator
+			;~ global CEnumerator
 			return new CEnumerator(this)
 		}
 		/*
@@ -280,7 +280,7 @@ Class CListViewControl Extends CControl
 		*/
 		MaxIndex()
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -299,7 +299,7 @@ Class CListViewControl Extends CControl
 		*/
 		Add(Options, Fields*)
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -334,7 +334,7 @@ Class CListViewControl Extends CControl
 		*/
 		Insert(RowNumber, Options, Fields*)
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -383,7 +383,7 @@ Class CListViewControl Extends CControl
 		*/
 		Modify(RowNumber, Options, Fields*)
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -416,7 +416,7 @@ Class CListViewControl Extends CControl
 		*/
 		Delete(RowNumber)
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -453,7 +453,7 @@ Class CListViewControl Extends CControl
 		*/
 		__Get(Name)
 		{
-			global CGUI
+			;~ global CGUI
 			if(Name != "_")
 			{
 				GUI := CGUI.GUIList[this._.GUINum]
@@ -471,7 +471,7 @@ Class CListViewControl Extends CControl
 		}
 		__Set(Name, Params*)
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -499,7 +499,7 @@ Class CListViewControl Extends CControl
 		{
 			__New(SortedIndex, UnsortedIndex, GUINum, hwnd)
 			{
-				global CGUI
+				;~ global CGUI
 				this.Insert("_", {})				
 				this._.RowNumber := UnsortedIndex
 				this._.GUINum := GUINum
@@ -526,7 +526,7 @@ Class CListViewControl Extends CControl
 			*/
 			AddControl(type, Name, Options, Text, UseEnabledState = 0)
 			{
-				global CGUI
+				;~ global CGUI
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!this.Selected)
 					Options .= UseEnabledState ? " Disabled" : " Hidden"
@@ -620,7 +620,7 @@ Class CListViewControl Extends CControl
 			}
 			_NewEnum()
 			{
-				global CEnumerator
+				;~ global CEnumerator
 				return new CEnumerator(this)
 			}
 			/*
@@ -629,7 +629,7 @@ Class CListViewControl Extends CControl
 			*/
 			MaxIndex()
 			{				
-				global CGUI
+				;~ global CGUI
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(GUI.IsDestroyed)
 					return
@@ -648,7 +648,7 @@ Class CListViewControl Extends CControl
 			*/
 			SetIcon(Filename, IconNumberOrTransparencyColor = 1)
 			{
-				global CGUI
+				;~ global CGUI
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(GUI.IsDestroyed)
 					return
@@ -684,7 +684,7 @@ Class CListViewControl Extends CControl
 			*/
 			__Get(Name)
 			{
-				global CGUI				
+				;~ global CGUI				
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!GUI.IsDestroyed)
 				{
@@ -720,7 +720,7 @@ Class CListViewControl Extends CControl
 			}
 			__Set(Name, Value)
 			{				
-				global CGUI
+				;~ global CGUI
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!GUI.IsDestroyed)
 				{

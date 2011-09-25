@@ -146,12 +146,12 @@ Class CTabControl Extends CControl
 		}
 		_NewEnum()
 		{
-			global CEnumerator
+			;~ global CEnumerator
 			return new CEnumerator(this._)
 		}
 		__Set(Name, Params*)
 		{
-			global CGUI
+			;~ global CGUI
 			Value := Params[Params.MaxIndex()]
 			Params.Remove(Params.MaxIndex())
 			if Name is Integer
@@ -180,7 +180,7 @@ Class CTabControl Extends CControl
 		*/
 		Add(Text)
 		{
-			global CGUI
+			;~ global CGUI
 			Tabs := []
 			Loop, Parse, Text, |
 			{
@@ -226,7 +226,7 @@ Class CTabControl Extends CControl
 			*/
 			AddControl(type, Name, Options, Text)
 			{
-				global CGUI
+				;~ global CGUI
 				if(type != "Tab")
 				{
 					GUI := CGUI.GUIList[this.GUINum]
@@ -261,7 +261,7 @@ Class CTabControl Extends CControl
 			}
 			__Set(Name, Value)
 			{
-				global CGUI
+				;~ global CGUI
 				if(Name = "Text")
 				{
 					Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]
@@ -298,7 +298,7 @@ Class CTabControl Extends CControl
 			*/
 			SetIcon(Filename, IconNumber = 1)
 			{
-				global CGUI
+				;~ global CGUI
 				this._.Icon := Filename
 				this._.IconNumber := IconNumber
 				Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]

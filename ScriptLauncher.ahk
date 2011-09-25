@@ -18,7 +18,7 @@ Class ScriptLauncher Extends CGUI
 	}
 	button1_Click()
 	{
-		global CFileDialog
+		;~ global CFileDialog
 		FileDialog := new CFileDialog("Open")
 		FileDialog.Filter := "*.ahk"
 		if(FileDialog.Show())

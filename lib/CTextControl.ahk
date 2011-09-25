@@ -19,7 +19,7 @@ Class CTextControl Extends CControl
 	*/
 	__Set(Name, Value)
 	{
-		global CGUI
+		;~ global CGUI
 		if(Name = "Link")
 		{
 			WM_SETCURSOR := 0x20

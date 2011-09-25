@@ -6,7 +6,7 @@ Class CControl ;Never created directly
 {
 	__New(Name, Options, Text, GUINum) ;Basic constructor for all controls. The control is created in CGUI.AddControl()
 	{
-		global CFont
+		;~ global CFont
 		this.Insert("Name", Name)
 		this.Insert("Options", Options)
 		this.Insert("Content", Text)
@@ -25,7 +25,7 @@ Class CControl ;Never created directly
 	*/
 	Show()
 	{
-		global CGUI
+		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		Control, Show,,,% "ahk_id " this.hwnd
@@ -37,7 +37,7 @@ Class CControl ;Never created directly
 	*/
 	Hide()
 	{
-		global CGUI
+		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		Control, Hide,,,% "ahk_id " this.hwnd
@@ -67,7 +67,7 @@ Class CControl ;Never created directly
 	*/
 	Focus()
 	{
-		global CGUI
+		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		ControlFocus,,% "ahk_id " this.hwnd
@@ -107,7 +107,7 @@ Class CControl ;Never created directly
 	*/
 	RegisterEvent(Type, FunctionName)
 	{
-		global CGUI
+		;~ global CGUI
 		if(FunctionName)
 		{
 			;Make sure function name is valid (or tell the developer about it)
@@ -124,7 +124,7 @@ Class CControl ;Never created directly
 	*/
 	CallEvent(Name, Params*)
 	{
-		global CGUI
+		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		if(this._.RegisteredEvents.HasKey(Name))
@@ -140,7 +140,7 @@ Class CControl ;Never created directly
 	*/
 	ProcessSubControlState(From, To)
 	{
-		global CGUI
+		;~ global CGUI
 		if(From != To && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			if(From)
@@ -245,7 +245,7 @@ Class CControl ;Never created directly
 	
 	__GetEx(ByRef Result, Name, Params*)
     {
-		global CGUI
+		;~ global CGUI
 		Handled := false
 		if Name not in base,_,GUINum
 			if(!CGUI.GUIList[this.GUINum].IsDestroyed)
@@ -347,7 +347,7 @@ Class CControl ;Never created directly
 	
     __Set(Name, Value)
     {
-		global CGUI
+		;~ global CGUI
 		if(Name != "_" && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -468,7 +468,7 @@ Class CControl ;Never created directly
 		}
 		SetIcon(ID, Path, IconNumber)
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			Control := GUI.Controls[this._.hwnd]
 			GUI, % this._.GUINum ":Default"

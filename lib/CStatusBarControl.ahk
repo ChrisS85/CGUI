@@ -144,7 +144,7 @@ Class CStatusBarControl Extends CControl
 		}
 		_NewEnum()
 		{
-			global CEnumerator
+			;~ global CEnumerator
 			return new CEnumerator(this._)
 		}
 		__Set(Name, Params*)
@@ -178,7 +178,7 @@ Class CStatusBarControl Extends CControl
 		*/
 		Add(Text, PartNumber = "", Width = 50, Style = "", Icon = "", IconNumber = "")
 		{
-			global CGUI
+			;~ global CGUI
 			if(PartNumber)
 				this._.Insert(PartNumber, new this.CPart(Text, PartNumber, Width, Style, Icon, IconNumber, this.GUINum, this.hwnd))
 			else
@@ -196,7 +196,7 @@ Class CStatusBarControl Extends CControl
 		*/
 		Remove(PartNumber)
 		{
-			global CGUI
+			;~ global CGUI
 			if PartNumber is Integer
 			{
 				this._.Remove(PartNumber)
@@ -249,7 +249,7 @@ Class CStatusBarControl Extends CControl
 			}
 			__Set(Name, Value)
 			{
-				global CGUI
+				;~ global CGUI
 				Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]
 				if(Name = "Width")
 				{

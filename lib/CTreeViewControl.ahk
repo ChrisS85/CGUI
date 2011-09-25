@@ -8,7 +8,7 @@ Class CTreeViewControl Extends CControl
 {
 	__New(Name, ByRef Options, Text, GUINum)
 	{
-		global CGUI
+		;~ global CGUI
 		Events := ["_Click", "_RightClick", "_EditingStart", "_FocusReceived", "_FocusLost", "_KeyPress", "_ItemExpanded", "_ItemCollapsed"]
 		if(!InStr(Options, "AltSubmit")) ;Automagically add AltSubmit when necessary
 		{
@@ -67,7 +67,7 @@ Class CTreeViewControl Extends CControl
 	*/
 	__Get(Name, Params*)
 	{
-		global CGUI		
+		;~ global CGUI		
 		if(Name = "Items")
 			Value := this._.Items
 		else if(Name = "SelectedItem")
@@ -88,7 +88,7 @@ Class CTreeViewControl Extends CControl
 	
 	__Set(Name, Value)
 	{
-		global CGUI
+		;~ global CGUI
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -149,7 +149,7 @@ Class CTreeViewControl Extends CControl
 	*/
 	HandleEvent(Event)
 	{
-		global CGUI
+		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		;Handle visibility of controls associated with tree nodees
@@ -195,7 +195,7 @@ Class CTreeViewControl Extends CControl
 		*/
 		Add(Text, Options = "")
 		{
-			global CGUI, CTreeViewControl
+			;~ global CGUI, CTreeViewControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -222,7 +222,7 @@ Class CTreeViewControl Extends CControl
 		*/
 		AddControl(type, Name, Options, Text, UseEnabledState = 0)
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(!this.Selected)
 				Options .= UseEnabledState ? " Disabled" : " Hidden"
@@ -241,7 +241,7 @@ Class CTreeViewControl Extends CControl
 		*/
 		Remove(ObjectOrIndex)
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -287,7 +287,7 @@ Class CTreeViewControl Extends CControl
 		*/
 		Move(Position=1, Parent = "")
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -350,7 +350,7 @@ Class CTreeViewControl Extends CControl
 		*/
 		SetIcon(Filename, IconNumberOrTransparencyColor = 1)
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -365,7 +365,7 @@ Class CTreeViewControl Extends CControl
 		*/
 		MaxIndex()
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -398,7 +398,7 @@ Class CTreeViewControl Extends CControl
 		}
 		_NewEnum()
 		{
-			global CEnumerator
+			;~ global CEnumerator
 			return new CEnumerator(this)
 		}
 		
@@ -447,7 +447,7 @@ Class CTreeViewControl Extends CControl
 		*/
 		__Get(Name, Params*)
 		{
-			global CTreeViewControl, CGUI
+			;~ global CTreeViewControl, CGUI
 			if(Name != "_")
 			{
 				GUI := CGUI.GUIList[this._.GUINum]
@@ -531,7 +531,7 @@ Class CTreeViewControl Extends CControl
 		}
 		__Set(Name, Params*)
 		{
-			global CGUI
+			;~ global CGUI
 			Value := Params[Params.MaxIndex()]
 			Params.Remove(Params.MaxIndex())
 			GUI := CGUI.GUIList[this._.GUINum]

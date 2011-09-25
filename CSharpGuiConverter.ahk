@@ -32,7 +32,7 @@ Class CSharpGuiConverter Extends CGUI
 	}
 	btnInput_Click()
 	{
-		global CFileDialog
+		;~ global CFileDialog
 		FileDialog := new CFileDialog("Open")
 		FileDialog.Filter := "*.cs"
 		Text := this.txtInput.Text
@@ -46,7 +46,7 @@ Class CSharpGuiConverter Extends CGUI
 	}
 	btnOutput_Click()
 	{
-		global CFileDialog
+		;~ global CFileDialog
 		FileDialog := new CFileDialog("Save")
 		FileDialog.Filter := "*.ahk"
 		Text := this.txtInput.Text
@@ -95,7 +95,7 @@ Class CSharpGuiConverter Extends CGUI
 	}
 	Convert(InPath, OutPath)
 	{
-		global Regex
+		;~ global Regex
 		FileRead, InputFile, % "*t " InPath
 		start := InStr(InputFile, "partial class ") + StrLen("partial class ")
 		Class := SubStr(InputFile, start, InStr(InputFile, "`n", 0, start) - start)

@@ -90,14 +90,14 @@ Class CMyWindow Extends CGUI
 		this.DestroyOnClose := true
 		;~ this.ValidateOnFocusLeave := true
 		this.OnGUIMessage(0x200, "MouseMove")
-		this.Menu1 := New("CMenu", "Main")
+		this.Menu1 := New CMenu("Main")
 		this.Menu1.AddMenuItem("hallo", "hallo")
 		this.Menu1[1].Text := "Test"
 		this.Menu1[1].Checked := true
 		this.Menu1[1].Enabled := false
 		this.Menu1.AddSubMenu("sub1", "Test")
 		this.Menu1[2].AddMenuItem("blup", "blup")
-		sub2 := New("CMenu", "sub2")
+		sub2 := New CMenu("sub2")
 		sub2.AddMenuItem("blah", "blah")
 		this.Menu1.AddSubMenu("sub2", sub2)
 		sub2.Icon := "C:\Program Files\Autohotkey\SciTE_beta5\AutoHotkey.exe"
@@ -191,7 +191,7 @@ Class CMyWindow Extends CGUI
 	}
 	btnLoad_Click()
 	{
-		global CFileDialog
+		;~ global CFileDialog
 		FileDialog := new CFileDialog("Open")
 		FileDialog.Filter := "Comma separated value(*.csv;*.dat)"
 		if(FileDialog.Show())
@@ -216,7 +216,7 @@ Class CMyWindow Extends CGUI
 	}
 	btnSave_Click()
 	{
-		global CFileDialog
+		;~ global CFileDialog
 		FileDialog := new CFileDialog("Save")
 		FileDialog.Filter := "Comma separated value(*.csv;*.dat)"
 		if(FileDialog.Show())

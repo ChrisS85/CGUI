@@ -50,7 +50,7 @@ Class CGUI
 	
 	__New(instance)
 	{
-		global CGUI, CFont
+		;~ global CGUI, CFont
 		if(!CGUI_Assert(IsObject(instance) && !instance.HasKey("hwnd"), "CGUI constructor must not be called!"))
 			return
 		;~ this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set		
@@ -89,7 +89,7 @@ Class CGUI
 		*/
 		RegisterListener(Message, hwnd, FunctionName)
 		{
-			global CGUI
+			;~ global CGUI
 			;Don't allow calling this function on the contained instances
 			if(this.Base.__Class = this.__Class)
 				return
@@ -122,7 +122,7 @@ Class CGUI
 		}
 		UnregisterListener(hwnd, Message = "")
 		{
-			global CGUI
+			;~ global CGUI
 			;Don't allow calling this function on the contained instances
 			if(this.Base.__Class = this.__Class)
 				return
@@ -195,7 +195,7 @@ Class CGUI
 	*/
 	Destroy()
 	{
-		global CGUI
+		;~ global CGUI
 		if(this.IsDestroyed)
 			return
 		;Remove it from GUI list
@@ -418,7 +418,7 @@ Class CGUI
 	*/
 	AddControl(Control, Name, Options, Text, ControlList="")
 	{
-		global
+		;~ global
 		local hControl, type
 		if(this.IsDestroyed)
 			return
@@ -646,7 +646,7 @@ Class CGUI
 	*/
 	__Get(Name)
 	{
-		global CGUI	
+		;~ global CGUI	
 			
 		DetectHidden := A_DetectHiddenWindows
 		DetectHiddenWindows, On
@@ -718,7 +718,7 @@ Class CGUI
 	}
 	__Set(Name, Value)
 	{
-		global CGUI
+		;~ global CGUI
 		DetectHidden := A_DetectHiddenWindows
 		DetectHiddenWindows, On
 		Handled := true
@@ -876,7 +876,7 @@ Class CGUI
 	*/
 	HandleEvent()
 	{
-		global CGUI
+		;~ global CGUI
 		WasCritical := A_IsCritical
 		Critical ;Critical needs to be used to catch all events, especially from ListViews
 		if(this.IsDestroyed)
@@ -894,7 +894,7 @@ Class CGUI
 	*/
 	RerouteEvent(Event)
 	{
-		global CGUI
+		;~ global CGUI
 		ControlName := SubStr(Event.Label, InStr(Event.Label, "_") + 1)
 		GUI := CGUI.GUIList[Event.GUI]
 		if(IsObject(GUI))
@@ -937,7 +937,7 @@ Class CGUI
 	;As of now, this function handles WM_MOUSEMOVE and WM_SETCURSOR to allow text controls to act as links
 	HandleInternalMessage(Msg, wParam, lParam)
 	{
-		global CGUI
+		;~ global CGUI
 		static WM_SETCURSOR := 0x20, WM_MOUSEMOVE := 0x200, h_cursor_hand
 		if(msg = WM_SETCURSOR || msg = WM_MOUSEMOVE) ;Text control Link support, thanks Shimanov!
 		{
@@ -1043,7 +1043,7 @@ This callback function will only be used when there are owned windows which have
 */
 CGUI_ShellMessage(wParam, lParam, msg, hwnd) 
 { 
-   global CGUI 
+   ;~ global CGUI 
    if(wParam = 2) ;Window Destroyed 
    {
 	  Loop % CGUI.GUIList.MaxIndex() 
@@ -1076,7 +1076,7 @@ CGUI_ShellMessage(wParam, lParam, msg, hwnd)
 ;Global window message handler for CGUI library that reroutes all registered window messages to the window instances.
 CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
 {
-	global CGUI
+	;~ global CGUI
 	GUI := CGUI.GUIFromHWND(hwnd)
 	if(GUI)
 	{
@@ -1111,7 +1111,7 @@ Class CFont
 	*/
 	__Set(Name, Value)
 	{
-		global CGUI
+		;~ global CGUI
 		if(Name = "Options")
 		{
 			if(this._.hwnd) ;belonging to a control
@@ -1176,19 +1176,10 @@ CGUI_IndexOf(Array, Value)
 		if(Array[A_Index]=Value)
 			return A_Index
 }
+
 CGUI_TypeOf(Object)
 {
 	return Object.__Class
-}
-New(Object, Params*)
-{
-	global
-	if(IsObject(%Object%))
-	{
-		instance := {base : %Object%}
-		instance.__New(Params*)
-		return instance
-	}
 }
 #include <gdip>
 #include <CControl>

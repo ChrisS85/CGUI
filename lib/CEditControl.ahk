@@ -72,7 +72,7 @@ Class CEditControl Extends CControl
 	*/
 	__Set(Name, Value)
 	{
-		global CGUI
+		;~ global CGUI
 		if(Name != "GUINum" && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			if(this._.UpDownHwnd && this._.HasKey({Min : "Min", Max : "Max"}[Name]))

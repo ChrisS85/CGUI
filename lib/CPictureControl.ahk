@@ -29,7 +29,7 @@ Class CPictureControl Extends CControl
 	*/
 	__Get(Name) 
     {
-		global CGUI
+		;~ global CGUI
 		if(Name != "GUINum" && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -57,7 +57,7 @@ Class CPictureControl Extends CControl
 	
 	__Set(Name, Value)
 	{
-		global CGUI
+		;~ global CGUI
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows

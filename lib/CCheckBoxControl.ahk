@@ -22,7 +22,7 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 	*/
 	__Get(Name)
     {
-		global CGUI
+		;~ global CGUI
 		if(Name != "GUINum" && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -39,7 +39,7 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 	}
 	__Set(Name, Value)
 	{
-		global CGUI
+		;~ global CGUI
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -74,7 +74,7 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 	*/
 	AddControl(type, Name, Options, Text, UseEnabledState = 0)
 	{
-		global CGUI
+		;~ global CGUI
 		GUI := CGUI.GUIList[this.GUINum]
 		if(!this.Checked)
 			Options .= UseEnabledState ? " Disabled" : " Hidden"
@@ -88,7 +88,7 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 	*/
 	GetRadioButtonGroup()
 	{
-		global CGUI
+		;~ global CGUI
 		GUI := CGUI.GUIList[this.GUINum]
 		if(GUI.IsDestroyed)
 			return []

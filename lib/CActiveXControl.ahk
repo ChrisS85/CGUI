@@ -33,7 +33,7 @@ Class CActiveXControl Extends CControl
 		}
 		__Call(Name, Params*)
 		{
-			global CGUI
+			;~ global CGUI
 			CGUI.GUIList[this.GUINum].Controls[this.hwnd].CallEvent(Name, Params*)
 			;~ if(ObjHasKey(CGUI.GUIList[this.GUINum].base, this.ControlName "_" Name))
 				;~ `(CGUI.GUIList[this.GUINum])[this.ControlName "_" Name](Params*)
@@ -43,7 +43,7 @@ Class CActiveXControl Extends CControl
 	*/
 	__GetEx(ByRef Result, Name, Params*)
 	{
-		global CGUI
+		;~ global CGUI
 		if(!Base.HasKey(Name))
 			If Name not in Base,_,GUINum
 			{
@@ -69,7 +69,7 @@ Class CActiveXControl Extends CControl
 	}
 	__Set(Name, Value, Params*)
 	{
-		global CGUI
+		;~ global CGUI
 		;~ If Name not in _,GUINum,Type,Options,Text,x,y,width,height,Position,Size,ClassNN,hwnd,Name,Content,Base,Focused,Tooltip
 		if(!base.__GetEx(Result, Name, Params*))
 			if(!CGUI.GUIList[this.GUINum].IsDestroyed)

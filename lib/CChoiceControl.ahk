@@ -43,7 +43,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	*/
 	__Get(Name, Params*)
     {
-		global CGUI
+		;~ global CGUI
 		if(Name != "GUINum" && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -82,7 +82,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	}
 	__Set(Name, Params*)
 	{
-		global CGUI
+		;~ global CGUI
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			Value := Params[Params.MaxIndex()]
@@ -224,7 +224,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		*/		
 		__Get(Name)
 		{
-			global CGUI
+			;~ global CGUI
 			if(this._.HasKey(Name))
 				return this._[Name]
 			else if(Name = "Count")
@@ -232,7 +232,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		}
 		__Set(Name, Value)
 		{
-			global CGUI
+			;~ global CGUI
 			if Name is Integer
 				return
 		}
@@ -246,7 +246,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		*/
 		Add(Text, Position = -1)
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			Control := GUI.Controls[this._.hwnd]
 			Selected := Control.SelectedIndex
@@ -276,7 +276,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		*/
 		Remove(IndexTextOrItem)
 		{
-			global CGUI
+			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			Control := GUI.Controls[this.hwnd]
 			if(IsObject(IndexTextOrItem))
@@ -313,7 +313,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		*/
 		MaxIndex()
 		{
-			global CGUI
+			;~ global CGUI
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
 			GUI := CGUI.GUIList[this._.GUINum]
@@ -327,7 +327,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		}
 		_NewEnum()
 		{
-			global CEnumerator
+			;~ global CEnumerator
 			return new CEnumerator(this)
 		}
 		/*
@@ -357,7 +357,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			*/
 			AddControl(type, Name, Options, Text, UseEnabledState = 0)
 			{
-				global CGUI
+				;~ global CGUI
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!this.Selected)
 					Options .= UseEnabledState ? " Disabled" : " Hidden"
@@ -375,7 +375,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			*/
 			__Get(Name, Params*)
 			{
-				global CGUI
+				;~ global CGUI
 				DetectHidden := A_DetectHiddenWindows
 				DetectHiddenWindows, On
 				if(Name = "Text")
@@ -408,7 +408,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			}
 			__Set(Name, Value)
 			{
-				global CGUI
+				;~ global CGUI
 				if(Name = "Text")
 				{
 					GUI := CGUI.GUIList[this._.GUINum]
