@@ -476,7 +476,8 @@ Class CGUI
 				return
 		}
 		;Old: (IsLabel(this.__Class "_" Control.Name) ? "g" this.__Class "_" Control.Name : "")
-		Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl gCGUI_HandleEvent v" this.GUINum "_" Control.Name, % Control.Content ;Create the control and get its window handle and setup a g-label
+		NeedsGLabel := Control.HasKey("Events")
+		Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl " (NeedsGLabel ? "gCGUI_HandleEvent " : "") "v" this.GUINum "_" Control.Name, % Control.Content ;Create the control and get its window handle and setup a g-label
 		Control.Insert("hwnd", hControl) ;Window handle is used for all further operations on this control
 		Control.PostCreate()
 		Control.Remove("Content")
