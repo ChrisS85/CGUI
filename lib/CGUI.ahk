@@ -475,17 +475,14 @@ Class CGUI
 			else
 				return
 		}
-		Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl " (IsLabel(this.__Class "_" Control.Name) ? "g" this.__Class "_" Control.Name : ""), % Control.Content ;Create the control and get its window handle and setup a g-label
+		;Old: (IsLabel(this.__Class "_" Control.Name) ? "g" this.__Class "_" Control.Name : "")
+		Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl gCGUI_HandleEvent v" this.GUINum "_" Control.Name, % Control.Content ;Create the control and get its window handle and setup a g-label
 		Control.Insert("hwnd", hControl) ;Window handle is used for all further operations on this control
 		Control.PostCreate()
 		Control.Remove("Content")
 		if(ControlList)
 			ControlList[Control.Name] := Control
 		this.Controls[hControl] := Control ;Add to list of controls
-		
-		;Check if the programmer missed a g-label
-		for index, Event in Control._.Events
-			CGUI_Assert(!(IsFunc(this.__Class "." Control.Name "_" Event) && !IsLabel(this.__Class "_" Control.Name)), "Event notification function found for " Control.Name ", but the appropriate label " this.__Class "_" Control.Name " does not exist!", -2)
 		
 		;Check if Focus change messages should be registered automatically
 		if(IsFunc(this[Name "_FocusEnter"]) || IsFunc(this[Name "_FocusLeave"]))
@@ -903,8 +900,8 @@ Class CGUI
 		Critical ;Critical needs to be used to catch all events, especially from ListViews
 		if(this.IsDestroyed)
 			return
-		CGUI.EventQueue.Insert({Label : A_ThisLabel, Errorlevel : Errorlevel, GUI : A_GUI, EventInfo : A_EventInfo, GUIEvent : A_GUIEvent})
-		SetTimer, CGUI_HandleEvent, -10
+		CGUI.EventQueue.Insert({Label : A_ThisLabel, Errorlevel : Errorlevel, GUI : A_GUI, EventInfo : A_EventInfo, GUIEvent : A_GUIEvent, GUIControl : A_GuiControl})
+		SetTimer, CGUI_HandleEventTimer, -10
 		if(!WasCritical)
 			Critical, Off ;And it also needs to be disabled again, otherwise there can be some handlers that won't run until the window is reactivated (context menu g-label notification from ListView for example)
 	}
@@ -917,11 +914,12 @@ Class CGUI
 	RerouteEvent(Event)
 	{
 		;~ global CGUI
-		ControlName := SubStr(Event.Label, InStr(Event.Label, "_") + 1)
+		
+		ControlName := SubStr(Event.GuiControl, InStr(Event.GuiControl, "_") + 1)
 		GUI := CGUI.GUIList[Event.GUI]
 		if(IsObject(GUI))
 		{
-			if(InStr(Event.Label, "CGUI_")) ;Handle default gui events (Close, Escape, DropFiles, ContextMenu)
+			if(Event.Label != "CGUI_HandleEvent" && InStr(Event.Label, "CGUI_")) ;Handle default gui events (Close, Escape, DropFiles, ContextMenu)
 			{
 				func := SubStr(Event.Label, InStr(Event.Label, "_") + 1)				
 				;Call PreClose before closing a window so it can be skipped
@@ -1043,17 +1041,18 @@ CGUI_ContextMenu:
 CGUI_DropFiles:
 CGUI_Close:
 CGUI_Escape:
+CGUI_HandleEvent:
 CGUI.HandleEvent()
 return
 
 ;Events are processed through an event queue and a timer so that no window messages will be missed.
-CGUI_HandleEvent:
+CGUI_HandleEventTimer:
 while(CGUI.EventQueue.MaxIndex())
 {
-	SetTimer, CGUI_HandleEvent, Off
+	SetTimer, CGUI_HandleEventTimer, Off
 	CGUI.GUIList[CGUI.EventQueue[1].GUI].RerouteEvent(CGUI.EventQueue[1])
 	CGUI.EventQueue.Remove(1)
-	SetTimer, CGUI_HandleEvent, -10
+	SetTimer, CGUI_HandleEventTimer, -10
 }
 return
 /*

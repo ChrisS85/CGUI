@@ -71,9 +71,3 @@ Class CBasicWindow Extends CGUI
 			ExitApp
 	}
 }
-
-;Required to handle control events
-CBasicWindow_btnButton:
-CBasicWIndow_MyEdit:
-CGUI.HandleEvent()
-return
