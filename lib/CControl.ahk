@@ -4,7 +4,7 @@ Basic control class from which all controls extend.
 */
 Class CControl ;Never created directly
 {
-	__New(Name, Options, Text, GUINum) ;Basic constructor for all controls. The control is created in CGUI.Add()
+	__New(Name, Options, Text, GUINum) ;Basic constructor for all controls. The control is created in CGUI.AddControl()
 	{
 		global CFont
 		this.Insert("Name", Name)

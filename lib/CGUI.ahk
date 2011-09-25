@@ -422,9 +422,9 @@ Class CGUI
 		local hControl, type
 		if(this.IsDestroyed)
 			return
-		if(!CGUI_Assert(Name, "GUI.Add() : No name specified. Please supply a proper control name.", -2)) ;Validate name.
+		if(!CGUI_Assert(Name, "GUI.AddControl() : No name specified. Please supply a proper control name.", -2)) ;Validate name.
 			return
-		if(!CGUI_Assert(!IsObject(ControlList[Name]), "GUI.Add(): The control " Name " already exists. Please choose another name!", -2)) ;Make sure not to add a control with duplicate name.
+		if(!CGUI_Assert(!IsObject(ControlList[Name]), "GUI.AddControl(): The control " Name " already exists. Please choose another name!", -2)) ;Make sure not to add a control with duplicate name.
 			return
 		type := Control
 		if(Control = "DropDownList" || Control = "ComboBox" || Control = "ListBox")

@@ -226,7 +226,7 @@ Class CTreeViewControl Extends CControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(!this.Selected)
 				Options .= UseEnabledState ? " Disabled" : " Hidden"
-			Control := GUI.Add(type, Name, Options, Text, this._.Controls)
+			Control := GUI.AddControl(type, Name, Options, Text, this._.Controls)
 			Control._.UseEnabledState := UseEnabledState
 			this._.Controls.Insert(Name, Control)
 			return Control
