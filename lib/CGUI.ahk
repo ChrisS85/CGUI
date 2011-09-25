@@ -72,6 +72,28 @@ Class CGUI
 		CGUI.GUIList[instance.GUINum] := instance
 		GUI, % instance.GUINum ":+LabelCGUI_ +LastFound"		
 		instance.hwnd := WinExist()
+		
+		/*
+		Prepare for some HAX!
+		The code below enables the user of this library to create subclasses inside the GUI class that represent controls.
+		It scans through the object and looks for fitting subclasses.
+		Then a an object based on a copy of a subclass is created and a control with the params specified in the subclass is created.
+		The base of the copied subclass is changed to the newly created control object so that the functions in the subclass can access the control object through the this keyword.
+		Event functions are also preferably routed to subclasses.
+		*/
+		for key, Value in instance.base
+		{
+			if(Value.HasKey("__Class") && Value.HasKey("Type")) ;Look for classes that define a type property
+			{
+				Name := Value.HasKey("Name") ? Value.Name : SubStr(Value.__Class, InStr(Value.__Class, ".") + 1)
+				control := instance.AddControl(Value.Type, Name, Value.Options, Value.Text)
+				instance[Name] := {base : ObjClone(Value)}
+				instance[Name].base.base := control
+				if(IsFunc(instance[Name].__New))
+					instance[Name].__New()
+				instance.Controls[instance[Name].hwnd] := instance[Name]
+			}
+		}
 	}
 	;This class handles window message routing to the instances of window classes that register for a specific window message
 	Class WindowMessageHandler

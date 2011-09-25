@@ -128,8 +128,15 @@ Class CControl ;Never created directly
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		if(this._.RegisteredEvents.HasKey(Name))
-			return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)}
-		else if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_" Name]))
+		{
+			if(IsFunc(this._.RegisteredEvents[Name]))
+				return {Handled : true, Result : this[this._.RegisteredEvents[Name]](CGUI.GUIList[this.GUINum], Params*)}
+			else if(IsFunc( `(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]]))
+				return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)}
+		}
+		else if(IsFunc(this[Name]))
+			return {Handled : true, Result : this[Name](CGUI.GUIList[this.GUINum], Params*)}
+		else if(IsFunc(`(CGUI.GUIList[this.GUINum])[this.Name "_" Name]))
 			return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)}
 		else
 			return {Handled : false}
