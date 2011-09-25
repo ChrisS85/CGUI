@@ -56,10 +56,11 @@ Class CGUI
 		;~ this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set		
 		start := 1
 		loop {
-			Gui % instance.__Class start ":", +LastFoundExist
+			GUINum := instance.__Class start
+			Gui %GUINum%:+LastFoundExist
 			IfWinNotExist
 			{
-				instance.GUINum := instance.__Class start
+				instance.GUINum := GUINum
 				break
 			}
 			start++
