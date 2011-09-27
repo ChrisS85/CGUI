@@ -35,6 +35,12 @@ Class CTabControl Extends CControl
 	
 	Variable: Text
 	The text of the first tab.
+	
+	Variable: SelectedItem
+	The selected tab item.
+	
+	Variable: SelectedIndex
+	The index of the selected tab item.
 	*/
 	__Get(Name, Params*)
 	{
@@ -42,6 +48,13 @@ Class CTabControl Extends CControl
 			Value := this._.Tabs
 		else if(Name = "Text")
 			Value := this._.Tabs[1].Text
+		else if(Name = "SelectedItem")
+		{
+			ControlGet, Value, Tab, , , % this.hwnd
+			Value := this.Tabs[Value]
+		}
+		else if(Name = "Selectedndex")
+			ControlGet, Value, Tab, , , % this.hwnd
 		if(Params.MaxIndex() >= 1 && IsObject(value)) ;Fix unlucky multi parameter __GET
 		{
 			Value := Value[Params[1]]
@@ -55,12 +68,10 @@ Class CTabControl Extends CControl
 	{
 		Value := Params[Params.MaxIndex()]
 		Params.Remove(Params.MaxIndex())
+		Handled := true
 		if(Name = "Text") ;Assign text -> assign text of first Tab
-		{
 			this._.Tabs[1].Text := Value
-			return true
-		}
-		if(Name = "Tabs") ;Assign all Tabs at once
+		else if(Name = "Tabs")
 		{
 			if(Params[1] >= 1 && Params[1] <= this._.Tabs.MaxIndex()) ;Set a single Tab
 			{
@@ -74,10 +85,16 @@ Class CTabControl Extends CControl
 				}
 				else ;Just set text directly
 					this._Tabs[Params[1]].Text := Value
-				return Value
 			}
-			return 0
 		}
+		else if(Name = "SelectedItem" && CGUI_TypeOf(Value) = "CTabControl.CTabs.CTab")
+			GuiControl, % this._.GUINum ":Choose", % this.ClassNN, % Value._.TabNumber
+		else if(Name = "SelectedIndex" && CGUI_TypeOf(Value) = "CTabControl.CTabs.CTab")
+			GuiControl, % this._.GUINum ":Choose", % this.ClassNN, % Value
+		else
+			Handled := false
+		if(Handled)
+			return Value
 	}
 	/*
 	Event: Introduction
@@ -91,21 +108,21 @@ Class CTabControl Extends CControl
 	Event: Attention
 	The tab control does not support the FocusEnter and FocusLeave events.
 	
-	Event: Click(TabIndex)
+	Event: Click(TabItem)
 	Invoked when the user clicked on the control.
 	
-	Event: DoubleClick(TabIndex)
+	Event: DoubleClick(TabItem)
 	Invoked when the user double-clicked on the control.
 	
-	Event: RightClick(TabIndex)
+	Event: RightClick(TabItem)
 	Invoked when the user right-clicked on the control.
 	
-	Event: DoubleRightClick(TabIndex)
+	Event: DoubleRightClick(TabItem)
 	Invoked when the user double-right-clicked on the control.
 	*/
 	HandleEvent(Event)
 	{
-		this.CallEvent({Normal : "_Click", DoubleClick : "_DoubleClick", Right : "_RightClick", R : "_DoubleRightClick"}[Event.GUIEvent], Event.EventInfo)
+		this.CallEvent({Normal : "_Click", DoubleClick : "_DoubleClick", Right : "_RightClick", R : "_DoubleRightClick"}[Event.GUIEvent], this.SelectedItem)
 	}
 	/*
 	Class: CTabControl.CTabs
