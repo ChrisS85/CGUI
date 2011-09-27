@@ -101,7 +101,7 @@ Class CSharpGuiConverter Extends CGUI
 		Class := SubStr(InputFile, start, InStr(InputFile, "`n", 0, start) - start)
 		Controls := [] ;array storing control definitions
 		Window := {Events : {}} ;Object storing window properties
-		pos := 0
+		tabPages := {} ;Array containing all defined Tab pages
 		StartString := "private System.Windows.Forms."
 		EndString := ";"
 		;Get a list of controls
@@ -121,9 +121,12 @@ Class CSharpGuiConverter Extends CGUI
 						Control := {Type : Type, Name : name, Events : {}}
 						if(CSharpType = "LinkLabel")
 							Control.Link := true
-						Controls.Insert(Control)
-						found := true
+						if(CSharpType = "TabControl")
+							Control.TabPages := {}
+						Controls[Control.Name] := Control
 					}
+					else if(CSharpType = "TabPage")
+						TabPages[Name] := {}
 				}
 			}
 		}
@@ -134,9 +137,8 @@ Class CSharpGuiConverter Extends CGUI
 			if(InStr(line, "// ") && !InStr(line, "///") && strlen(line) > 4) ;Start of control section is marked by //
 			{
 				found := false
-				for index, Control in Controls
+				for Name, Control in Controls
 				{
-					fileappend, % line "`n// " Control.Name "`n" (line = "// " Control.Name) "`n" InStr(line, "// " Control.Name) "`n" strlen(line) ":" strlen("// " Control.Name), C:\Users\csander\Desktop\debug.txt
 					if(line = "// " Control.Name) ;Start of new control section
 					{
 						CurrentControl := Control
@@ -144,6 +146,8 @@ Class CSharpGuiConverter Extends CGUI
 						break
 					}
 				}
+				if(!found)
+					CurrentControl := ""
 				if(!found && strLen(line) > 5 && !InStr(line, "///"))
 				{
 					if(!found && InStr(line, "// " Class))
@@ -224,7 +228,7 @@ Class CSharpGuiConverter Extends CGUI
 					else if(InStr(line, "this." CurrentControl.Name ".Enabled"))
 						CurrentControl.Enabled := (InStr(line, "true") || InStr(line, "1;"))
 					else if(InStr(line, "this." CurrentControl.Name ".Visible"))
-						CurrentControl.Enabled := (InStr(line, "true") || InStr(line, "1;"))
+						CurrentControl.Visible := (InStr(line, "true") || InStr(line, "1;"))
 					else if(InStr(line, "this." CurrentControl.Name ".TextAlign"))
 					{
 						if(InStr(line, "Left"))
@@ -240,14 +244,92 @@ Class CSharpGuiConverter Extends CGUI
 			}
 		}
 		
-		;Now that all info is available, write the file
-		OutputFile := "gui := new " Class "()`n#include <CGUI>`nClass " Class " Extends CGUI`n{`n`t__New()`n`t{`n"
-		for index, Control in Controls
+		;Scan for tab pages and associate controls with tab control tabs
+		;Find tabpage->tab control relationship
+		Loop, Parse, InputFile, `n, %A_Space%%A_Tab%
 		{
-			Options := (Control.HasKey("x") ? "x" Control.x " " : "" ) (Control.HasKey("y") ? "y" Control.y " " : "" ) (Control.HasKey("width") ? "w" Control.width " " : "" ) (Control.HasKey("height") ? "h" Control.height : "" )
-			OutputFile .= "`t`tthis.Add(""" Control.Type """, """ Control.Name """, """ Options """, """ Control.Text """)`n"
+			if(InStr(A_LoopField, ".Controls.Add("))
+			{
+				TabControl := Regex.MatchSimple(A_LoopField, "Name", "this\.(?P<Name>.*?)\.Controls\.Add\(")
+				if(Controls[TabControl].Type = "Tab")
+				{
+					TabPage := {Name : Regex.MatchSimple(A_LoopField, "Control", "\(this\.(?P<Control>.*?)\);")}  ;this.tabPage1.Controls.Add(this.label2);
+					Controls[TabControl].TabPages.Insert(TabPage)
+				}
+			}
+			;~ this.tabPage2.Controls.Add(this.txtTags);
+		}
+		;Find tabpage text
+		Loop, Parse, InputFile, `n, %A_Space%%A_Tab%
+		{
+			if(InStr(A_LoopField, ".Text = """)) ;this.tabPage1.Text = "General";
+			{
+				TabPage := Regex.MatchSimple(A_LoopField, "Name", "this\.(?P<Name>.*?)\.Text = ")
+				for name, control in Controls
+					for index, tabpage2 in control.TabPages
+					if(TabPage2.Name = TabPage)
+					{
+						TabPage2.Text := Regex.MatchSimple(A_LoopField, "Text", " = ""(?P<Text>.*?)"";")
+						break 2
+					}
+			}
+		}
+		
+		;Find control->tabpage relationship
+		Loop, Parse, InputFile, `n, %A_Space%%A_Tab%
+		{
+			if(InStr(A_LoopField, ".Controls.Add(")) ;this.tabPage1.Controls.Add(this.label2);
+			{
+				TabPage := Regex.MatchSimple(A_LoopField, "Name", "this\.(?P<Name>.*?)\.Controls\.Add\(")
+				if(IsObject(TabPages[TabPage]))
+				{
+					SubControl := Regex.MatchSimple(A_LoopField, "Control", "\(this\.(?P<Control>.*?)\);")  
+					for Name, Control in Controls
+						if(IsObject(Control.TabPages))
+							for index, TabPage2 in Control.TabPages
+								if(TabPage2.Name = TabPage)
+								{
+									Controls[SubControl].TabControl := Control									
+									Controls[SubControl].Tab := index
+									break 2
+								}					
+				}
+			}
+			;~ this.tabPage2.Controls.Add(this.txtTags);
+		}
+		;Now that all info is available, write the file
+		OutputFile := "gui := new " Class "()`n#include <CGUI>`nClass " Class " Extends CGUI`n{`n"
+		for Name, Control in Controls
+		{
+			if(!Control.HasKey("TabControl") && Control.Type != "Tab")
+			{
+				Options := (Control.HasKey("x") ? "x" Control.x " " : "" ) (Control.HasKey("y") ? "y" Control.y " " : "" ) (Control.HasKey("width") ? "w" Control.width " " : "" ) (Control.HasKey("height") ? "h" Control.height : "" )
+				OutputFile .= "`t" Control.Name " := this.AddControl(""" Control.Type """, """ Control.Name """, """ Options """, """ Control.Text """)`n"
+			}
+		}
+		for Name, Control in Controls
+		{
+			if(Control.Type = "Tab")
+			{
+				Options := (Control.HasKey("x") ? "x" Control.x " " : "" ) (Control.HasKey("y") ? "y" Control.y " " : "" ) (Control.HasKey("width") ? "w" Control.width " " : "" ) (Control.HasKey("height") ? "h" Control.height : "" )
+				for index, TabPage in Control.TabPages
+					Text .= A_Index = 1 ? TabPage.Text : "|" TabPage.Text
+				OutputFile .= "`tClass " Control.Name "`n`t{`n`t`tstatic Type := ""Tab""`n`t`tstatic Options := """ Options """`n`t`tstatic Text := """ Text """`n`t`t__New(GUI)`n`t`t{`n"
+				
+				for Name2, Control2 in Controls
+					if(Control2.TabControl = Control)
+					{
+						Options := (Control2.HasKey("x") ? "x" Control2.x + 22 " " : "" ) (Control2.HasKey("y") ? "y" Control2.y + 36 " " : "" ) (Control2.HasKey("width") ? "w" Control2.width " " : "" ) (Control2.HasKey("height") ? "h" Control2.height : "" )
+						OutputFile .= "`t`t`tthis.Tabs[" Control2.Tab "].AddControl(""" Control2.Type """, """ Control2.Name """, """ Options """, """ Control2.Text """)`n"
+					}
+				OutputFile .= "`t`t}`n`t}`n`t`n"
+			}
+		}
+		OutputFile .= "`t__New()`n`t{`n"
+		for, Name, Control in Controls
+		{			
 			for Property, Value in Control
-				if Property not in x,y,width,height,name,type,Text,Events
+				if Property not in x,y,width,height,name,type,Text,Events,Tab,TabControl
 				{
 					if Value is Number
 						OutputFile .= "`t`tthis." Control.Name "." Property " := " Value "`n"
@@ -256,7 +338,6 @@ Class CSharpGuiConverter Extends CGUI
 					else
 						OutputFile .= "`t`tthis." Control.Name "." Property " := """ Value """`n"
 				}
-			OutputFile .= "`t`t`n"
 		}
 		for WindowProperty, Value in Window
 		{
@@ -274,7 +355,7 @@ Class CSharpGuiConverter Extends CGUI
 		OutputFile .= "`t}"
 		for EventIndex, GUIEvent in Window.Events
 			OutputFile .= "`n`t" GUIEvent "`n`t{`n`t`t`n`t}"
-		for index, Control in Controls
+		for Name, Control in Controls
 		{
 			for index2, Event in Control.Events
 			{
@@ -282,14 +363,7 @@ Class CSharpGuiConverter Extends CGUI
 				AnyEvents := true
 			}
 		}
-		OutputFile .= "`n}`n"
-		for index, Control in Controls
-		{
-			if(Control.Events.MaxIndex() >= 1)
-				OutputFile .= Class "_" Control.Name ":`n"
-		}
-		if(AnyEvents)
-			OutputFile .= "CGUI.HandleEvent()`nreturn"
+		OutputFile .= "`n}"
 		FileDelete, % OutPath
 		FileAppend, % OutputFile, % OutPath
 	}

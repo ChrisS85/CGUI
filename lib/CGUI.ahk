@@ -89,9 +89,9 @@ Class CGUI
 				control := instance.AddControl(Value.Type, Name, Value.Options, Value.Text)
 				instance[Name] := {base : ObjClone(Value)}
 				instance[Name].base.base := control
-				if(IsFunc(instance[Name].__New) = 2)
+				if(IsFunc(instance[Name].__New) = 3)
 					instance[Name].__New(instance)
-				else if(IsFunc(instance[Name].__New) = 1)
+				else if(IsFunc(instance[Name].__New) = 2)
 					instance[Name].__New()
 				instance.Controls[instance[Name].hwnd] := instance[Name]
 			}
