@@ -89,7 +89,9 @@ Class CGUI
 				control := instance.AddControl(Value.Type, Name, Value.Options, Value.Text)
 				instance[Name] := {base : ObjClone(Value)}
 				instance[Name].base.base := control
-				if(IsFunc(instance[Name].__New))
+				if(IsFunc(instance[Name].__New) = 2)
+					instance[Name].__New(instance)
+				else if(IsFunc(instance[Name].__New) = 1)
 					instance[Name].__New()
 				instance.Controls[instance[Name].hwnd] := instance[Name]
 			}
@@ -441,7 +443,7 @@ Class CGUI
 	AddControl(Control, Name, Options, Text, ControlList="")
 	{
 		;~ global
-		local hControl, type
+		local hControl, type, testHWND, vName, NeedsGLabel
 		if(this.IsDestroyed)
 			return
 		if(!CGUI_Assert(Name, "GUI.AddControl() : No name specified. Please supply a proper control name.", -2)) ;Validate name.
@@ -477,7 +479,12 @@ Class CGUI
 		}
 		;Old: (IsLabel(this.__Class "_" Control.Name) ? "g" this.__Class "_" Control.Name : "")
 		NeedsGLabel := Control._.HasKey("Events")
-		Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl " (NeedsGLabel ? "gCGUI_HandleEvent " : "") "v" this.GUINum "_" Control.Name, % Control.Content ;Create the control and get its window handle and setup a g-label
+		
+		;Find a free GUI variable. Might need to add an index because there might be controls with the same name that are nested in other controls
+		GuiControlGet, testHWND, % this.GUINum ":hwnd", % vName := this.GUINum "_" Control.Name
+		while(testHWND)
+			GuiControlGet, testHWND, % this.GUINum ":hwnd", % vName := this.GUINum "_" Control.Name A_Index
+		Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl " (NeedsGLabel ? "gCGUI_HandleEvent " : "") "v" vName, % Control.Content ;Create the control and get its window handle and setup a g-label
 		Control.Insert("hwnd", hControl) ;Window handle is used for all further operations on this control
 		Control.PostCreate()
 		Control.Remove("Content")
@@ -915,8 +922,6 @@ Class CGUI
 	RerouteEvent(Event)
 	{
 		;~ global CGUI
-		
-		ControlName := SubStr(Event.GuiControl, InStr(Event.GuiControl, "_") + 1)
 		GUI := CGUI.GUIList[Event.GUI]
 		if(IsObject(GUI))
 		{
@@ -943,14 +948,8 @@ Class CGUI
 			}
 			else ;Forward events to specific controls so they can split the specific g-label cases
 			{
-				for hwnd, Control in GUI.Controls
-				{
-					if(Control.Name = ControlName)
-					{
-						Control.HandleEvent(Event)
-						return
-					}
-				}
+				GuiControlGet, ControlHWND, % GUI.GUINum ":hwnd", % Event.GuiControl
+				Gui.Controls[ControlHWND].HandleEvent(Event)
 			}
 		}
 	}

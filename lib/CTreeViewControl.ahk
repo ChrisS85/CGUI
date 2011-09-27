@@ -31,8 +31,9 @@ Class CTreeViewControl Extends CControl
 	PostCreate()
 	{
 		Base.PostCreate()
-		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
-		this._.Insert("Items", new this.CItem(0, this.GUINum, this.hwnd))
+		this._.ImageListManager := new this.CImageListManager(this.GUINum, this.hwnd)
+		this._.Items := new this.CItem(0, this.GUINum, this.hwnd)
+		this._.PreviouslySelectedItem := this._.Items
 	}
 	/*
 	Function: FindItem
@@ -120,28 +121,28 @@ Class CTreeViewControl Extends CControl
 	For better readability labels may be chained since they all execute the same code.
 	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
-	Event: Click(NodeIndex)
+	Event: Click(Item)
 	Invoked when the user clicked on the control.
 	
-	Event: DoubleClick(NodeIndex)
+	Event: DoubleClick(Item)
 	Invoked when the user double-clicked on the control.
 	
-	Event: RightClick(NodeIndex)
+	Event: RightClick(Item)
 	Invoked when the user right-clicked on the control.
 	
-	Event: EditingStart(NodeIndex)
+	Event: EditingStart(Item)
 	Invoked when the user started editing a node.
 	
-	Event: EditingEnd(NodeIndex)
+	Event: EditingEnd(Item)
 	Invoked when the user finished editing a node.
 	
-	Event: ItemSelected(NodeIndex)
+	Event: ItemSelected(Item)
 	Invoked when the user selected a node.
 	
-	Event: ItemExpanded(NodeIndex)
+	Event: ItemExpanded(Item)
 	Invoked when the user expanded a node.
 	
-	Event: ItemCollapsed(NodeIndex)
+	Event: ItemCollapsed(Item)
 	Invoked when the user collapsed a node.
 	
 	Event: KeyPress(KeyCode)
@@ -156,16 +157,19 @@ Class CTreeViewControl Extends CControl
 		if(Event.GUIEvent = "S")
 		{
 			this.ProcessSubControlState(this.PreviouslySelectedItem, this.SelectedItem)
-			this.PreviouslySelectedItem := this.SelectedItem
 		}
 		if(Event.GUIEvent == "E")
-			this.CallEvent("EditingStart", Event.EventInfo)
-		else if(EventName := {DoubleClick : "DoubleClick", e : "EditingEnd", S : "ItemSelected", Normal : "Click", RightClick : "RightClick", K : "KeyPress", "+" : "ItemExpanded", "-" : "ItemCollapsed"}[Event.GUIEvent])
+			this.CallEvent("EditingStart", this.Items.ItemByID(Event.EventInfo))
+		else if(EventName := {DoubleClick : "DoubleClick", e : "EditingEnd", S : "ItemSelected", Normal : "Click", RightClick : "RightClick", "+" : "ItemExpanded", "-" : "ItemCollapsed"}[Event.GUIEvent])
+			this.CallEvent(EventName, this.Items.ItemByID(Event.EventInfo))
+		else if(EventName = "K")
 			this.CallEvent(EventName, Event.EventInfo)
 		else if(Event.GUIEvent == "F")
 			this.CallEvent("FocusReceived")
 		else if(Event.GUIEvent == "f")
 			this.CallEvent("FocusLost")
+		if(Event.GUIEvent = "S")			
+			this.PreviouslySelectedItem := this.SelectedItem
 	}
 	
 	/*
@@ -371,7 +375,6 @@ Class CTreeViewControl Extends CControl
 				return
 			Control := GUI.Controls[this._.hwnd]
 			Gui, % this._.GUINum ":Default"
-			text := this.text
 			Gui, TreeView, % Control.ClassNN
 			current := this._.ID ? TV_GetChild(this._.ID) : TV_GetNext() ;Get first child or first top node
 			if(!current)
@@ -384,7 +387,7 @@ Class CTreeViewControl Extends CControl
 		
 		/*
 		Function: ItemByID
-		Access a child item by its ID. This function only works for childs of the first order, no grand-child nodes etc...
+		Access a child item by its ID.
 		
 		Parameters:
 			ID - The ID of the child item
@@ -393,8 +396,12 @@ Class CTreeViewControl Extends CControl
 		ItemByID(ID)
 		{
 			Loop % this.MaxIndex()
+			{
 				if(this[A_Index]._.ID = ID)
 					return this[A_Index]
+				else if(Item := this[A_Index].ItemByID(ID))
+					return Item
+			}
 		}
 		_NewEnum()
 		{

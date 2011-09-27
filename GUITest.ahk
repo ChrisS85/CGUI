@@ -148,7 +148,7 @@ Class CMyWindow Extends CGUI
 			;~ msgbox % this.comboBox.Items[A_Index]
 		msgbox % this.lvItems.SelectedIndex
 	}
-	lvItems_SelectionChanged(Row)
+	lvItems_SelectionChanged(RowItem)
 	{
 		if(this.lvItems.SelectedIndices.MaxIndex() >= 1)
 		{

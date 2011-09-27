@@ -777,33 +777,33 @@ Class CListViewControl Extends CControl
 	For better readability labels may be chained since they all execute the same code.
 	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
-	Event: Click(RowIndex)
+	Event: Click(RowItem)
 	Invoked when the user clicked on the control.
 	
-	Event: DoubleClick(RowIndex)
+	Event: DoubleClick(RowItem)
 	Invoked when the user double-clicked on the control.
 	
-	Event: RightClick(RowIndex)
+	Event: RightClick(RowItem)
 	Invoked when the user right-clicked on the control.
 	
-	Event: DoubleRightClick(RowIndex)
+	Event: DoubleRightClick(RowItem)
 	Invoked when the user double-right-clicked on the control.
 	
 	Event: ColumnClick(ColumnIndex)
 	Invoked when the user clicked on a column header.
 	
-	Event: EditingStart(RowIndex)
+	Event: EditingStart(RowItem)
 	Invoked when the user started editing the first cell of a row.
 	
-	Event: EditingEnd(RowIndex)
+	Event: EditingEnd(RowItem)
 	Invoked when the user finished editing a cell.
 	
-	Event: ItemActivate(RowIndex)
+	Event: ItemActivate(RowItem)
 	Invoked when a row was activated.
 	
 	Event: KeyPress(KeyCode)
 	Invoked when the user pressed a key while the control had focus.
-		
+	
 	Event: MouseLeave()
 	Invoked when the mouse leaves the control boundaries.
 	
@@ -822,31 +822,31 @@ Class CListViewControl Extends CControl
 	Event: ScrollingEnd()
 	Invoked when the user ends scrolling the control.
 	
-	Event: ItemSelected(RowIndex)
+	Event: ItemSelected(RowItem)
 	Invoked when the user selects an item.
 	
-	Event: ItemDeselected(RowIndex)
+	Event: ItemDeselected(RowItem)
 	Invoked when the user deselects an item.
 	
-	Event: SelectionChanged(RowIndex)
+	Event: SelectionChanged(RowItem)
 	Invoked when the selected item(s) has/have changed.
 	
-	Event: ItemFocused(RowIndex)
+	Event: ItemFocused(RowItem)
 	Invoked when a row gets focused.
 	
-	Event: ItemDefocused(RowIndex)
+	Event: ItemDefocused(RowItem)
 	Invoked when a row loses the focus.
 	
-	Event: FocusedChanged(RowIndex)
+	Event: FocusedChanged(RowItem)
 	Invoked when the row focus has changed.
 	
-	Event: ItemChecked(RowIndex)
+	Event: ItemChecked(RowItem)
 	Invoked when the user checks a row.
 	
-	Event: ItemUnchecked(RowIndex)
+	Event: ItemUnchecked(RowItem)
 	Invoked when the user unchecks a row.	
 	
-	Event: CheckedChanged(RowIndex)
+	Event: CheckedChanged(RowItem)
 	Invoked when the checked row(s) has/have changed.
 	*/
 	HandleEvent(Event)
@@ -867,15 +867,9 @@ Class CListViewControl Extends CControl
 			if(InStr(Event.Errorlevel, "S")) ;Process sub control state
 			{
 				if(LV_GetCount("Selected") = 1)
-				{
 					this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
-					this._.PreviouslySelectedItem := this.SelectedItem
-				}
 				else
-				{
 					this.ProcessSubControlState(this._.PreviouslySelectedItem, "")
-					this._.PreviouslySelectedItem := ""
-				}
 			}
 			Mapping := { Sa : "ItemSelected", sb : "ItemDeselected", Fa : "ItemFocused", fb : "ItemDefocused", Ca : "ItemChecked", cb : "ItemUnChecked"} ;Case insensitivity strikes back!
 			for EventIndex, Function in Mapping
@@ -886,6 +880,13 @@ Class CListViewControl Extends CControl
 				}
 			if(EventName :=  {S : "SelectionChanged", C : "CheckedChanged", F : "FocusedChanged"}[Event.Errorlevel])
 				this.CallEvent(EventName, Row)
+			if(InStr(Event.Errorlevel, "S")) ;Process sub control state
+			{
+				if(LV_GetCount("Selected") = 1)
+					this._.PreviouslySelectedItem := this.SelectedItem
+				else
+					this._.PreviouslySelectedItem := ""
+			}
 		}
 	}
 }
