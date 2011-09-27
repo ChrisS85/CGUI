@@ -67,6 +67,7 @@ File: CTabControl  (CTabControl.ahk)
 File: CTextControl  (CTextControl.ahk)
 File: CTreeViewControl  (CTreeViewControl.ahk)
 File: gdip.ahk  (gdip.ahk)
+File: CMenu  (CMenu.ahk)
 
 Group: Index  {
 
