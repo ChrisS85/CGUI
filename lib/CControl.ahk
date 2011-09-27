@@ -13,7 +13,7 @@ Class CControl ;Never created directly
 		this.Insert("GUINum", GUINum) ;Store link to gui for GuiControl purposes (and possibly others later
 		this.Insert("_", {}) ;Create proxy object to enable __Get and __Set calls for existing keys (like ClassNN which stores a cached value in the proxy)
 		this.Insert("Font", new CFont(GUINum))
-		this._.Insert("RegisteredEvents")
+		this._.Insert("RegisteredEvents", {})
 	}
 	PostCreate()
 	{
@@ -129,7 +129,7 @@ Class CControl ;Never created directly
 			return
 		if(this._.RegisteredEvents.HasKey(Name))
 		{
-			if(IsFunc(this._.RegisteredEvents[Name]))
+			if(IsFunc(this[this._.RegisteredEvents[Name]]))
 				return {Handled : true, Result : this[this._.RegisteredEvents[Name]](CGUI.GUIList[this.GUINum], Params*)}
 			else if(IsFunc( `(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]]))
 				return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)}
