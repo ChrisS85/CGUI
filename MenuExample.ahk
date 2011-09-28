@@ -6,7 +6,7 @@ return
 #include <CGUI>
 Class CMyWindow Extends CGUI
 {
-	EditTest := this.AddControl("Edit", "EditTest", "", "")
+	EditTest := this.AddControl("Button", "EditTest", "", "")
 	__New(Title)
 	{
 		this.Title := Title
@@ -14,24 +14,26 @@ Class CMyWindow Extends CGUI
 		this.MinSize := "500x200"
 		this.CloseOnEscape := true
 		this.DestroyOnClose := true
-		this.Menu1 := new CMenu("Main")
-		this.Menu1.AddMenuItem("hello", "test")
-		this.Menu1[1].Text := "Test"
-		this.Menu1[1].Checked := true
-		this.Menu1[1].Enabled := false
-		this.Menu1.AddSubMenu("sub1", "Test")
-		this.Menu1[2].AddMenuItem("blup", "blup")
+		Menu1 := new CMenu("Main")
+		Menu1.AddMenuItem("hello", "test")
+		Menu1[1].Text := "Test"
+		Menu1[1].Checked := true
+		Menu1[1].Enabled := false
+		Menu1.AddSubMenu("sub1", "Test")
+		Menu1[2].AddMenuItem("blup", "blup")
 		sub2 := New CMenu("sub2")
 		sub2.AddMenuItem("blah", "blah")
-		this.Menu1.AddSubMenu("sub2", sub2)
+		Menu1.AddSubMenu("sub2", sub2)
 		sub2.Icon := "C:\Program Files\Autohotkey\SciTE_beta5\AutoHotkey.exe"
-		this.Menu1.DeleteMenuItem(1)
+		Menu1.DeleteMenuItem(1)
+		this.EditTest.Menu := Menu1
 		;~ this.Menu(this.Menu1) ;Menu can't be used for context and menu bar at once...
 		this.Show("")
 	}
-	ContextMenu()
+	EditTest_ContextMenu()
 	{
-		this.ShowMenu(this.Menu1)
+		MsgBox menu
+		;~ this.ShowMenu(this.Menu1)
 	}
 	blup()
 	{

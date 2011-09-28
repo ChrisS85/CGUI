@@ -214,6 +214,9 @@ Class CControl ;Never created directly
 	If a text is set for this value, this control will show a tooltip when the mouse hovers over it.
 	Text and Picture controls require that you define a g-label for them to make this work.
 	
+	Variable: Menu
+	If this variable contains an instance of <CMenu> and there is no ContextMenu() event handler for this control, this menu will be shown when the user right clicks on this control or presses the AppsKey while this control has focus.
+	
 	Variable: Left
 	The control left-aligns its text. This is the default setting.
 	
@@ -455,6 +458,9 @@ Class CControl ;Never created directly
 	Event: FocusLeave
 	Invoked when the control loses keyboard focus. This event does not require that the control has a matching g-label since it is implemented through window messages.
 	This event is not supported for all input-capable controls unfortunately.
+	
+	Event: ContextMenu
+	Invoked when the user right clicks on the control or presses the AppsKey while this control has focus. If this event is not handled a static context menu can be shown by setting the Menu variable of this control to an instance of <CMenu>.
 	
 	Event: Validate
 	Invoked when the control is asked to validate its (textual) contents. This event is only valid for controls containing text, which are only Edit and ComboBox controls as of now.

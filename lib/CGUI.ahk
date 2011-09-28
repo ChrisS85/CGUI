@@ -385,13 +385,13 @@ Class CGUI
 	}
 	
 	/*
-	Function: Menu	
+	Function: AddMenuBar
 	Attaches a menu bar to the window. The menu object can be accessed under the "Menu" property of the class instance deriving from CGUI.
 	
 	Parameters:
 		Menu - An instance of <CMenu> containing the menu information. Leave empty to remove the menu. If the menu object is attached as menu bar, it can not be used as a context menu anymore.
 	*/
-	Menu(Menu)
+	AddMenuBar(Menu)
 	{
 		if(this.IsDestroyed)
 			return
@@ -642,6 +642,9 @@ Class CGUI
 	Variable: Instances
 	A list of all instances of the current window class. If you inherit from CGUI you can use this to find all windows of this type.
 	
+	Variable: Menu
+	If this variable contains an instance of <CMenu> and there is no ContextMenu() event handler for this window, this menu will be shown when the user right clicks on an empty window area.
+	
 	Variable: MinSize
 	Minimum window size when Resize is enabled.
 	
@@ -884,7 +887,7 @@ Class CGUI
 	On a related note, you can listen to window messages by calling <CGUI.OnMessage> on a window instance.
 	
 	Event: ContextMenu()
-	Invoked when the user right clicks on a control of this window.
+	Invoked when the user right clicks on a an empty area in this window. It is possible to show a static context menu without handling this event by assigning the Menu property of this window to an instance of <CMenu>.
 	
 	Event: DropFiles()
 	Invoked when the user dropped files on the window.
@@ -939,12 +942,29 @@ Class CGUI
 				;Call PreClose before closing a window so it can be skipped
 				func := func = "Escape" && GUI.CloseOnEscape ? "PreClose" : func
 				func := func = "Close" ? "PreClose" : func
-				if(IsFunc(GUI[func]))
+				if(func != "ContextMenu")
 				{
-					if(Event.Label = "CGUI_Size")
-						result := `(GUI)[func](Event.EventInfo)
-					else
-						result := `(GUI)[func]() ;PreClose can return false to prevent closing the window
+					if(IsFunc(GUI[func]))
+					{
+						if(Event.Label = "CGUI_Size")
+							result := `(GUI)[func](Event.EventInfo)
+						else
+							result := `(GUI)[func]() ;PreClose can return false to prevent closing the window
+					}
+				}
+				else
+				{
+					MouseGetPos, , , , hControl, 2
+					if(hControl)
+					{
+						Handled := Gui.Controls[hControl].CallEvent(func).Handled
+						if(!Handled && CGUI_TypeOf(Gui.Controls[hControl].Menu) = "CMenu")
+							Gui.ShowMenu(Gui.Controls[hControl].Menu)
+					}
+					else if(IsFunc(GUI[func]))
+						result := `(GUI)[func]()
+					else if(CGUI_TypeOf(Gui.Menu) = "CMenu")
+						Gui.ShowMenu(Gui.Menu)
 				}
 				if(!this.IsDestroyed)
 				{
