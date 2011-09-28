@@ -80,6 +80,7 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 			Options .= UseEnabledState ? " Disabled" : " Hidden"
 		Control := GUI.AddControl(type, Name, Options, Text, this._.Controls)
 		Control._.UseEnabledState := UseEnabledState
+		Control.hParentControl := this.hwnd
 		return Control
 	}
 	/*

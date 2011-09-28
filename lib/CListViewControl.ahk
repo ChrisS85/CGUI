@@ -532,7 +532,7 @@ Class CListViewControl Extends CControl
 					Options .= UseEnabledState ? " Disabled" : " Hidden"
 				Control := GUI.AddControl(type, Name, Options, Text, this._.Controls)
 				Control._.UseEnabledState := UseEnabledState
-				this._.Controls.Insert(Name, Control)
+				Control.hParentControl := this._.hwnd
 				return Control
 			}
 			/*

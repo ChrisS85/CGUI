@@ -371,7 +371,7 @@ Class CSharpGuiConverter Extends CGUI
 						;~ Options := (Control2.HasKey("x") ? "x" Control2.x + 22 " " : "" ) (Control2.HasKey("y") ? "y" Control2.y + 36 " " : "" ) (Control2.HasKey("width") ? "w" Control2.width " " : "" ) (Control2.HasKey("height") ? "h" Control2.height : "" )
 						;~ OutputFile .= "`t`t`tthis.Tabs[" Control2.Tab "].AddControl(""" Control2.Type """, """ Control2.Name """, """ Options """, """ Control2.Text """)`n"						
 						if(Control2.Type = "GroupBox")
-							this.WriteGroupBox(OutputFile, Controls, Control2, "this.Tabs[" Control2.Tab "]." Control2.Name ".AddControl", "this.Tabs[" Control2.Tab "].Controls", 3)
+							this.WriteGroupBox(OutputFile, Controls, Control2, "this.Tabs[" Control2.Tab "].Controls." Control2.Name ".AddControl", "this.Tabs[" Control2.Tab "].Controls." Control2.Name ".Controls", 3)
 					}
 				OutputFile .= "`t`t}`n`t}`n`t`n"
 			}
@@ -379,17 +379,18 @@ Class CSharpGuiConverter Extends CGUI
 		/*
 		//Tab Class
 		*/
+		
 		OutputFile .= "`t__New()`n`t{`n"
 		for Name, Control in Controls
 			if(Control.Type = "GroupBox" && !Control.HasKey(TabControl))
-				this.WriteGroupBox(OutputFileControl, Controls, Control, "", "this", 2)
+				this.WriteGroupBox(OutputFileControl, Controls, Control, "this." Control.Name ".AddControl", "this." Control.Name, 2)
 			else if(!Control.HasKey("TabControl") && Control.HasKey("UpDown"))
 				this.WriteControl(OutputFile, Control, "this." Control.Name " := this.AddControl", "this." Control.Name, 2) 
 		
 		for, Name, Control in Controls
 		{
 			for Property, Value in Control
-				if Property not in x,y,width,height,name,type,Text,Events,Tab,TabControl,TabPages,GroupBox,Controls,UpDown
+				if Property not in x,y,width,height,name,type,Text,Events,Tab,TabControl,TabPages,GroupBox,Controls,UpDown,Min,Max
 				{
 					if Value is Number
 						OutputFile .= "`t`tthis." Control.Name "." Property " := " Value "`n"
@@ -450,6 +451,8 @@ Class CSharpGuiConverter Extends CGUI
 			if(!PreText)
 				PreText := "this." ControlName " := this." GroupBoxControl.Name ".AddControl"			
 			AccessText .= ".Controls." ControlName
+			Control.X := Control.X + GroupBoxControl.X
+			Control.Y := Control.Y + GroupBoxControl.Y
 			this.WriteControl(OutputFile, Control, PreText, AccessText, IndentLevel)
 			;~ Options := (Control.HasKey("x") ? "x" Control.x " " : "" ) (Control.HasKey("y") ? "y" Control.y " " : "" ) (Control.HasKey("width") ? "w" Control.width " " : "" ) (Control.HasKey("height") ? "h" Control.height : "" )
 			;~ Loop % IndentLevel
