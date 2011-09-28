@@ -93,6 +93,97 @@ Class CSharpGuiConverter Extends CGUI
 		IniWrite, % this.txtOutput.Text, %A_ScriptName%.ini, Settings, Out
 		ExitApp
 	}
+	ReadTabs(ByRef InputFile, Controls, TabPages)
+	{
+		;Collect TabPage variables and create TabPages array for each tab control
+		Loop, Parse, InputFile, `n, %A_Space%%A_Tab%
+		{
+			if(InStr(A_LoopField, "private System.Windows.Forms."))
+			{
+				CSharptype := Regex.MatchSimple(A_LoopField, "type", "\.Forms\.(?P<type>.*?) (?P<name>.*?)\;")
+				name := Regex.MatchSimple(A_LoopField, "name", "\.Forms\.(?P<type>.*?) (?P<name>.*?)\;")
+				if(CSharptype && name)
+				{
+					if(CSharpType = "TabControl")
+						Controls[Name].TabPages := {}
+					else if(CSharpType = "TabPage")
+						TabPages[Name] := {}
+				}
+			}
+		}
+		;Scan for tab pages and associate controls with tab control tabs
+		;Find tabpage->tab control relationship
+		Loop, Parse, InputFile, `n, %A_Space%%A_Tab%
+		{
+			if(InStr(A_LoopField, ".Controls.Add("))
+			{
+				TabControl := Regex.MatchSimple(A_LoopField, "Name", "this\.(?P<Name>.*?)\.Controls\.Add\(")
+				if(Controls[TabControl].Type = "Tab")
+				{
+					TabPage := {Name : Regex.MatchSimple(A_LoopField, "Control", "\(this\.(?P<Control>.*?)\);")}  ;this.tabPage1.Controls.Add(this.label2);
+					Controls[TabControl].TabPages.Insert(TabPage)
+				}
+			}
+			;~ this.tabPage2.Controls.Add(this.txtTags);
+		}
+		;Find tabpage text
+		Loop, Parse, InputFile, `n, %A_Space%%A_Tab%
+		{
+			if(InStr(A_LoopField, ".Text = """)) ;this.tabPage1.Text = "General";
+			{
+				TabPage := Regex.MatchSimple(A_LoopField, "Name", "this\.(?P<Name>.*?)\.Text = ")
+				for name, control in Controls
+					for index, tabpage2 in control.TabPages
+					if(TabPage2.Name = TabPage)
+					{
+						TabPage2.Text := Regex.MatchSimple(A_LoopField, "Text", " = ""(?P<Text>.*?)"";")
+						break 2
+					}
+			}
+		}
+		
+		;Find control->tabpage relationship
+		Loop, Parse, InputFile, `n, %A_Space%%A_Tab%
+		{
+			if(InStr(A_LoopField, ".Controls.Add(")) ;this.tabPage1.Controls.Add(this.label2);
+			{
+				TabPage := Regex.MatchSimple(A_LoopField, "Name", "this\.(?P<Name>.*?)\.Controls\.Add\(")
+				if(IsObject(TabPages[TabPage]))
+				{
+					SubControl := Regex.MatchSimple(A_LoopField, "Control", "\(this\.(?P<Control>.*?)\);")  
+					for Name, Control in Controls
+						if(IsObject(Control.TabPages))
+							for index, TabPage2 in Control.TabPages
+								if(TabPage2.Name = TabPage)
+								{
+									Controls[SubControl].TabControl := Control									
+									Controls[SubControl].Tab := index
+									break 2
+								}					
+				}
+			}
+			;~ this.tabPage2.Controls.Add(this.txtTags);
+		}
+	}
+	ReadGroupBoxes(ByRef InputFile, Controls)
+	{
+		for name, control in Controls
+			if(control.Type = "GroupBox")
+				control.Controls := {}
+		Loop, Parse, InputFile, `n, %A_Space%%A_Tab%
+		{
+			if(InStr(A_LoopField, ".Controls.Add("))
+			{
+				GroupBoxControl := Regex.MatchSimple(A_LoopField, "Name", "this\.(?P<Name>.*?)\.Controls\.Add\(")
+				if(Controls[GroupBoxControl].Type = "GroupBox")
+				{
+					SubControl := Regex.MatchSimple(A_LoopField, "Control", "\(this\.(?P<Control>.*?)\);") ;this.tabPage1.Controls.Add(this.label2);
+					Controls[GroupBoxControl].Controls.Insert(SubControl)
+					Controls[SubControl].GroupBox := 1
+				}
+			}
+		}
+	}
 	Convert(InPath, OutPath)
 	{
 		;~ global Regex
@@ -101,7 +192,6 @@ Class CSharpGuiConverter Extends CGUI
 		Class := SubStr(InputFile, start, InStr(InputFile, "`n", 0, start) - start)
 		Controls := [] ;array storing control definitions
 		Window := {Events : {}} ;Object storing window properties
-		tabPages := {} ;Array containing all defined Tab pages
 		StartString := "private System.Windows.Forms."
 		EndString := ";"
 		;Get a list of controls
@@ -114,19 +204,21 @@ Class CSharpGuiConverter Extends CGUI
 				name := Regex.MatchSimple(line, "name", "\.Forms\.(?P<type>.*?) (?P<name>.*?)\;")
 				if(CSharptype && name)
 				{
-					SupportedControls := { TextBox : "Edit", Label : "Text", Button : "Button", CheckBox : "CheckBox", PictureBox : "Picture", ListView : "ListView", ComboBox : "ComboBox", ListBox : "ListBox", TreeView : "TreeView", GroupBox : "GroupBox", RadioButton : "Radio", TabControl : "Tab", LinkLabel : "Text", StatusStrip : "StatusBar"}
+					SupportedControls := { TextBox : "Edit", Label : "Text", Button : "Button", CheckBox : "CheckBox", PictureBox : "Picture", ListView : "ListView", ComboBox : "ComboBox", ListBox : "ListBox", TreeView : "TreeView", GroupBox : "GroupBox", RadioButton : "Radio", TabControl : "Tab", LinkLabel : "Text", StatusStrip : "StatusBar", NumericUpDown : "Edit"}
 					type := SupportedControls[CSharptype]
 					if(type)
 					{
 						Control := {Type : Type, Name : name, Events : {}}
 						if(CSharpType = "LinkLabel")
 							Control.Link := true
-						if(CSharpType = "TabControl")
-							Control.TabPages := {}
+						else if(CSharpType = "NumericUpDown")
+						{
+							Control.UpDown := true
+							Control.Min := 0
+							Control.Max := 100
+						}
 						Controls[Control.Name] := Control
 					}
-					else if(CSharpType = "TabPage")
-						TabPages[Name] := {}
 				}
 			}
 		}
@@ -243,93 +335,61 @@ Class CSharpGuiConverter Extends CGUI
 					Handled := this[CurrentControl.Type](CurrentControl, line)
 			}
 		}
+		TabPages := {}
+		this.ReadTabs(InputFile, Controls, TabPages)
+		this.ReadGroupBoxes(InputFile, Controls)
 		
-		;Scan for tab pages and associate controls with tab control tabs
-		;Find tabpage->tab control relationship
-		Loop, Parse, InputFile, `n, %A_Space%%A_Tab%
-		{
-			if(InStr(A_LoopField, ".Controls.Add("))
-			{
-				TabControl := Regex.MatchSimple(A_LoopField, "Name", "this\.(?P<Name>.*?)\.Controls\.Add\(")
-				if(Controls[TabControl].Type = "Tab")
-				{
-					TabPage := {Name : Regex.MatchSimple(A_LoopField, "Control", "\(this\.(?P<Control>.*?)\);")}  ;this.tabPage1.Controls.Add(this.label2);
-					Controls[TabControl].TabPages.Insert(TabPage)
-				}
-			}
-			;~ this.tabPage2.Controls.Add(this.txtTags);
-		}
-		;Find tabpage text
-		Loop, Parse, InputFile, `n, %A_Space%%A_Tab%
-		{
-			if(InStr(A_LoopField, ".Text = """)) ;this.tabPage1.Text = "General";
-			{
-				TabPage := Regex.MatchSimple(A_LoopField, "Name", "this\.(?P<Name>.*?)\.Text = ")
-				for name, control in Controls
-					for index, tabpage2 in control.TabPages
-					if(TabPage2.Name = TabPage)
-					{
-						TabPage2.Text := Regex.MatchSimple(A_LoopField, "Text", " = ""(?P<Text>.*?)"";")
-						break 2
-					}
-			}
-		}
-		
-		;Find control->tabpage relationship
-		Loop, Parse, InputFile, `n, %A_Space%%A_Tab%
-		{
-			if(InStr(A_LoopField, ".Controls.Add(")) ;this.tabPage1.Controls.Add(this.label2);
-			{
-				TabPage := Regex.MatchSimple(A_LoopField, "Name", "this\.(?P<Name>.*?)\.Controls\.Add\(")
-				if(IsObject(TabPages[TabPage]))
-				{
-					SubControl := Regex.MatchSimple(A_LoopField, "Control", "\(this\.(?P<Control>.*?)\);")  
-					for Name, Control in Controls
-						if(IsObject(Control.TabPages))
-							for index, TabPage2 in Control.TabPages
-								if(TabPage2.Name = TabPage)
-								{
-									Controls[SubControl].TabControl := Control									
-									Controls[SubControl].Tab := index
-									break 2
-								}					
-				}
-			}
-			;~ this.tabPage2.Controls.Add(this.txtTags);
-		}
 		;Now that all info is available, write the file
 		OutputFile := "gui := new " Class "()`n#include <CGUI>`nClass " Class " Extends CGUI`n{`n"
-		for Name, Control in Controls
+		for Name, Control in Controls ;Write static control definitions
 		{
-			if(!Control.HasKey("TabControl") && Control.Type != "Tab")
+			if(!Control.HasKey("TabControl") && Control.Type != "Tab" && !Control.HasKey("GroupBox") && !Control.HasKey("UpDown")) ;Must not add subcontrols of groupboxes and UpDown Controls here
 			{
 				Options := (Control.HasKey("x") ? "x" Control.x " " : "" ) (Control.HasKey("y") ? "y" Control.y " " : "" ) (Control.HasKey("width") ? "w" Control.width " " : "" ) (Control.HasKey("height") ? "h" Control.height : "" )
 				OutputFile .= "`t" Control.Name " := this.AddControl(""" Control.Type """, """ Control.Name """, """ Options """, """ Control.Text """)`n"
 			}
 		}
+		
+		/*
+		Tab Class
+		*/
 		for Name, Control in Controls
 		{
 			if(Control.Type = "Tab")
 			{
-				Options := (Control.HasKey("x") ? "x" Control.x " " : "" ) (Control.HasKey("y") ? "y" Control.y " " : "" ) (Control.HasKey("width") ? "w" Control.width " " : "" ) (Control.HasKey("height") ? "h" Control.height : "" )
 				for index, TabPage in Control.TabPages
 					Text .= A_Index = 1 ? TabPage.Text : "|" TabPage.Text
+				Options := (Control.HasKey("x") ? "x" Control.x " " : "" ) (Control.HasKey("y") ? "y" Control.y " " : "" ) (Control.HasKey("width") ? "w" Control.width " " : "" ) (Control.HasKey("height") ? "h" Control.height : "" )
 				OutputFile .= "`tClass " Control.Name "`n`t{`n`t`tstatic Type := ""Tab""`n`t`tstatic Options := """ Options """`n`t`tstatic Text := """ Text """`n`t`t__New(GUI)`n`t`t{`n"
 				
 				for Name2, Control2 in Controls
-					if(Control2.TabControl = Control)
+					if(Control2.TabControl = Control && !Control2.GroupBox)
 					{
-						Options := (Control2.HasKey("x") ? "x" Control2.x + 22 " " : "" ) (Control2.HasKey("y") ? "y" Control2.y + 36 " " : "" ) (Control2.HasKey("width") ? "w" Control2.width " " : "" ) (Control2.HasKey("height") ? "h" Control2.height : "" )
-						OutputFile .= "`t`t`tthis.Tabs[" Control2.Tab "].AddControl(""" Control2.Type """, """ Control2.Name """, """ Options """, """ Control2.Text """)`n"
+						Control2.x := Control2.x + 22
+						Control2.y := Control2.y + 36
+						this.WriteControl(OutputFile, Control2, "this.Tabs[" Control2.Tab "].AddControl", "this.Tabs[" Control2.Tab "].Controls." Control2.Name, 3)
+						;~ Options := (Control2.HasKey("x") ? "x" Control2.x + 22 " " : "" ) (Control2.HasKey("y") ? "y" Control2.y + 36 " " : "" ) (Control2.HasKey("width") ? "w" Control2.width " " : "" ) (Control2.HasKey("height") ? "h" Control2.height : "" )
+						;~ OutputFile .= "`t`t`tthis.Tabs[" Control2.Tab "].AddControl(""" Control2.Type """, """ Control2.Name """, """ Options """, """ Control2.Text """)`n"						
+						if(Control2.Type = "GroupBox")
+							this.WriteGroupBox(OutputFile, Controls, Control2, "this.Tabs[" Control2.Tab "]." Control2.Name ".AddControl", "this.Tabs[" Control2.Tab "].Controls", 3)
 					}
 				OutputFile .= "`t`t}`n`t}`n`t`n"
 			}
 		}
+		/*
+		//Tab Class
+		*/
 		OutputFile .= "`t__New()`n`t{`n"
+		for Name, Control in Controls
+			if(Control.Type = "GroupBox" && !Control.HasKey(TabControl))
+				this.WriteGroupBox(OutputFileControl, Controls, Control, "", "this", 2)
+			else if(!Control.HasKey("TabControl") && Control.HasKey("UpDown"))
+				this.WriteControl(OutputFile, Control, "this." Control.Name " := this.AddControl", "this." Control.Name, 2) 
+		
 		for, Name, Control in Controls
-		{			
+		{
 			for Property, Value in Control
-				if Property not in x,y,width,height,name,type,Text,Events,Tab,TabControl
+				if Property not in x,y,width,height,name,type,Text,Events,Tab,TabControl,TabPages,GroupBox,Controls,UpDown
 				{
 					if Value is Number
 						OutputFile .= "`t`tthis." Control.Name "." Property " := " Value "`n"
@@ -366,6 +426,36 @@ Class CSharpGuiConverter Extends CGUI
 		OutputFile .= "`n}"
 		FileDelete, % OutPath
 		FileAppend, % OutputFile, % OutPath
+	}
+	WriteControl(ByRef OutputFile, Control, PreText, AccessText, IndentLevel)
+	{
+		if(!PreText)
+			PreText := "this." ControlName " := this.AddControl"
+		Options := (Control.HasKey("x") ? "x" Control.x " " : "" ) (Control.HasKey("y") ? "y" Control.y " " : "" ) (Control.HasKey("width") ? "w" Control.width " " : "" ) (Control.HasKey("height") ? "h" Control.height : "" )
+		Loop % IndentLevel
+			OutputFile .= "`t"
+		OutputFile .= PreText "(""" Control.Type """, """ Control.Name """, """ Options """, """ Control.Text """)`n"
+		if(Control.UpDown)
+		{	
+			Loop % IndentLevel
+				OutputFile .= "`t"
+			OutputFile .= AccessText ".AddUpDown(" Control.Min ", " Control.Max ")`n"
+		}
+	}
+	WriteGroupBox(ByRef OutputFile, Controls, GroupBoxControl, PreText, AccessText, IndentLevel)
+	{		
+		for index, ControlName in GroupBoxControl.Controls
+		{
+			Control := Controls[ControlName]
+			if(!PreText)
+				PreText := "this." ControlName " := this." GroupBoxControl.Name ".AddControl"			
+			AccessText .= ".Controls." ControlName
+			this.WriteControl(OutputFile, Control, PreText, AccessText, IndentLevel)
+			;~ Options := (Control.HasKey("x") ? "x" Control.x " " : "" ) (Control.HasKey("y") ? "y" Control.y " " : "" ) (Control.HasKey("width") ? "w" Control.width " " : "" ) (Control.HasKey("height") ? "h" Control.height : "" )
+			;~ Loop % IndentLevel
+				;~ OutputFile .= "`t"
+			;~ OutputFile .= PreText "(""" Control.Type """, """ Control.Name """, """ Options """, """ Control.Text """)`n"
+		}
 	}
 	Text(CurrentControl, line)
 	{

@@ -13,6 +13,8 @@ Class CTabControl Extends CControl
 		this._.Insert("ControlStyles", {Bottom : 0x2, HotTrack : 0x40, Buttons : 0x100, MultiLine : 0x200})
 		this._.Insert("Events", ["Click", "DoubleClick", "RightClick", "DoubleRightClick"])
 		this._.Insert("Messages", {0x004E : "Notify"})
+		CGUI.GUIList[this.GUINum].TabCount := CGUI.GUIList[this.GUINum].TabCount ? CGUI.GUIList[this.GUINum].TabCount + 1 : 1 ;Increase count of tabs in this GUI, required for GUI, Tab command
+		this._.Insert("TabIndex", CGUI.GUIList[this.GUINum].TabCount)
 	}
 	
 	PostCreate()
@@ -247,8 +249,10 @@ Class CTabControl Extends CControl
 				if(type != "Tab")
 				{
 					GUI := CGUI.GUIList[this.GUINum]
-					Gui, % this.GUINum ":Tab", % this._.TabNumber
+					TabControl := GUI.Controls[this._.hwnd]
+					Gui, % this.GUINum ":Tab", % this._.TabNumber, % TabControl._.TabIndex
 					Control := GUI.AddControl(type, Name, Options, Text)
+					Control.hParentControl := this.hwnd
 					this._.Controls.Insert(Name, Control)
 					Gui, % this.GUINum ":Tab"
 					return Control

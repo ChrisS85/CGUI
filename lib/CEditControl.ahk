@@ -26,7 +26,14 @@ Class CEditControl Extends CControl
 	{
 		WM_USER := 0x0400 
 		UDM_SETBUDDY := WM_USER + 105
+		;If this edit control belongs to a tab, set the correct tab first and unset it afterwards
+		if(this.hParentControl && CGUI.GUIList[this.GUINum].Controls[this.hParentControl].Type = "Tab")
+			Gui, % this.GUINum ":Tab", % this.TabNumber, % CGUI.GUIList[this.GUINum].Controls[this.hParentControl]._.TabIndex
+		
 		Gui, % this.GUINum ":Add", UpDown, Range%Min%-%Max% hwndhUpDown, % this.Text
+		
+		if(this.hParentControl && CGUI.GUIList[this.GUINum].Controls[this.hParentControl].Type = "Tab")
+			Gui, % this.GUINum ":Tab"
 		hwnd := this.hwnd
 		;~ SendMessage, UDM_SETBUDDY, hwnd, 0,, % "ahk_id " hwnd
 		this._.UpDownHwnd := hUpDown
