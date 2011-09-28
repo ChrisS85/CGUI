@@ -243,6 +243,9 @@ Class CControl ;Never created directly
 	
 	Variable: Border
 	Provides a thin-line border around the control.
+	
+	Variable: hParentControl
+	If this control is a subcontrol of another control, this variable contains the window handle of the parent control.
 	*/
 	__Get(Name, Params*) 
     { 
