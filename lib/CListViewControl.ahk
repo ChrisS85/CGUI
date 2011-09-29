@@ -408,6 +408,15 @@ Class CListViewControl Extends CControl
 		}
 		
 		/*
+		Function: Clear
+		Clears the ListView by deleting all rows.
+		*/
+		Clear()
+		{
+			Loop % this.MaxIndex()
+				this.Delete(1)
+		}
+		/*
 		Function: Delete
 		Deletes a row.
 		

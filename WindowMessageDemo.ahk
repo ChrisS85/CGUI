@@ -6,6 +6,7 @@ return
 #include <CGUI>
 Class CWindowMessageDemo Extends CGUI
 {
+	;Add some controls
 	txtX 		:= this.AddControl("Text", "txtX", "x10", "X:")
 	editX 	:= this.AddControl("Edit", "editX", "x+10", "")
 	txtY		:= this.AddControl("Text", "txtY", "x10", "Y:")
@@ -17,18 +18,24 @@ Class CWindowMessageDemo Extends CGUI
 		this.MinSize := "400x300"
 		this.CloseOnEscape := true
 		this.DestroyOnClose := true
+		
+		;Register the mouse move message. It will be forwarded to MouseMove() in this class.
 		this.OnMessage(0x200, "MouseMove")
 		this.Show("")
 		return this
 	}
+	
+	;Called when MouseMove message is received
 	MouseMove(Msg, wParam, lParam)
 	{
 		this.editX.text := lParam & 0xFFFF
 		this.editY.text := (lParam & 0xFFFF0000) >> 16
 		return 0
 	}
-	editX_Leave()
+	
+	PostDestroy()
 	{
-		tooltip editX leave
+		if(!this.Instances.MaxIndex())
+			ExitApp
 	}
 }

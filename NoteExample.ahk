@@ -6,7 +6,7 @@ gui := new NoteExample()
 #Commentflag ;
 Class NoteExample Extends CGUI
 {
-	;~ treeNoteList				:= this.AddControl("TreeView", "treeNoteList", "x12 y12 w214 h400", "")
+	;The TreeView control is added as a subclass here because it allows better grouping of control-related functions and properties
 	Class treeNoteList
 	{
 		static Type := "TreeView"
@@ -57,6 +57,7 @@ Class NoteExample Extends CGUI
 			GUI.txtName.Text := Item.Text ;display the name of the category/note
 		}
 	}
+	
 	btnAddCategory			:= this.AddControl("Button", "btnAddCategory", "x12 y418 w79 h23", "Add category")		
 	btnDelete					:= this.AddControl("Button", "btnDelete", "x164 y418 w62 h23", "Delete")		
 	txtName						:= this.AddControl("Edit", "txtName", "x232 y12 w508 h23", "")		
