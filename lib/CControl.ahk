@@ -374,10 +374,14 @@ Class CControl ;Never created directly
 				ControlMove,, % Value.x,% Value.y,,,% "ahk_id " this.hwnd
 			else if(Name = "Size")
 				ControlMove,, % Value.width,% Value.height,% "ahk_id " this.hwnd
-			else if(Name = "Enabled")
-				Control, % (Value = 0 ? "Disable" : "Enable"),,,% "ahk_id " this.hwnd
-			else if(Name = "Visible")
-				Control,  % (Value = 0 ? "Hide" : "Show"),,,% "ahk_id " this.hwnd
+			else if(Name = "Enabled" && Value)
+				this.Enable()
+			else if(Name = "Enabled" && !Value)
+				this.Disable()
+			else if(Name = "Visible" && Value)
+				this.Show()
+			else if(Name = "Visible" && !Value)
+				this.Hide()
 			else if(Name = "Style")
 				Control, Style, %Value%,,,% "ahk_id " this.hwnd
 			else if(Name = "ExStyle")

@@ -83,17 +83,19 @@ Class CGUI
 		*/
 		for key, Value in instance.base
 		{
-			if(Value.HasKey("__Class") && Value.HasKey("Type")) ;Look for classes that define a type property
+			if(Value.HasKey("__Class") && Value.HasKey("Type") && Value.HasKey("Options")	&& Value.HasKey("Text")) ;Look for classes that define a type property
 			{
+				;~ if(!CGUI_Assert(Value.Type != "", "Control class definitions must use static properties."))
+					;~ continue
 				Name := Value.HasKey("Name") ? Value.Name : SubStr(Value.__Class, InStr(Value.__Class, ".") + 1)
 				control := instance.AddControl(Value.Type, Name, Value.Options, Value.Text)
 				instance[Name] := {base : ObjClone(Value)}
 				instance[Name].base.base := control
+				instance.Controls[instance[Name].hwnd] := instance[Name]
 				if(IsFunc(instance[Name].__New) = 3)
 					instance[Name].__New(instance)
 				else if(IsFunc(instance[Name].__New) = 2)
 					instance[Name].__New()
-				instance.Controls[instance[Name].hwnd] := instance[Name]
 			}
 		}
 	}

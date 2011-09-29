@@ -33,10 +33,7 @@ Class CActiveXControl Extends CControl
 		}
 		__Call(Name, Params*)
 		{
-			;~ global CGUI
 			CGUI.GUIList[this.GUINum].Controls[this.hwnd].CallEvent(Name, Params*)
-			;~ if(ObjHasKey(CGUI.GUIList[this.GUINum].base, this.ControlName "_" Name))
-				;~ `(CGUI.GUIList[this.GUINum])[this.ControlName "_" Name](Params*)
 		}
 	}
 	/*
@@ -45,7 +42,7 @@ Class CActiveXControl Extends CControl
 	{
 		;~ global CGUI
 		if(!Base.HasKey(Name))
-			If Name not in Base,_,GUINum
+			If Name not in Base,_,GUINum,
 			{
 				if(base.__GetEx(Result, Name, Params*))
 					return true
@@ -97,8 +94,13 @@ Class CActiveXControl Extends CControl
 	{
 		if Name not in Insert,Remove,HasKey,__GetEx
 		{
-			if(!ObjHasKey(this.base.base, Name) && !ObjHasKey(this.base, Name))
+			if(!ObjHasKey(this.base.base, Name) && !ObjHasKey(this.base, Name) && !ObjHasKey(this.base.base.base.base, Name))
+			{
+				Error := ComObjError()
+					ComObjError(false)
 				`(this._.Object)[Name](Params*)
+					ComObjError(Error)
+			}
 		}	
 	}
 	/*
