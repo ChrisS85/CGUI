@@ -14,6 +14,7 @@ Class CActiveXControl Extends CControl
 	{
 		Base.__New(Name, Options, Text, GUINum)
 		this.Insert("Type", "ActiveX")
+		this._.Insert("Messages", {0x004E : "Notify"})
 	}
 	PostCreate()
 	{
@@ -41,8 +42,6 @@ Class CActiveXControl Extends CControl
 	__GetEx(ByRef Result, Name, Params*)
 	{
 		;~ global CGUI
-		if(name = "LocationURL")
-			OutputDebug break
 		if(!Base.HasKey(Name))
 			If Name not in Base,_,GUINum,
 			{

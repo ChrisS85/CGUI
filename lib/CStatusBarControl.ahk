@@ -262,6 +262,7 @@ Class CStatusBarControl Extends CControl
 					this._[Name] := Value
 					Gui, % this.GUINum ":Default"
 					SB_SetText(Name = "Text" ? Value : this._.Text, this._.PartNumber, Name = "Style" ? Value : this._.Style)
+					return Value
 				}
 				else if(Name = "Icon" || Name = "IconNumber")
 				{

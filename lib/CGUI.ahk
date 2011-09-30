@@ -504,7 +504,7 @@ Class CGUI
 		this.Controls[hControl] := Control ;Add to list of controls
 		
 		;Check if Focus change messages should be registered automatically
-		if(IsFunc(this[Name "_FocusEnter"]) || IsFunc(this[Name "_FocusLeave"]))
+		if(IsFunc(this[Name "_FocusEnter"]) || IsFunc(this[Name "_FocusLeave"]) || IsFunc(this.FocusChange))
 			this.ActivateFocusChangeMessages(Control)
 		return Control
 	}
@@ -922,12 +922,17 @@ Class CGUI
 		Critical ;Critical needs to be used to catch all events, especially from ListViews
 		if(this.IsDestroyed)
 			return
-		CGUI.EventQueue.Insert({Label : A_ThisLabel, Errorlevel : Errorlevel, GUI : A_GUI, EventInfo : A_EventInfo, GUIEvent : A_GUIEvent, GUIControl : A_GuiControl})
-		SetTimer, CGUI_HandleEventTimer, -10
+		this.PushEvent(A_ThisLabel, A_Gui, A_GuiControl, ErrorLevel, A_EventInfo, A_GuiEvent)
 		if(!WasCritical)
 			Critical, Off ;And it also needs to be disabled again, otherwise there can be some handlers that won't run until the window is reactivated (context menu g-label notification from ListView for example)
 	}
 	
+	;Adds an event to the event queue
+	PushEvent(Label, GUINum, vControl = "", lErrorLevel = "", lEventInfo = "", lGUIEvent = "")
+	{
+		CGUI.EventQueue.Insert({"Label" : Label, "Errorlevel" : lErrorlevel, "GUI" : GUINum, "EventInfo" : lEventInfo, "GUIEvent" : lGUIEvent, "GUIControl" : vControl})
+		SetTimer, CGUI_HandleEventTimer, -10
+	}
 	/*
 	Called by a timer that processes the event queue of all g-label notifications
 	and reroutes specific events to gui event functions and control classes
@@ -1054,6 +1059,8 @@ Class CGUI
 			if(!Code)
 				return
 		}
+		if(Code = "SetFocus" || Code = "KillFocus")
+			this.PushEvent("CGUI_FocusChange", this.GUINum)
 		if(Code = "SetFocus")
 			Control.CallEvent("FocusEnter")
 		else if(Code = "KillFocus")
