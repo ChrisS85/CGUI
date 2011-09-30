@@ -41,6 +41,8 @@ Class CActiveXControl Extends CControl
 	__GetEx(ByRef Result, Name, Params*)
 	{
 		;~ global CGUI
+		if(name = "LocationURL")
+			OutputDebug break
 		if(!Base.HasKey(Name))
 			If Name not in Base,_,GUINum,
 			{
@@ -52,15 +54,15 @@ Class CActiveXControl Extends CControl
 					DetectHiddenWindows, On
 					if(this.IsMemberOf(Name))
 					{
-						Value := this._.Object[Name]
+						Result := this._.Object[Name]
 						Loop % Params.MaxIndex()
-							if(IsObject(Value)) ;Fix unlucky multi parameter __GET
-								Value := Value[Params[A_Index]]
+							if(IsObject(Result)) ;Fix unlucky multi parameter __GET
+								Result := Result[Params[A_Index]]
 					}
 					if(!DetectHidden)
 						DetectHiddenWindows, Off
-					if(Value != "")
-						return Value
+					if(Result != "")
+						return true
 				}
 			}
 	}

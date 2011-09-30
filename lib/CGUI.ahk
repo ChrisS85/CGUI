@@ -128,7 +128,7 @@ Class CGUI
 			}
 			
 			;if parameters are valid and the listener isn't registered yet, add it and possibly set up the OnMessage Callback
-			if(Message && GUI && FunctionName && IsFunc(GUI[FunctionName]))
+			if(Message && GUI && FunctionName && IsFunc(GUI[FunctionName]) = 5)
 			{
 				;If the current message hasn't been registered anywhere
 				if(!this.WindowMessageListeners.HasKey(Message))
@@ -145,6 +145,7 @@ Class CGUI
 				this.WindowMessageListeners[Message].Listeners[hwnd] := FunctionName
 				
 			}
+			CGUI_Assert(IsFunc(GUI[FunctionName]) = 5, "Invalid function definition " GUI[FunctionName] ". Function takes 3 parameters, Msg, lParam and wParam.")
 		}
 		UnregisterListener(hwnd, Message = "")
 		{

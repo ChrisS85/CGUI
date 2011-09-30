@@ -252,7 +252,7 @@ Class CControl ;Never created directly
 	*/
 	__Get(Name, Params*) 
     { 
-        if this.__GetEx(Result, Name, Params*) 
+        if(this.__GetEx(Result, Name, Params*) )
             return Result 
     }
 	
