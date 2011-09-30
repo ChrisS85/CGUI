@@ -486,7 +486,7 @@ Class CControl ;Never created directly
 			this._.hwnd := hwnd
 			this._.IconList := {}
 		}
-		SetIcon(ID, Path, IconNumber)
+		SetIcon(ID, PathOrhBitmap, IconNumber)
 		{
 			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
@@ -517,10 +517,10 @@ Class CControl ;Never created directly
 					SendMessage, 0x1303, 0, this._.IconList.SmallIL_ID, % Control.ClassNN, % "ahk_id " GUI.hwnd  ; 0x1109 is TVM_SETIMAGELIST					
 				}
 			}
-			if(Path != "")
+			if(FileExist(PathorhBitmap))
 			{
 				Loop % this._.IconList.MaxIndex() ;IDs and paths and whatnot are identical in both lists so one is enough here
-					if(this._.IconList[A_Index].Path = Path && this._.IconList[A_Index].IconNumber = IconNumber)
+					if(this._.IconList[A_Index].Path = PathorhBitmap && this._.IconList[A_Index].IconNumber = IconNumber)
 					{
 						Icon := this._.IconList[A_Index]
 						break
@@ -528,10 +528,26 @@ Class CControl ;Never created directly
 				
 				if(!Icon)
 				{
-					IID := IL_Add(this._.IconList.SmallIL_ID, Path, IconNumber, 1)
+					IID := IL_Add(this._.IconList.SmallIL_ID, PathorhBitmap, IconNumber, 1)
 					if(Control.Type = "ListView")
-						IID := IL_Add(this._.IconList.LargeIL_ID, Path, IconNumber, 1)
-					this._.IconList.Insert(Icon := {Path : Path, IconNumber : IconNumber, ID : IID})
+						IID := IL_Add(this._.IconList.LargeIL_ID, PathorhBitmap, IconNumber, 1)
+					this._.IconList.Insert(Icon := {Path : PathorhBitmap, IconNumber : IconNumber, ID : IID})
+				}
+			}
+			else
+			{
+				Loop % this._.IconList.MaxIndex() ;IDs and paths and whatnot are identical in both lists so one is enough here
+					if(this._.IconList[A_Index].Path = PathorhBitmap && this._.IconList[A_Index].IconNumber = IconNumber)
+					{
+						Icon := this._.IconList[A_Index]
+						break
+					}
+				if(!Icon)
+				{
+					IID := DllCall("ImageList_ReplaceIcon", "Ptr", this._.IconList.SmallIL_ID, Int, -1, "Ptr", PathorhBitmap) + 1
+					if(Control.Type = "ListView")
+						IID := DllCall("ImageList_ReplaceIcon", "Ptr", this._.IconList.LargeIL_ID, Int, -1, "Ptr", PathorhBitmap) + 1
+					this._.IconList.Insert(Icon := {Path : PathorhBitmap, IconNumber : 1, ID : IID})
 				}
 			}
 			if(Control.Type = "ListView")

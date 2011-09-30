@@ -16,11 +16,18 @@ Class Explorer Extends CGUI
 		this.ExplorerRight.Navigate("C:\")
 		DriveGet,list,List
 		Loop, Parse, list
-			this.treeFiles.Items.Add(A_LoopField ":")
+			this.AddFolderToTree(this.treeFiles.SelectedItem, A_LoopField ":")
 	}
-	treeFiles_FocusEnter()
+	AddFolderToTree(Parent, name, level = 0)
 	{
-		;~ MsgBox Enter
+		node := Parent.Add(name)
+		Path := this.BuildPath(Node)
+		node.SetIcon(ExtractAssociatedIcon(0, Path))
+		if(level = 0)
+		{
+			Loop, %Path%\*, 2, 0 ;This recursion is pretty slow but it is required to find out if there are subfolders. This is just a demo project showing off this library, so I don't really care...Explorer namespace extensions provide information if there are subfolders, but accessing those goes too far here.
+				this.AddFolderToTree(node, A_LoopFileName, 1)
+		}
 	}
 	treeFiles_ItemSelected()
 	{
@@ -29,8 +36,8 @@ Class Explorer Extends CGUI
 		for index, node in this.TreeFiles.SelectedItem
 			this.TreeFiles.SelectedItem.Remove(node)
 		Loop, %Path%\*, 2, 0
-			;~ MsgBox % A_LoopFileName
-			this.treeFiles.SelectedItem.Add(A_LoopFileName)
+			this.AddFolderToTree(this.treeFiles.SelectedItem, A_LoopFileName)
+			;~ this.treeFiles.SelectedItem.Add(A_LoopFileName)
 	}
 	BuildPath(TreeNode)
 	{
@@ -76,26 +83,6 @@ Class Explorer Extends CGUI
 	{
 		this.editAddress.Text := URL
 	}
-	WM_KEYDOWN(nMsg, wParam, lParam) 
-	{
-		MsgBox keydown
-	   If  (wParam = 0x09 || wParam = 0x0D || wParam = 0x2E || wParam = 0x26 || wParam = 0x28) ; tab enter delete up down 
-	   ;If  (wParam = 9 || wParam = 13 || wParam = 46 || wParam = 38 || wParam = 40) ; tab enter delete up down 
-	   { 
-		  control := this.ActiveControl
-		  ;tooltip % class 
-		  If  (control.Type = "ActiveX") 
-		  { 
-			MsgBox activex
-			control.goback()
-			 ;~ VarSetCapacity(Msg, 28) 
-			 ;~ NumPut(hWnd,Msg), NumPut(nMsg,Msg,4), NumPut(wParam,Msg,8), NumPut(lParam,Msg,12) 
-			 ;~ NumPut(A_EventInfo,Msg,16), NumPut(A_GuiX,Msg,20), NumPut(A_GuiY,Msg,24) 
-			 ;~ DllCall(NumGet(NumGet(1*pipaun)+20), "Ptr", pipaun, "Ptr", &Msg) 
-			 Return 0 
-		  } 
-	   } 
-	}
 	PreClose()
 	{
 		ExitApp
@@ -103,7 +90,6 @@ Class Explorer Extends CGUI
 }
 
 #If WinActive("Explorer ahk_class AutoHotkeyGUI")
-BackSpace::
 Enter::
 RerouteHotkey()
 return
@@ -115,3 +101,7 @@ RerouteHotkey()
 		if(GUI.hwnd = hwnd)
 			GUI.OnKeyDown()
 }
+ExtractAssociatedIcon(hInst, lpIconPath, ByRef lpiIcon = 0)
+{
+	return DllCall("Shell32\ExtractAssociatedIcon", "Ptr", hInst, "Str", lpIconPath, "UShortP", lpiIcon, "Ptr")
+ }
