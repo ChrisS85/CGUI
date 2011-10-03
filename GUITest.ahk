@@ -106,6 +106,10 @@ Class CMyWindow Extends CGUI
 		this.Show("")
 		return this
 	}
+	sometab_Click(Item)
+	{
+		MsgBox tab
+	}
 	ContextMenu()
 	{
 		ToolTip context

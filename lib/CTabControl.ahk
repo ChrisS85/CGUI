@@ -124,7 +124,7 @@ Class CTabControl Extends CControl
 	*/
 	HandleEvent(Event)
 	{
-		this.CallEvent({Normal : "_Click", DoubleClick : "_DoubleClick", Right : "_RightClick", R : "_DoubleRightClick"}[Event.GUIEvent], this.SelectedItem)
+		this.CallEvent({Normal : "Click", DoubleClick : "DoubleClick", Right : "RightClick", R : "DoubleRightClick"}[Event.GUIEvent], this.SelectedItem)
 	}
 	/*
 	Class: CTabControl.CTabs
