@@ -108,7 +108,7 @@ Class CMyWindow Extends CGUI
 	}
 	sometab_Click(Item)
 	{
-		MsgBox tab
+		MsgBox % item.Text
 	}
 	ContextMenu()
 	{

@@ -52,11 +52,11 @@ Class CTabControl Extends CControl
 			Value := this._.Tabs[1].Text
 		else if(Name = "SelectedItem")
 		{
-			ControlGet, Value, Tab, , , % this.hwnd
+			ControlGet, Value, Tab, , , % "ahk_id " this.hwnd
 			Value := this.Tabs[Value]
 		}
 		else if(Name = "Selectedndex")
-			ControlGet, Value, Tab, , , % this.hwnd
+			ControlGet, Value, Tab, , , % "ahk_id " this.hwnd
 		if(Params.MaxIndex() >= 1 && IsObject(value)) ;Fix unlucky multi parameter __GET
 		{
 			Value := Value[Params[1]]
