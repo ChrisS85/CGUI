@@ -32,4 +32,22 @@ Class CGroupBoxControl Extends CControl
 		Control.hParentControl := this.hwnd
 		return Control
 	}
+	
+	/*
+	Variable: Controls
+	An array of controls added to this groupbox. The controls are accessed by name.
+	*/
+	__Get(Name, Params*)
+	{
+		if(Name = "Controls")
+			Value := this._.Controls
+		if(Params.MaxIndex() >= 1 && IsObject(value)) ;Fix unlucky multi parameter __GET
+		{
+			Value := Value[Params[1]]
+			if(Params.MaxIndex() >= 2 && IsObject(value))
+				Value := Value[Params[2]]
+		}
+		if(Value != "")
+			return Value
+	}
 }

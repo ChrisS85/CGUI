@@ -60,10 +60,24 @@ Class CSharpGuiConverter Extends CGUI
 	}
 	btnConvert_Click()
 	{
-		this.Convert(this.txtInput.Text, this.txtOutput.Text)
-		this.ConvertedFile := this.txtOutput.Text
-		this.btnRun.Enable()
-		this.btnEdit.Enable()
+		if(InStr(FileExist(this.txtInput.Text), "D") && InStr(FileExist(this.txtOutput.Text), "D"))
+		{
+			Loop, % this.txtInput.Text "\*.cs", 0, 0
+			{
+				if(InStr(A_LoopFileName, ".Designer.cs"))
+				{
+					;~ MsgBox % "convert " A_LoopFileLongPath " -> " this.txtOutput.Text "\" SubStr(A_LoopFileName, 1, StrLen(A_LoopFileName) - 11) ".ahk"
+					this.Convert(A_LoopFileLongPath, this.txtOutput.Text "\" SubStr(A_LoopFileName, 1, StrLen(A_LoopFileName) - 12) ".ahk")
+				}
+			}
+		}
+		else
+		{
+			this.Convert(this.txtInput.Text, this.txtOutput.Text)
+			this.ConvertedFile := this.txtOutput.Text
+			this.btnRun.Enable()
+			this.btnEdit.Enable()
+		}
 	}
 	btnRun_Click()
 	{
@@ -180,6 +194,7 @@ Class CSharpGuiConverter Extends CGUI
 					SubControl := Regex.MatchSimple(A_LoopField, "Control", "\(this\.(?P<Control>.*?)\);") ;this.tabPage1.Controls.Add(this.label2);
 					Controls[GroupBoxControl].Controls.Insert(SubControl)
 					Controls[SubControl].GroupBox := 1
+					Controls[SubControl].AccessString := "this." GroupBoxControl ".Controls." Controls[SubControl].Name
 				}
 			}
 		}
@@ -383,21 +398,22 @@ Class CSharpGuiConverter Extends CGUI
 		OutputFile .= "`t__New()`n`t{`n"
 		for Name, Control in Controls
 			if(Control.Type = "GroupBox" && !Control.HasKey(TabControl))
-				this.WriteGroupBox(OutputFileControl, Controls, Control, "this." Control.Name ".AddControl", "this." Control.Name, 2)
+				this.WriteGroupBox(OutputFile, Controls, Control, "this." Control.Name ".AddControl", "this." Control.Name, 2)
 			else if(!Control.HasKey("TabControl") && Control.HasKey("UpDown"))
 				this.WriteControl(OutputFile, Control, "this." Control.Name " := this.AddControl", "this." Control.Name, 2) 
 		
 		for, Name, Control in Controls
 		{
 			for Property, Value in Control
-				if Property not in x,y,width,height,name,type,Text,Events,Tab,TabControl,TabPages,GroupBox,Controls,UpDown,Min,Max
+				if Property not in x,y,width,height,name,type,Text,Events,Tab,TabControl,TabPages,GroupBox,Controls,UpDown,Min,Max,AccessString
 				{
+					AccessString := Control.HasKey("AccessString") ? Control.AccessString : "this." Control.Name "."
 					if Value is Number
-						OutputFile .= "`t`tthis." Control.Name "." Property " := " Value "`n"
+						OutputFile .= "`t`t" AccessString "." Property " := " Value "`n"
 					else if(Value = "true" || Value = "false")
-						OutputFile .= "`t`tthis." Control.Name "." Property " := " Value "`n"
+						OutputFile .= "`t`t" AccessString "." Property " := " Value "`n"
 					else
-						OutputFile .= "`t`tthis." Control.Name "." Property " := """ Value """`n"
+						OutputFile .= "`t`t" AccessString "." Property " := """ Value """`n"
 				}
 		}
 		for WindowProperty, Value in Window
@@ -444,7 +460,7 @@ Class CSharpGuiConverter Extends CGUI
 		}
 	}
 	WriteGroupBox(ByRef OutputFile, Controls, GroupBoxControl, PreText, AccessText, IndentLevel)
-	{		
+	{
 		for index, ControlName in GroupBoxControl.Controls
 		{
 			Control := Controls[ControlName]
@@ -540,8 +556,13 @@ Class CSharpGuiConverter Extends CGUI
 	{
 		if(InStr(line, "EventHandler("))
 		{
-			if(InStr(line, "_ItemSelectionChanged);"))
+			if(InStr(line, "_ItemSelectionChanged);") || InStr(line, "_SelectedIndexChanged")) ;Make sure only one of those events is transformed
+			{
+				for key, Value in CurrentControl.Events
+					if(Value = "_SelectionChanged(Row)")
+						return
 				CurrentControl.Events.Insert("_SelectionChanged(Row)")
+			}
 			else if(InStr(line, "_ItemCheckedChanged);"))
 				CurrentControl.Events.Insert("_CheckedChanged(Row)")
 			else if(InStr(line, "_MouseClick);"))
