@@ -14,33 +14,6 @@ Class CTextControl Extends CControl
 		this._.Insert("Events", ["Click", "DoubleClick"])
 	}
 	/*
-	Variable: Link
-	If true, the control will appear like a hyperlink. To react to a click, implement the Click() event.
-	*/
-	__Set(Name, Value)
-	{
-		;~ global CGUI
-		if(Name = "Link")
-		{
-			WM_SETCURSOR := 0x20
-			WM_MOUSEMOVE := 0x200
-			WM_NCMOUSELEAVE := 0x2A2
-			WM_MOUSELEAVE := 0x2A3
-			if(Value > 0)
-			{
-				CGUI.GUIList[this.GUINum].OnMessage(WM_SETCURSOR, "HandleInternalMessage")
-				CGUI.GUIList[this.GUINum].OnMessage(WM_MOUSEMOVE, "HandleInternalMessage")
-			}
-			this._.Link := Value > 0
-			this.Font.Options := "cBlue"
-		}
-	}
-	__Get(Name)
-	{
-		if(Name = "Link")
-			return this._.Link
-	}
-	/*
 	Event: Introduction
 	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
 	The parameters depend on the event and there may not be params at all in some cases.

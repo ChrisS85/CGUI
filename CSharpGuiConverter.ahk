@@ -633,6 +633,11 @@ Class CSharpGuiConverter Extends CGUI
 				CurrentControl.Events.Insert("_DoubleClick()")
 		}
 	}
+	SysLink(CurrentControl, line)
+	{
+		if(InStr(line, "new System.Windows.Forms.LinkLabelLinkClickedEventHandler"))
+			CurrentControl.Events.Insert("_Click(URL)")
+	}
 }
 CSharpGuiConverter_btnInput:
 CSharpGuiConverter_btnOutput:
