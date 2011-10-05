@@ -1062,10 +1062,10 @@ Class CGUI
 		if(Code = "SetFocus" || Code = "KillFocus")
 			this.PushEvent("CGUI_FocusChange", this.GUINum)
 		if(Code = "SetFocus")
-			Control.CallEvent("FocusEnter")
+			Control.CallEvent("FocusReceived")
 		else if(Code = "KillFocus")
 		{
-			Control.CallEvent("FocusLeave")
+			Control.CallEvent("FocusLost")
 			if(this.ValidateOnFocusLeave && Control.IsValidatableControlType())
 				Control.Validate()
 		}

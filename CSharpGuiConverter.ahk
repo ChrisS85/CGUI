@@ -343,6 +343,10 @@ Class CSharpGuiConverter Extends CGUI
 						else if(InStr(line, "Right"))
 							CurrentControl.Right := 1
 					}
+					else if(InStr(line, "new System.EventHandler") && InStr(line, "_Enter);"))
+						CurrentControl.Events.Insert("_FocusReceived()")
+					else if(InStr(line, "new System.EventHandler") && InStr(line, "_Leave);"))
+						CurrentControl.Events.Insert("_FocusLost()")
 					else
 						handled := false
 				}
@@ -581,10 +585,6 @@ Class CSharpGuiConverter Extends CGUI
 				CurrentControl.Events.Insert("_KeyPress(Key)")
 			else if(InStr(line, "_MouseLeave);"))
 				CurrentControl.Events.Insert("_MouseLeave()")
-			else if(InStr(line, "_Enter);"))
-				CurrentControl.Events.Insert("_FocusReceived()")
-			else if(InStr(line, "_Leave);"))
-				CurrentControl.Events.Insert("_FocusLost()")
 		}
 	}
 	TreeView(CurrentControl, line)
@@ -592,27 +592,23 @@ Class CSharpGuiConverter Extends CGUI
 		if(InStr(line, "new System.EventHandler"))
 		{
 			if(InStr(line, "_MouseClick);"))
-				CurrentControl.Events.Insert("_Click(RowNumber)")
+				CurrentControl.Events.Insert("_Click(Item)")
 			else if(InStr(line, "_MouseDoubleClick);"))
-				CurrentControl.Events.Insert("_DoubleClick(RowNumber)")
+				CurrentControl.Events.Insert("_DoubleClick(Item)")
 			else if(InStr(line, "_BeforeLabelEdit);"))
-				CurrentControl.Events.Insert("_EditingStart(RowNumber)")
+				CurrentControl.Events.Insert("_EditingStart(Item)")
 			else if(InStr(line, "_AfterLabelEdit);"))
-				CurrentControl.Events.Insert("_EditingEnd(RowNumber)")
+				CurrentControl.Events.Insert("_EditingEnd(Item)")
 			else if(InStr(line, "_ItemActivate);"))
 				CurrentControl.Events.Insert("_KeyPress(Key)")
 			else if(InStr(line, "_MouseLeave);"))
 				CurrentControl.Events.Insert("_MouseLeave()")
-			else if(InStr(line, "_Enter);"))
-				CurrentControl.Events.Insert("_FocusReceived()")
-			else if(InStr(line, "_Leave);"))
-				CurrentControl.Events.Insert("_FocusLost()")
 			else if(InStr(line, "_AfterSelect);"))
-				CurrentControl.Events.Insert("_ItemSelected()")
+				CurrentControl.Events.Insert("_ItemSelected(Item)")
 			else if(InStr(line, "_AfterExpand);"))
-				CurrentControl.Events.Insert("_ItemExpanded()")
+				CurrentControl.Events.Insert("_ItemExpanded(Item)")
 			else if(InStr(line, "_AfterCollapse);"))
-				CurrentControl.Events.Insert("_ItemCollapsed()")
+				CurrentControl.Events.Insert("_ItemCollapsed(Item)")
 		}
 		else if(InStr(line, "this." CurrentControl.Name ".Checkboxes"))
 			CurrentControl.Checked := 1
