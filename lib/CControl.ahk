@@ -583,3 +583,4 @@ Class CControl ;Never created directly
 #include <CSliderControl>
 #include <CHotkeyControl>
 #include <CActiveXControl>
+#include <CSysLinkControl>

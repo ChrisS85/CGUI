@@ -98,6 +98,10 @@ Class CGUI
 					instance[Name].__New()
 			}
 		}
+		
+		;Register for WM_COMMAND and WM_NOTIFY messages since they are commonly used for various purposes.
+		instance.OnMessage(WM_COMMAND := 0x111, "HandleInternalMessage")
+		instance.OnMessage(WM_NOTIFY := 0x004E, "HandleInternalMessage")
 	}
 	;This class handles window message routing to the instances of window classes that register for a specific window message
 	Class WindowMessageHandler
@@ -449,11 +453,15 @@ Class CGUI
 		local hControl, type, testHWND, vName, NeedsGLabel
 		if(this.IsDestroyed)
 			return
-		if(!CGUI_Assert(Name, "GUI.AddControl() : No name specified. Please supply a proper control name.", -2)) ;Validate name.
+		 ;Validate name.
+		if(!CGUI_Assert(Name, "GUI.AddControl() : No name specified. Please supply a proper control name.", -2))
 			return
-		if(!CGUI_Assert(!IsObject(ControlList[Name]), "GUI.AddControl(): The control " Name " already exists. Please choose another name!", -2)) ;Make sure not to add a control with duplicate name.
+		;Make sure not to add a control with duplicate name.
+		if(!CGUI_Assert(!IsObject(ControlList[Name]), "GUI.AddControl(): The control " Name " already exists. Please choose another name!", -2))
 			return
+		
 		type := Control
+		;Some control classes represent multiple controls, those are handled separately here.
 		if(Control = "DropDownList" || Control = "ComboBox" || Control = "ListBox")
 		{
 			Control := object("base", CChoiceControl)
@@ -472,58 +480,48 @@ Class CGUI
 		else
 		{
 			Control := "C" Control "Control"
-			if(CGUI_Assert(IsObject(%Control%), "The control " Control " was not found!", -2)) ;Make sure that a control of this type exists.
+			;Make sure that a control of this type exists.
+			if(CGUI_Assert(IsObject(%Control%), "The control " Control " was not found!", -2))
 			{
 				Control := object("base", %Control%)
-				Control.__New(Name, Options, Text, this.GUINum)
+				hControl := Control.__New(Name, Options, Text, this.GUINum)
+				if(!CGUI_Assert(hControl != 0, "Error creating " Type "Control", -2))
+					return
 			}
 			else
 				return
 		}
-		;Old: (IsLabel(this.__Class "_" Control.Name) ? "g" this.__Class "_" Control.Name : "")
-		NeedsGLabel := Control._.HasKey("Events")
 		
-		;Find a free GUI variable. Might need to add an index because there might be controls with the same name that are nested in other controls
-		GuiControlGet, testHWND, % this.GUINum ":hwnd", % vName := this.GUINum "_" Control.Name
-		while(testHWND)
-			GuiControlGet, testHWND, % this.GUINum ":hwnd", % vName := this.GUINum "_" Control.Name A_Index
-		
-		;If the control that is added here is a subcontrol of a control in a tab control, we need to set the corresponding tab first and unset it after the control has been added
-		if(this.Controls[ParentControl.hParentControl].Type = "Tab")
-			Gui, % this.GUINum ":Tab", % ParentControl.TabNumber, % this.Controls[ParentControl.hParentControl]._.TabIndex
-		
-		Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl " (NeedsGLabel ? "gCGUI_HandleEvent " : "") "v" vName, % Control.Content ;Create the control and get its window handle and setup a g-label
-		
-		if(this.Controls[ParentControl.hParentControl].Type = "Tab")
-			Gui, % this.GUINum ":Tab"
+		;The __New constructor of a control may return a window handle when it needs to create the control manually.
+		if(!hControl)
+		{
+			;Old: (IsLabel(this.__Class "_" Control.Name) ? "g" this.__Class "_" Control.Name : "")
+			NeedsGLabel := Control._.HasKey("Events")
+			
+			;Find a free GUI variable. Might need to add an index because there might be controls with the same name that are nested in other controls
+			GuiControlGet, testHWND, % this.GUINum ":hwnd", % vName := this.GUINum "_" Control.Name
+			while(testHWND)
+				GuiControlGet, testHWND, % this.GUINum ":hwnd", % vName := this.GUINum "_" Control.Name A_Index
+			
+			;If the control that is added here is a subcontrol of a control in a tab control, we need to set the corresponding tab first and unset it after the control has been added
+			if(this.Controls[ParentControl.hParentControl].Type = "Tab")
+				Gui, % this.GUINum ":Tab", % ParentControl.TabNumber, % this.Controls[ParentControl.hParentControl]._.TabIndex
+			
+			Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl " (NeedsGLabel ? "gCGUI_HandleEvent " : "") "v" vName, % Control.Content ;Create the control and get its window handle and setup a g-label
+			
+			if(this.Controls[ParentControl.hParentControl].Type = "Tab")
+				Gui, % this.GUINum ":Tab"
+		}
 		Control.Insert("hwnd", hControl) ;Window handle is used for all further operations on this control
+		;Call PostCreate to allow the control to do things with itself after it was created. CControl.PostCreate needs to be called anyway, so all controls that handle PostCreate need to add this.base.PostCreate().
 		Control.PostCreate()
 		Control.Remove("Content")
 		if(ControlList)
 			ControlList[Control.Name] := Control
 		this.Controls[hControl] := Control ;Add to list of controls
-		
-		;Check if Focus change messages should be registered automatically
-		if(IsFunc(this[Name "_FocusEnter"]) || IsFunc(this[Name "_FocusLeave"]) || IsFunc(this.FocusChange))
-			this.ActivateFocusChangeMessages(Control)
 		return Control
 	}
 	
-	;This function activates the message handling with the control-specific message numbers for SetFocus and KillFocus messages
-	ActivateFocusChangeMessages(Control)
-	{
-		;Old controls use WM_COMMAND with a custom code that differs between controls. 
-		;Because of this the control stores the WM_COMMAND parameters in the SetFocus and KillFocus keys. 
-		;They always appear in pairs so here only one is checked
-		if(Message := CGUI_IndexOf(Control._.Messages, "SetFocus"))
-			this.OnMessage(0x111, "InternalMessageHandling")
-		
-		;Newer Controls use WM_NOTIFY with NM_SETFOCUS and NM_KILLFOCUS
-		if(Message := CGUI_IndexOf(Control._.Messages, "Notify"))
-			this.OnMessage(Message, "InternalMessageHandling")
-		;~ this.OnMessage(0x004E, "InternalMessageHandling")
-		;~ this.OnMessage(0x111, "InternalMessageHandling")
-	}
 	/*
 	Function: Validate
 	Validates the contents of controls containing text fields by calling <Control.Validate> for each fitting control.
@@ -863,13 +861,7 @@ Class CGUI
 			else if(Name = "Visible")
 				this.Style := (Value ? "+" : "-") 0x10000000 ;WS_VISIBLE			
 			else if(Name = "ValidateOnFocusLeave")
-			{
 				this._[Name] := Value = 1
-				if(Value = 1)
-					for hwnd, Control in this.Controls
-						if(Control.IsValidatableControlType())
-							this.ActivateFocusChangeMessages(Control)
-			}
 			else if(Name = "_Constructor") ;_Constructor is just a temporary variable name for automatically calling the CGUI constructor
 				Handled := true
 			else if(Name = "_") ;Prohibit setting the proxy object
@@ -990,70 +982,43 @@ Class CGUI
 		}
 	}
 	
-	;As of now, this function handles WM_MOUSEMOVE and WM_SETCURSOR to allow text controls to act as links
-	HandleInternalMessage(Msg, wParam, lParam)
-	{
-		;~ global CGUI
-		static WM_SETCURSOR := 0x20, WM_MOUSEMOVE := 0x200, h_cursor_hand
-		if(msg = WM_SETCURSOR || msg = WM_MOUSEMOVE) ;Text control Link support, thanks Shimanov!
-		{
-			if(msg = WM_SETCURSOR)
-			{
-				If(this._.Hovering)
-					Return true
-			}
-			else if(msg = WM_MOUSEMOVE)
-			{
-				MouseGetPos,,,,ControlHWND, 2
-				if(this.Controls.HasKey(ControlHWND) && this.Controls[ControlHWND].Link)
-				{
-					if(!this._.Hovering)
-					{
-						this.Controls[ControlHWND].Font.Options := "cBlue underline"
-						this._.LastHoveredControl := this.Controls[ControlHWND].hwnd
-						h_cursor_hand := DllCall("LoadCursor", "Ptr", 0, "uint", 32649, "Ptr")
-						this._.Hovering := true
-					}
-					this._.h_old_cursor := DllCall("SetCursor", "Ptr", h_cursor_hand, "Ptr")
-				}
-				; Mouse cursor doesn't hover URL text control
-				else
-				{
-					if(this._.Hovering)
-					{
-						if(this.Controls.HasKey(this._.LastHoveredControl) && this.Controls[this._.LastHoveredControl].Link)
-						{
-							this.Controls[this._.LastHoveredControl].Font.Options := "norm cBlue"
-							DllCall("SetCursor", "Ptr", GUI._.h_old_cursor)
-							this._.Hovering := false
-						}					
-					}
-				}
-			}
-		}
-	}
 	/*
 	This function gets called when a window receives internal messages that are handled through the library.
 	It is currently handles WM_COMMAND and WM_Notify to check for focus change events.
 	*/
-	InternalMessageHandling(Msg, wParam, lParam)
+	HandleInternalMessage(Msg, wParam, lParam)
 	{
-		if(Msg = 0x004E)
+		static WM_NOTIFY := 0x004E, WM_COMMAND := 0x111, NM_KILLFOCUS := 0xFFFFFFF8, NM_SETFOCUS := 0xFFFFFFF9
+		;~ static WM_SETCURSOR := 0x20, WM_MOUSEMOVE := 0x200, h_cursor_hand
+		if(Msg = WM_NOTIFY)
 		{
+			;lParam is a NMHDR structure or one that begins with it: http://msdn.microsoft.com/en-us/library/bb775514(VS.85).aspx
 			hwndFrom := NumGet(lParam+0, 0, "UPTR")
 			Control := this.Controls[hwndFrom]
-			Code := NumGet(lParam+0, 2*A_PtrSize, "UINT") ;NM_KILLFOCUS := 0xFFFFFFF8, NM_SETFOCUS := 0xFFFFFFF9
-			if(Code = 0xFFFFFFF8)
+			
+			;Forward the function to the control object. Some controls may want to process it and call events.
+			if(IsFunc(Control.OnWM_NOTIFY))
+				Control.OnWM_NOTIFY(wParam, lParam)
+			
+			Code := NumGet(lParam+0, 2*A_PtrSize, "UINT")
+			if(Code = NM_KILLFOCUS)
 				Code := "KillFocus"
-			else if(Code = 0xFFFFFFF9)
+			else if(Code = NM_SETFOCUS)
 				Code := "SetFocus"
 		}
-		else if(Msg = 0x111)
+		else if(Msg = WM_COMMAND)
 		{
 			if(lParam = 0) ;Only handle messages from controls
 				return
+			
+			;WM_COMMAND passes the window handle as lParam directly.
 			hwndFrom := lParam
 			Control := this.Controls[hwndFrom]
+			
+			;Forward the function to the control object. Some controls may want to process it and call events.
+			if(IsFunc(Control.OnWM_COMMAND))
+				Control.OnWM_COMMAND(wParam, lParam)
+			
 			Code := CGUI_HighWord(wParam)
 			Code := Control._.Messages[Code] ;Translate to a common message name shared among all controls that support it to map different code numbers with same meaning from different controls to the same name
 			if(!Code)
@@ -1070,6 +1035,46 @@ Class CGUI
 				Control.Validate()
 		}
 	}
+	/*
+	if(msg = WM_SETCURSOR || msg = WM_MOUSEMOVE) ;Text control Link support, thanks Shimanov!
+	{
+		if(msg = WM_SETCURSOR)
+		{
+			If(this._.Hovering)
+				Return true
+		}
+		else if(msg = WM_MOUSEMOVE)
+		{
+			; MouseGetPos,,,,ControlHWND, 2
+			GuiControlGet, ControlHWND, % this.GUINum ":hwnd", % A_GuiControl
+			outputdebug hwnd %hwnd%
+			if(this.Controls.HasKey(ControlHWND) && this.Controls[ControlHWND].Link)
+			{
+				if(!this._.Hovering)
+				{
+					this.Controls[ControlHWND].Font.Options := "cBlue underline"
+					this._.LastHoveredControl := this.Controls[ControlHWND].hwnd
+					h_cursor_hand := DllCall("LoadCursor", "Ptr", 0, "uint", 32649, "Ptr")
+					this._.Hovering := true
+				}
+				this._.h_old_cursor := DllCall("SetCursor", "Ptr", h_cursor_hand, "Ptr")
+			}
+			; Mouse cursor doesn't hover URL text control
+			else
+			{
+				if(this._.Hovering)
+				{
+					if(this.Controls.HasKey(this._.LastHoveredControl) && this.Controls[this._.LastHoveredControl].Link)
+					{
+						this.Controls[this._.LastHoveredControl].Font.Options := "norm cBlue"
+						DllCall("SetCursor", "Ptr", GUI._.h_old_cursor)
+						this._.Hovering := false
+					}					
+				}
+			}
+		}
+	}
+	*/
 }
 
 

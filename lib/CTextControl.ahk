@@ -26,7 +26,7 @@ Class CTextControl Extends CControl
 			WM_MOUSEMOVE := 0x200
 			WM_NCMOUSELEAVE := 0x2A2
 			WM_MOUSELEAVE := 0x2A3
-			if(Value)
+			if(Value > 0)
 			{
 				CGUI.GUIList[this.GUINum].OnMessage(WM_SETCURSOR, "HandleInternalMessage")
 				CGUI.GUIList[this.GUINum].OnMessage(WM_MOUSEMOVE, "HandleInternalMessage")

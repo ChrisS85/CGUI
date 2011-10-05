@@ -21,6 +21,7 @@ Class CMyWindow Extends CGUI
 	statBar			:= this.AddControl("StatusBar", "statBar", "", "test")
 	sometab			:= this.AddControl("Tab", "sometab", "x20 y200 w200 h200", "tab1|tab2|tab3")
 	tree					:= this.AddControl("TreeView", "tree", "x300 y600 w100 h200 -Readonly", "")
+	sysLink			:= this.AddControl("SysLink", "sysLink", "x800 y500", "For more information about AutoHotkey <A HREF=""http://www.autohotkey.com/forum"">visit the forum</A>, please.")
 	__New(title)
 	{
 		this.Title := Title

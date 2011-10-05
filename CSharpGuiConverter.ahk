@@ -219,14 +219,12 @@ Class CSharpGuiConverter Extends CGUI
 				name := Regex.MatchSimple(line, "name", "\.Forms\.(?P<type>.*?) (?P<name>.*?)\;")
 				if(CSharptype && name)
 				{
-					SupportedControls := { TextBox : "Edit", Label : "Text", Button : "Button", CheckBox : "CheckBox", PictureBox : "Picture", ListView : "ListView", ComboBox : "ComboBox", ListBox : "ListBox", TreeView : "TreeView", GroupBox : "GroupBox", RadioButton : "Radio", TabControl : "Tab", LinkLabel : "Text", StatusStrip : "StatusBar", NumericUpDown : "Edit"}
+					SupportedControls := { TextBox : "Edit", Label : "Text", Button : "Button", CheckBox : "CheckBox", PictureBox : "Picture", ListView : "ListView", ComboBox : "ComboBox", ListBox : "ListBox", TreeView : "TreeView", GroupBox : "GroupBox", RadioButton : "Radio", TabControl : "Tab", LinkLabel : "SysLink", StatusStrip : "StatusBar", NumericUpDown : "Edit"}
 					type := SupportedControls[CSharptype]
 					if(type)
 					{
 						Control := {Type : Type, Name : name, Events : {}}
-						if(CSharpType = "LinkLabel")
-							Control.Link := true
-						else if(CSharpType = "NumericUpDown")
+						if(CSharpType = "NumericUpDown")
 						{
 							Control.UpDown := true
 							Control.Min := 0
@@ -331,7 +329,12 @@ Class CSharpGuiConverter Extends CGUI
 							CurrentControl.y := y
 					}
 					else if(InStr(line, "this." CurrentControl.Name ".Text"))
+					{
 						CurrentControl.Text := Regex.MatchSimple(line, "text", """(?P<text>.*)""")
+						;Convert SysLink control text to URL if it is one.
+						if(CurrentControl.Type = "SysLink" && RegexMatch(Trim(CurrentControl.Text, " "), "(?:(?:ht|f)tps?://|www\.).+\..+") > 0)
+							CurrentControl.Text := "<A HREF = """ CurrentControl.Text """>" CurrentControl.Text "</A>"
+					}
 					else if(InStr(line, "this." CurrentControl.Name ".Enabled"))
 						CurrentControl.Enabled := (InStr(line, "true") || InStr(line, "1;"))
 					else if(InStr(line, "this." CurrentControl.Name ".Visible"))
