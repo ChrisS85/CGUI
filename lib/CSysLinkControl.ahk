@@ -50,6 +50,18 @@
 ; This software is provided 'as-is', without any express or implied warranty. 
 ; In no event will the authors be held liable for any damages arising from the use of this software. 
 ; ====================================================================================================================== 
+
+/*
+Class: CSysLinkControl
+A class for displaying hyperlinks in text. 
+
+Variable: Text
+Simply use <A HREF="URL">URL Text</A> notation inside the text to show a link. This control supports multiple links and regular text as well.
+
+Event: Click(URL)
+Called when a link is clicked. If this is not handled the control will try to open the URL.
+
+*/
 Class CSysLinkControl { 
    ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
    ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 

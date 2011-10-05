@@ -68,6 +68,7 @@ File: CTextControl  (CTextControl.ahk)
 File: CTreeViewControl  (CTreeViewControl.ahk)
 File: gdip.ahk  (gdip.ahk)
 File: CMenu  (CMenu.ahk)
+File: CSysLinkControl  (CSysLinkControl.ahk)
 
 Group: Index  {
 
