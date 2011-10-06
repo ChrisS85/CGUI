@@ -1,0 +1,17 @@
+Crash Message:
+
+   Couldn't create output file D:\Projekte\Autohotkey\CGUI\lib\_doc\index.html.
+
+Natural Docs version 1.4
+Perl version 5.8.8 on MSWin32
+
+Command Line:
+
+   -i D:\Projekte\Autohotkey\CGUI\lib -o HTML D:\Projekte\Autohotkey\CGUI\lib\_doc -p D:\Projekte\Autohotkey\CGUI\lib\_doc\_ndProj
+
+Stack Trace:
+
+   NaturalDocs::Error::CatchDeath, called from
+   NaturalDocs::Builder::HTML::UpdateMenu, line 280, called from
+   NaturalDocs::Builder::Run, line 267, called from
+   (eval), line 373 of C:\Program Files\Autohotkey\NaturalDocs\NaturalDocs\NaturalDocs.exe
