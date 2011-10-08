@@ -62,7 +62,7 @@ Event: Click(URL)
 Called when a link is clicked. If this is not handled the control will try to open the URL.
 
 */
-Class CSysLinkControl { 
+Class CSysLinkControl extends CControl { 
    ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
    ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
    ; PRIVATE Properties and Methods ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
@@ -203,8 +203,9 @@ Class CSysLinkControl {
 		{
 			Url := StrGet(lParam + OffUrl, L_MAX_URL_LENGTH, "UTF-16") 
 			Url := Trim(Url)
-			if(!this.CallEvent("Click", Url).Handled && Url)
-				Run, *Open %Url% 
+			if(!this.CallEvent("Click", Url).Handled)
+				if(Url)
+					Run, *Open %Url% 
 		}
 	} 
 }

@@ -50,4 +50,45 @@ Class CGroupBoxControl Extends CControl
 		if(Value != "")
 			return Value
 	}
+	
+	/*
+	Function: Hide
+	Hides the groupbox and all of its controls
+	*/
+	Hide()
+	{
+		base.Hide()
+		for key, control in this.Controls
+			control.Hide()
+	}
+	/*
+	Function: Show()
+	Shows the groupbox and all of its controls
+	*/
+	Show()
+	{
+		base.Show()
+		for key, control in this.Controls
+			control.Show()
+	}
+	/*
+	Function: Disable
+	Disables the groupbox and all of its controls
+	*/
+	Disable()
+	{
+		base.Disable()
+		for key, control in this.Controls
+			control.Disable()
+	}
+	/*
+	Function: Enable()
+	Enables the groupbox and all of its controls
+	*/
+	Enable()
+	{
+		base.Enable()
+		for key, control in this.Controls
+			control.Enable()
+	}
 }
