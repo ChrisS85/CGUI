@@ -333,7 +333,7 @@ Class CSharpGuiConverter Extends CGUI
 						CurrentControl.Text := Regex.MatchSimple(line, "text", """(?P<text>.*)""")
 						;Convert SysLink control text to URL if it is one.
 						if(CurrentControl.Type = "SysLink" && RegexMatch(Trim(CurrentControl.Text, " "), "(?:(?:ht|f)tps?://|www\.).+\..+") > 0)
-							CurrentControl.Text := "<A HREF = """ CurrentControl.Text """>" CurrentControl.Text "</A>"
+							CurrentControl.Text := "<A HREF = """"" CurrentControl.Text """"">" CurrentControl.Text "</A>"
 					}
 					else if(InStr(line, "this." CurrentControl.Name ".Enabled"))
 						CurrentControl.Enabled := (InStr(line, "true") || InStr(line, "1;"))
