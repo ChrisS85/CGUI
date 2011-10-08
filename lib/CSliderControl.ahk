@@ -16,6 +16,7 @@ Class CSliderControl Extends CControl
 		this._.Insert("Max", 100)
 		this._.Insert("Invert", InStr(Options, "Invert"))
 		this._.Insert("Messages", {0x004E : "Notify"}) ;This control uses WM_NOTIFY with NM_SETFOCUS and NM_KILLFOCUS
+		this._.Insert("Events", ["SliderMoved"])
 	}	
 	
 	/*
@@ -112,7 +113,7 @@ Class CSliderControl Extends CControl
 	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
 	Event: SliderMoved()
-	Invoked when the user clicked on the control.
+	Invoked when the user clicked on the control. This control does not implement all the advanced Slider events yet. Should be easy to implement though if there is any demand.
 	*/
 	HandleEvent(Event)
 	{

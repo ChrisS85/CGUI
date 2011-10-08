@@ -198,8 +198,8 @@ Class CSysLinkControl {
 		Static OffStmask := OffState + 4 
 		Static OffID     := OffStmask + 4 
 		Static OffUrl    := OffID + (MAX_LINKID_TEXT * 2)
-
-		if(wParam = NM_CLICK || wParam = NM_RETURN)
+		Code := NumGet(lParam + 0, OffCode, "INT")
+		if(Code = NM_CLICK || Code = NM_RETURN)
 		{
 			Url := StrGet(lParam + OffUrl, L_MAX_URL_LENGTH, "UTF-16") 
 			Url := Trim(Url)
