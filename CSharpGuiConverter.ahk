@@ -538,7 +538,7 @@ Class CSharpGuiConverter Extends CGUI
 		if(InStr(line, "new System.EventHandler"))
 		{
 			if(InStr(line, "_SelectedIndexChanged);"))
-				CurrentControl.Events.Insert("_SelectedIndexChanged()")
+				CurrentControl.Events.Insert("_SelectionChanged()")
 		}
 		else if(InStr(line, "this." CurrentControl.Name ".DropDownStyle") && InStr(line, "DropDownList"))
 			CurrentControl.type := "DropDownList"
@@ -548,7 +548,7 @@ Class CSharpGuiConverter Extends CGUI
 		if(InStr(line, "new System.EventHandler"))
 		{
 			if(InStr(line, "_SelectedIndexChanged);"))
-				CurrentControl.Events.Insert("_SelectedIndexChanged()")
+				CurrentControl.Events.Insert("_SelectionChanged()")
 		}
 	}
 	ListBox(CurrentControl, line)
@@ -556,7 +556,7 @@ Class CSharpGuiConverter Extends CGUI
 		if(InStr(line, "new System.EventHandler"))
 		{
 			if(InStr(line, "_SelectedIndexChanged);"))
-				CurrentControl.Events.Insert("_SelectedIndexChanged()")
+				CurrentControl.Events.Insert("_SelectionChanged()")
 		}
 	}
 	ListView(CurrentControl, line)

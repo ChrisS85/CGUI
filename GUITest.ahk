@@ -103,14 +103,14 @@ Class CMyWindow Extends CGUI
 		this.Menu1.AddSubMenu("sub2", sub2)
 		sub2.Icon := "C:\Program Files\Autohotkey\SciTE_beta5\AutoHotkey.exe"
 		this.Menu1.DeleteMenuItem(1)
-		this.AddControl("Slider", "slider", "x600 y200", 20)
+		this.slider := this.AddControl("Slider", "slider", "x600 y200", 20)
 		;~ this.Menu(this.Menu1) ;It seems a menu can't be used for context and menu bar at once?
 		this.Show("")
 		return this
 	}
 	Slider_SliderMoved()
 	{
-		MsgBox Moved
+		MsgBox % this.Slider.Value
 	}
 	sometab_Click(Item)
 	{

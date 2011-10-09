@@ -924,7 +924,7 @@ Class CGUI
 	PushEvent(Label, GUINum, vControl = "", lErrorLevel = "", lEventInfo = "", lGUIEvent = "")
 	{
 		CGUI.EventQueue.Insert({"Label" : Label, "Errorlevel" : lErrorlevel, "GUI" : GUINum, "EventInfo" : lEventInfo, "GUIEvent" : lGUIEvent, "GUIControl" : vControl})
-		SetTimer, CGUI_HandleEventTimer, -10
+		SetTimer, CGUI_HandleEventTimer, -1
 	}
 	/*
 	Called by a timer that processes the event queue of all g-label notifications
@@ -1096,7 +1096,7 @@ while(CGUI.EventQueue.MaxIndex())
 	SetTimer, CGUI_HandleEventTimer, Off
 	CGUI.GUIList[CGUI.EventQueue[1].GUI].RerouteEvent(CGUI.EventQueue[1])
 	CGUI.EventQueue.Remove(1)
-	SetTimer, CGUI_HandleEventTimer, -10
+	SetTimer, CGUI_HandleEventTimer, -1
 }
 return
 /*

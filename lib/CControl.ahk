@@ -28,7 +28,7 @@ Class CControl ;Never created directly
 		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
-		Control, Show,,,% "ahk_id " this.hwnd
+		GuiControl, % this.GUINum ":Show",% this.hwnd
 	}
 	
 	/*
@@ -40,7 +40,7 @@ Class CControl ;Never created directly
 		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
-		Control, Hide,,,% "ahk_id " this.hwnd
+		GuiControl, % this.GUINum ":Hide",% this.hwnd
 	}
 	
 	/*
@@ -49,7 +49,7 @@ Class CControl ;Never created directly
 	*/
 	Enable()
 	{
-		Control, Enable,,,% "ahk_id " this.hwnd
+		GuiControl, % this.GUINum ":Enable",% this.hwnd
 	}
 	
 	/*
@@ -58,7 +58,7 @@ Class CControl ;Never created directly
 	*/
 	Disable()
 	{
-		Control, Disable,,,% "ahk_id " this.hwnd
+		GuiControl, % this.GUINum ":Disable",% this.hwnd
 	}
 	
 	/*

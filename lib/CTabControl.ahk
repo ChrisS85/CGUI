@@ -203,7 +203,8 @@ Class CTabControl Extends CControl
 			Tabs := []
 			Loop, Parse, Text, |
 			{
-				Tab := new this.CTab(A_loopField, this._.MaxIndex() + 1, this.GUINum, this.hwnd)
+				TabNumber := this._.MaxIndex() ? this._.MaxIndex() + 1 : 1
+				Tab := new this.CTab(A_loopField, TabNumber, this.GUINum, this.hwnd)
 				this._.Insert(Tab)
 				Tabs.Insert(Tab)
 				Control := CGUI.GUIList[this.GUINum][this.hwnd]
