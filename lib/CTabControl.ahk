@@ -252,7 +252,7 @@ Class CTabControl Extends CControl
 					GUI := CGUI.GUIList[this.GUINum]
 					TabControl := GUI.Controls[this._.hwnd]
 					Gui, % this.GUINum ":Tab", % this._.TabNumber, % TabControl._.TabIndex
-					Control := GUI.AddControl(type, Name, Options, Text, this._.Controls)
+					Control := GUI.AddControl(type, Name, Options, Text, this._.Controls, this)
 					Control.hParentControl := this._.hwnd
 					Control.TabNumber := this._.TabNumber
 					Gui, % this.GUINum ":Tab"

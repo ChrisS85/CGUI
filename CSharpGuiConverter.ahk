@@ -316,7 +316,7 @@ Class CSharpGuiConverter Extends CGUI
 						Height := Regex.MatchSimple(line, "height", "\.Size\((?P<width>\d+),.*?(?P<height>\d+)")
 						if(width)
 							CurrentControl.Width := width
-						if(height)
+						if(height && CurrentControl.Type != "ComboBox") ;ComboBox/DropDownList use it to limit their drop down list
 							CurrentControl.height := height
 					}
 					else if(InStr(line, "this." CurrentControl.Name ".Location"))

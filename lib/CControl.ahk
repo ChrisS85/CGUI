@@ -111,7 +111,7 @@ Class CControl ;Never created directly
 		if(FunctionName)
 		{
 			;Make sure function name is valid (or tell the developer about it)
-			if(CGUI_Assert(IsFunc(this[FunctionName]), "Invalid function name passed to CControl.RegisterEvent()"), -2)
+			if(CGUI_Assert(IsFunc(this[FunctionName]) || IsFunc( `(CGUI.GUIList[this.GUINum])[FunctionName]), "Invalid function name passed to CControl.RegisterEvent()"), -2)
 				this._.RegisteredEvents[Type] := FunctionName
 		}
 		else

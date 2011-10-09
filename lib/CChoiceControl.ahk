@@ -361,7 +361,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!this.Selected)
 					Options .= UseEnabledState ? " Disabled" : " Hidden"
-				Control := GUI.AddControl(type, Name, Options, Text, this._.Controls)
+				Control := GUI.AddControl(type, Name, Options, Text, this._.Controls, this)
 				Control._.UseEnabledState := UseEnabledState
 				Control.hParentControl := this._.hwnd
 				return Control
