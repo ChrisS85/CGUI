@@ -127,6 +127,8 @@ Class CControl ;Never created directly
 		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
+		if(this.DisableNotifications)
+			return
 		if(this._.RegisteredEvents.HasKey(Name))
 		{
 			if(IsFunc(this[this._.RegisteredEvents[Name]]))
@@ -252,6 +254,9 @@ Class CControl ;Never created directly
 	
 	Variable: hParentControl
 	If this control is a subcontrol of another control, this variable contains the window handle of the parent control.
+	
+	Variable: DisableNotifications
+	If true, this control will not call any of its notification functions. This is useful when the controls of a window are first created and change handlers should not be called.
 	*/
 	__Get(Name, Params*) 
     { 

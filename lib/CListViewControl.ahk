@@ -413,8 +413,10 @@ Class CListViewControl Extends CControl
 		*/
 		Clear()
 		{
+			GuiControl, % this._.GUINum ":-Redraw", % this._.hwnd
 			Loop % this.MaxIndex()
 				this.Delete(1)
+			GuiControl, % this._.GUINum ":-Redraw", % this._.hwnd
 		}
 		/*
 		Function: Delete
@@ -880,18 +882,31 @@ Class CListViewControl Extends CControl
 				else
 					this.ProcessSubControlState(this._.PreviouslySelectedItem, "")
 			}
-			Mapping := { Sa : "ItemSelected", sb : "ItemDeselected", Fa : "ItemFocused", fb : "ItemDefocused", Ca : "ItemChecked", cb : "ItemUnChecked"} ;Case insensitivity strikes back!
+			Mapping := { Sa : "ItemSelected", sb : "ItemDeselected", Ca : "ItemChecked", cb : "ItemUnChecked"} ;Case insensitivity strikes back!
 			for EventIndex, Function in Mapping
 				if(InStr(Event.Errorlevel, SubStr(EventIndex, 1, 1), true))
 				{
 					this.CallEvent(Function, Row)
 					break
 				}
+			;This is handled in CGUI for all controls at the moment.
+			;~ if(Event.ErrorLevel = "f")
+			;~ {
+				;~ CGUI.PushEvent("CGUI_FocusChange", this.GUINum)
+				;~ if(Event.ErrorLevel == "F")
+					;~ this.CallEvent("FocusReceived")
+				;~ else if(Event.ErrorLevel == "f")
+				;~ {
+					;~ this.CallEvent("FocusLost")
+					;~ if(CGUI.GUIList[this.GUINum].ValidateOnFocusLeave && this.IsValidatableControlType())
+						;~ this.Validate()
+				;~ }
+			;~ }
 			if(EventName :=  {S : "SelectionChanged", C : "CheckedChanged", F : "FocusedChanged"}[Event.Errorlevel])
 				this.CallEvent(EventName, Row)
 			if(InStr(Event.Errorlevel, "S")) ;Process sub control state
 			{
-				if(LV_GetCount("Selected") = 1)
+				if(this.SelectedItems.MaxIndex() = 1)
 					this._.PreviouslySelectedItem := this.SelectedItem
 				else
 					this._.PreviouslySelectedItem := ""
