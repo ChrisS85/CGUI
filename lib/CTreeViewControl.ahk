@@ -101,6 +101,7 @@ Class CTreeViewControl Extends CControl
 				Gui, % this.GUINum ":Default"
 				Gui, TreeView, % this.ClassNN
 				TV_Modify(Value._.ID)
+				this.CallEvent("ItemSelected")
 				this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 				this._.PreviouslySelectedItem := this.SelectedItem
 			}

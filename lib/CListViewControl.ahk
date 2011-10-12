@@ -413,10 +413,8 @@ Class CListViewControl Extends CControl
 		*/
 		Clear()
 		{
-			GuiControl, % this._.GUINum ":-Redraw", % this._.hwnd
 			Loop % this.MaxIndex()
 				this.Delete(1)
-			GuiControl, % this._.GUINum ":-Redraw", % this._.hwnd
 		}
 		/*
 		Function: Delete
