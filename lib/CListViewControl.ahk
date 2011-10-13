@@ -413,8 +413,17 @@ Class CListViewControl Extends CControl
 		*/
 		Clear()
 		{
-			Loop % this.MaxIndex()
-				this.Delete(1)
+			GUI := CGUI.GUIList[this._.GUINum]
+			if(GUI.IsDestroyed)
+				return
+			Control := GUI.Controls[this._.hwnd]
+			Gui, % Control.GUINum ":Default"
+			Gui, ListView, % Control.ClassNN
+			LV_Delete()
+			Loop % Control._.MaxIndex()
+				Control._.Remove(A_Index, "")
+			Control.ProcessSubControlState(Control._.PreviouslySelectedItem, "")
+			Control._.PreviouslySelectedItem := ""
 		}
 		/*
 		Function: Delete
@@ -439,6 +448,7 @@ Class CListViewControl Extends CControl
 			Loop % LV_GetCount() - UnsortedIndex
 				this.CRow.SetUnsortedIndex(this.CRow.GetSortedIndex(UnsortedIndex + A_Index, Control.hwnd), UnsortedIndex + A_Index - 1, Control.hwnd)
 			LV_Delete(SortedIndex)
+			this._.Remove(UnsortedIndex)
 			if(WasSelected)
 			{
 				if(LV_GetCount("Selected") = 1)
@@ -831,12 +841,6 @@ Class CListViewControl Extends CControl
 	Event: ScrollingEnd()
 	Invoked when the user ends scrolling the control.
 	
-	Event: ItemSelected(RowItem)
-	Invoked when the user selects an item.
-	
-	Event: ItemDeselected(RowItem)
-	Invoked when the user deselects an item.
-	
 	Event: SelectionChanged(RowItem)
 	Invoked when the selected item(s) has/have changed.
 	
@@ -880,7 +884,7 @@ Class CListViewControl Extends CControl
 				else
 					this.ProcessSubControlState(this._.PreviouslySelectedItem, "")
 			}
-			Mapping := { Sa : "ItemSelected", sb : "ItemDeselected", Ca : "ItemChecked", cb : "ItemUnChecked"} ;Case insensitivity strikes back!
+			Mapping := {Ca : "ItemChecked", cb : "ItemUnChecked"} ;Case insensitivity strikes back!
 			for EventIndex, Function in Mapping
 				if(InStr(Event.Errorlevel, SubStr(EventIndex, 1, 1), true))
 				{

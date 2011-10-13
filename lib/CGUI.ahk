@@ -23,7 +23,7 @@ Class CGUI
 	Instances ;Returns a list of instances of this window class
 	
 	
-	var CloseOnEscape := 0 ;If true, pressing escape will call the Close() event function if defined. Otherwise, it will call Escape() if it is defined.
+	var CloseOnEscape := 0 ;If true, pressing escape will call the PreClose() event function if defined. Otherwise, it will call Escape() if it is defined.
 	var DestroyOnClose := 0 ;If true, the gui will be destroyed instead of being hidden when it gets closed by the user.
 		
 	Not supported:
@@ -100,8 +100,8 @@ Class CGUI
 		}
 		
 		;Register for WM_COMMAND and WM_NOTIFY messages since they are commonly used for various purposes.
-		instance.OnMessage(WM_COMMAND := 0x111, "HandleInternalMessage")
-		instance.OnMessage(WM_NOTIFY := 0x004E, "HandleInternalMessage")
+		;~ instance.OnMessage(WM_COMMAND := 0x111, "HandleInternalMessage")
+		;~ instance.OnMessage(WM_NOTIFY := 0x004E, "HandleInternalMessage")
 	}
 	;This class handles window message routing to the instances of window classes that register for a specific window message
 	Class WindowMessageHandler
@@ -268,6 +268,14 @@ Class CGUI
 		WinActivate, % "ahk_id " this.hwnd
 	}
 	
+	/*
+	Function: Close
+	Closes the window. Effectively the same as clicking the x in the title bar.
+	*/
+	Close()
+	{
+		PostMessage, 0x112, 0xF060,,, % "ahk_id " this.hwnd  ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE
+	}
 	/*
 	Function: Hide
 	
@@ -923,8 +931,13 @@ Class CGUI
 	;Adds an event to the event queue
 	PushEvent(Label, GUINum, vControl = "", lErrorLevel = "", lEventInfo = "", lGUIEvent = "")
 	{
+		;Unfortunately listview selection change events are fired to rapidly (one for each list entry), so some optimizations are needed
+		if(lGUIEvent = "I" && lErrorlevel = "S") ;Check if there is already a listview select event for this control in the queue.
+			for index, event in CGUI.EventQueue
+				if(event.GuiControl = vControl && event.GuiEvent = "I" && Event.ErrorLevel = "S")
+					return
 		CGUI.EventQueue.Insert({"Label" : Label, "Errorlevel" : lErrorlevel, "GUI" : GUINum, "EventInfo" : lEventInfo, "GUIEvent" : lGUIEvent, "GUIControl" : vControl})
-		SetTimer, CGUI_HandleEventTimer, -1
+		SetTimer, CGUI_HandleEventTimer, -100
 	}
 	/*
 	Called by a timer that processes the event queue of all g-label notifications
@@ -987,9 +1000,13 @@ Class CGUI
 	This function gets called when a window receives internal messages that are handled through the library.
 	It is currently handles WM_COMMAND and WM_Notify to check for focus change events.
 	*/
+	/*
+	;This function needed to be disabled because AHK can't keep up with handling WM_NOTIFY messages properly and will fall into some kind of recursion internally.
+	;See http://www.autohotkey.com/forum/viewtopic.php?p=481765
 	HandleInternalMessage(Msg, wParam, lParam)
 	{
 		static WM_NOTIFY := 0x004E, WM_COMMAND := 0x111, NM_KILLFOCUS := 0xFFFFFFF8, NM_SETFOCUS := 0xFFFFFFF9
+		;~ Critical 1000
 		;~ static WM_SETCURSOR := 0x20, WM_MOUSEMOVE := 0x200, h_cursor_hand
 		if(Msg = WM_NOTIFY)
 		{
@@ -999,9 +1016,10 @@ Class CGUI
 			
 			;Forward the function to the control object. Some controls may want to process it and call events.
 			if(IsFunc(Control.OnWM_NOTIFY))
-				Control.OnWM_NOTIFY(wParam, lParam)
-			
-			Code := NumGet(lParam+0, 2*A_PtrSize, "UINT")
+				result := Control.OnWM_NOTIFY(wParam, lParam)
+			if(!result >= 0)
+				return result
+			Code := NumGet(lParam+0, 2*A_PtrSize, "INT")
 			if(Code = NM_KILLFOCUS)
 				Code := "KillFocus"
 			else if(Code = NM_SETFOCUS)
@@ -1035,7 +1053,9 @@ Class CGUI
 			if(this.ValidateOnFocusLeave && Control.IsValidatableControlType())
 				Control.Validate()
 		}
+		Critical, Off
 	}
+	*/
 	/*
 	if(msg = WM_SETCURSOR || msg = WM_MOUSEMOVE) ;Text control Link support, thanks Shimanov!
 	{
@@ -1094,8 +1114,7 @@ CGUI_HandleEventTimer:
 while(CGUI.EventQueue.MaxIndex())
 {
 	SetTimer, CGUI_HandleEventTimer, Off
-	CGUI.GUIList[CGUI.EventQueue[1].GUI].RerouteEvent(CGUI.EventQueue[1])
-	CGUI.EventQueue.Remove(1)
+	CGUI.GUIList[CGUI.EventQueue[1].GUI].RerouteEvent(CGUI.EventQueue.Remove(1))	
 	SetTimer, CGUI_HandleEventTimer, -1
 }
 return
@@ -1141,7 +1160,6 @@ CGUI_ShellMessage(wParam, lParam, msg, hwnd)
 ;Global window message handler for CGUI library that reroutes all registered window messages to the window instances.
 CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
 {
-	;~ global CGUI
 	GUI := CGUI.GUIFromHWND(hwnd)
 	if(GUI)
 	{
@@ -1149,10 +1167,11 @@ CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
 		if(CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners.HasKey(0))
 		{
 			internalfunc := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[0]
-			`(GUI.base.base)[internalfunc](Msg, wParam, lParam)
+			result := `(GUI.base.base)[internalfunc](Msg, wParam, lParam)
 		}
 		func := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[hwnd]
-		return GUI[func](Msg, wParam, lParam)
+		result := GUI[func](Msg, wParam, lParam)
+		return result
 	}
 }
 /*
