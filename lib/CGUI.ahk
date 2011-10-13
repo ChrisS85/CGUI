@@ -132,7 +132,7 @@ Class CGUI
 			}
 			
 			;if parameters are valid and the listener isn't registered yet, add it and possibly set up the OnMessage Callback
-			if(Message && GUI && FunctionName && IsFunc(GUI[FunctionName]) = 5)
+			if(Message && GUI && FunctionName && IsFunc(GUI[FunctionName]))
 			{
 				;If the current message hasn't been registered anywhere
 				if(!this.WindowMessageListeners.HasKey(Message))
@@ -149,7 +149,7 @@ Class CGUI
 				this.WindowMessageListeners[Message].Listeners[hwnd] := FunctionName
 				
 			}
-			CGUI_Assert(IsFunc(GUI[FunctionName]) = 5, "Invalid function definition " GUI[FunctionName] ". Function takes 3 parameters, Msg, lParam and wParam.")
+			CGUI_Assert(IsFunc(GUI[FunctionName]), "Invalid function definition " GUI[FunctionName] ". Function takes 3 parameters, Msg, wParam and lParam.")
 		}
 		UnregisterListener(hwnd, Message = "")
 		{
@@ -207,7 +207,7 @@ Class CGUI
 		Message - The number of the window message
 		FunctionName - The name of the function contained in the instance of the window class that will be called when the message is received.
 		To stop listening, skip this parameter or leave it empty. To change to another function, simply specify another name (stopping first isn't required). The function won't be called anymore after the window is destroyed. DON'T USE GUI, DESTROY ON ANY WINDOWS CREATED WITH THIS LIBRARY THOUGH. Instaed use window.Destroy() or window.Close() when window.DestroyOnClose is enabled.
-		The function accepts three parameters, Message, wParam and lParam (in this order).
+		The function accepts four parameters, Message, wParam, lParam and hwnd (in this order). hwnd can be the window handle of the window or the related control (e.g. for WM_KEYDOWN)
 	*/
 	OnMessage(Message, FunctionName = "")
 	{
@@ -1161,16 +1161,19 @@ CGUI_ShellMessage(wParam, lParam, msg, hwnd)
 CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
 {
 	GUI := CGUI.GUIFromHWND(hwnd)
+	;If no window found, it might be the handle of a control:
+	if(!GUI)
+		GUI := CGUI.GUIList[CGUI.ControlFromHWND(hwnd).GUINum]
 	if(GUI)
 	{
 		;Internal message handlers are processed first.
 		if(CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners.HasKey(0))
 		{
 			internalfunc := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[0]
-			result := `(GUI.base.base)[internalfunc](Msg, wParam, lParam)
+			result := `(GUI.base.base)[internalfunc](Msg, wParam, lParam, hwnd)
 		}
-		func := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[hwnd]
-		result := GUI[func](Msg, wParam, lParam)
+		func := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[GUI.hwnd]
+		result := GUI[func](Msg, wParam, lParam, hwnd)
 		return result
 	}
 }

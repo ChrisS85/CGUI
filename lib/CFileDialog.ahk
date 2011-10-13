@@ -32,7 +32,7 @@ Class CFileDialog
 	;Initial directory of the dialog.
 	
 	;Variable: Filename
-	;Initial filename in the filename edit field.
+	;Initial filename in the filename edit field. If the dialog was confirmed, this property contains the selected path & filename. If multiple files are selected, this property will be an array.
 	
 	;Variable: Title
 	;Title of the dialog window.
@@ -72,7 +72,7 @@ Class CFileDialog
 	/*
 	Function: Show
 	Shows a file dialog window. To show a modal window, set OwnDialogs := 1 for the GUI thread that calls this.
-	
+	The path & filename of the selected file will be stored under the key "Filename". If multiple files are selected, this property will be an array.
 	Returns:
 	1 if the user confirmed the selection and pressed OK, 0 if the file selection was cancelled.
 	*/
