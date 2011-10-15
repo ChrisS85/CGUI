@@ -37,29 +37,43 @@ Class CListViewControl Extends CControl
 	}
 	/*
 	Function: ModifyCol
-	Modifies a column. See AHK help on LV_ModifyCol for details.
+	Modifies a column. All parameters are optional, see AHK help on LV_ModifyCol for details.
+	
+	Parameters:
+		ColumnNumber - The number of the column to modify, one-based
+		Options - The new width. See AHK documentation.
+		ColumnTitle - The new column title.
 	*/
-	ModifyCol(ColumnNumber="", Options="", ColumnTitle="")
+	ModifyCol(Params*)
 	{
 		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
+		if(!CGUI_Assert(!(Params.MaxIndex() > 3), "ModifyCol: This function accepts no more than 3 parameters."))
+			return
 		Gui, % this.GUINum ":Default"
 		Gui, ListView, % this.ClassNN
-		LV_ModifyCol(ColumnNumber, Options, ColumnTitle)
+		LV_ModifyCol(Params*)
 	}
 	/*
 	Function: InsertCol
 	Inserts a column. See AHK help on LV_InsertCol for details.
+	
+	Parameters:
+		ColumnNumber - The position of the new column
+		Options - The new width. See AHK documentation.
+		ColumnTitle - The new column title.
 	*/
-	InsertCol(ColumnNumber, Options="", ColumnTitle="")
+	InsertCol(Params*)
 	{
 		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
+		if(!CGUI_Assert(!(Params.MaxIndex() > 3), "InsertCol: This function accepts no more than 3 parameters."))
+			return
 		Gui, % this.GUINum ":Default"
 		Gui, ListView, % this.ClassNN
-		LV_InsertCol(ColumnNumber, Options, ColumnTitle)
+		LV_InsertCol(Params*)
 	}
 	/*
 	Function: DeleteCol
@@ -327,7 +341,7 @@ Class CListViewControl Extends CControl
 			Gui, % this._.GUINum ":Default"
 			Gui, ListView, % Control.hwnd
 			SortedIndex := LV_Add(Options, Fields*)
-			UnsortedIndex := this._.MaxIndex() + 1
+			UnsortedIndex := (UnsortedIndex := this._.MaxIndex() + 1) ? UnsortedIndex : 1
 			Row := new this.CRow(SortedIndex, UnsortedIndex, this._.GUINum, this._.hwnd)
 			this._.Insert(UnsortedIndex, Row)
 			if(InStr(Options, "Select"))
