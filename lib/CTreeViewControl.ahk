@@ -101,7 +101,6 @@ Class CTreeViewControl Extends CControl
 				Gui, % this.GUINum ":Default"
 				Gui, TreeView, % this.ClassNN
 				TV_Modify(Value._.ID)
-				this.CallEvent("ItemSelected")
 				this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 				this._.PreviouslySelectedItem := this.SelectedItem
 			}
@@ -156,9 +155,7 @@ Class CTreeViewControl Extends CControl
 			return
 		;Handle visibility of controls associated with tree nodees
 		if(Event.GUIEvent = "S")
-		{
-			this.ProcessSubControlState(this.PreviouslySelectedItem, this.SelectedItem)
-		}
+			this.ProcessSubControlState(this.PreviouslySelectedItem, SelectedItem := this.Items.ItemByID(Event.EventInfo))
 		if(Event.GUIEvent == "E")
 			this.CallEvent("EditingStart", this.Items.ItemByID(Event.EventInfo))
 		else if(EventName := {DoubleClick : "DoubleClick", e : "EditingEnd", S : "ItemSelected", Normal : "Click", RightClick : "RightClick", "+" : "ItemExpanded", "-" : "ItemCollapsed"}[Event.GUIEvent])
@@ -170,7 +167,7 @@ Class CTreeViewControl Extends CControl
 		else if(Event.GUIEvent == "f")
 			this.CallEvent("FocusLost")
 		if(Event.GUIEvent = "S")			
-			this.PreviouslySelectedItem := this.SelectedItem
+			this.PreviouslySelectedItem := SelectedItem
 	}
 	
 	/*

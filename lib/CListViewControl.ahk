@@ -178,6 +178,15 @@ Class CListViewControl Extends CControl
 			Handled := true
 			Value := Params[Params.MaxIndex()]
 			Params.Remove(Params.MaxIndex())
+			if(Params.MaxIndex())
+			{
+				Params.Insert(1, Name)
+				Name :=  Params[Params.MaxIndex()]
+				Params.Remove(Params.MaxIndex())
+				Object := this[Params*]
+				Object[Name] := Value
+				return Value
+			}
 			if(Name = "SelectedIndices" || Name = "CheckedIndices" || Name = "SelectedItems" || Name = "CheckedItems")
 			{
 				Gui, % this.GUINum ":Default"
@@ -390,34 +399,21 @@ Class CListViewControl Extends CControl
 		Modifies a row.
 		
 		Parameters:
-			RowNumber - Index of the row which should be modified.
+			RowNumberOrItem - Index of the row or the item which should be modified.
 			Options - Options for the modified row. See AHK documentation on LV_Modify().
 			Fields - Any additional parameters are used as cell text.
 		*/
-		Modify(RowNumber, Options, Fields*)
+		Modify(RowNumberOrItem, Options, Fields*)
 		{
 			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
 			Control := GUI.Controls[this._.hwnd]
-			Gui, % Control.GUINum ":Default"
-			Gui, ListView, % Control.ClassNN
-			SortedIndex := Control.IndependentSorting ? this.CRow.GetSortedIndex(RowNumber, Control.hwnd) : RowNumber ;If independent sorting is off, the RowNumber parameter of this function is interpreted as sorted index
-			LV_Modify(SortedIndex, Options, Fields*)
-			if(InStr(Options, "Select"))
-			{
-				if(LV_GetCount("Selected") = 1)
-				{
-					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, Control.SelectedItem)
-					Control._.PreviouslySelectedItem := Control.SelectedItem
-				}
-				else
-				{
-					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, "")
-					Control._.PreviouslySelectedItem := ""
-				}
-			}
+			if(!IsObject(RowNumberOrItem))
+				RowNumberOrItem := Control.Items[RowNumberOrItem]
+			if(IsObject(RowNumberOrItem))
+				RowNumberOrItem.Modify(Options, Fields*)
 		}
 		
 		/*
@@ -691,6 +687,39 @@ Class CListViewControl Extends CControl
 				this._.Icon := Filename
 				this._.IconNumber := IconNumberOrTransparencyColor
 			}
+			/*
+		Function: Modify
+		Modifies a row.
+		
+		Parameters:
+			Options - Options for the modified row. See AHK documentation on LV_Modify().
+			Fields - Any additional parameters are used as cell text.
+		*/
+		Modify(Options, Fields*)
+		{
+			;~ global CGUI
+			GUI := CGUI.GUIList[this._.GUINum]
+			if(GUI.IsDestroyed)
+				return
+			Control := GUI.Controls[this._.hwnd]
+			Gui, % Control.GUINum ":Default"
+			Gui, ListView, % Control.ClassNN
+			SortedIndex := Control.IndependentSorting ? this.CRow.GetSortedIndex(this._.RowNumber, Control.hwnd) : this._.RowNumber ;If independent sorting is off, the RowNumber parameter of this function is interpreted as sorted index
+			LV_Modify(SortedIndex, Options, Fields*)
+			if(InStr(Options, "Select"))
+			{
+				if(LV_GetCount("Selected") = 1)
+				{
+					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, Control.SelectedItem)
+					Control._.PreviouslySelectedItem := Control.SelectedItem
+				}
+				else
+				{
+					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, "")
+					Control._.PreviouslySelectedItem := ""
+				}
+			}
+		}
 			/*
 			Variable: 1,2,3,4,...
 			Columns can be accessed by their index, e.g. this.ListView.Items[1][2] accesses the text of the first row and second column.
