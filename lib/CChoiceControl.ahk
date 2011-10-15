@@ -50,15 +50,19 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			DetectHiddenWindows, On
 			if(Name = "SelectedItem")
 			{
-				SendMessage, 0x147, 0, 0,,% "ahk_id " this.hwnd
-				Value := this._.Items[ErrorLevel + 1]
+				SendMessage, 0x147, 0, 0,,% "ahk_id " this.hwnd ;CB_GETCURSEL
+				ErrorLevel := (ErrorLevel > 0x7FFFFFFF ? -(~ErrorLevel) - 1 : ErrorLevel)
+				if(ErrorLevel >= 0)
+					Value := this._.Items[ErrorLevel + 1]
 			}
 			else if(Name = "Text")
 				ControlGet, Value, Choice,,,% "ahk_id " this.hwnd
 			else if(Name = "SelectedIndex")
 			{
 				SendMessage, 0x147, 0, 0,,% "ahk_id " this.hwnd
-				Value := ErrorLevel + 1
+				ErrorLevel := (ErrorLevel > 0x7FFFFFFF ? -(~ErrorLevel) - 1 : ErrorLevel)
+				if(ErrorLevel >= 0)
+					Value := ErrorLevel + 1
 			}
 			else if(Name = "Items")
 				Value := this._.Items
@@ -76,6 +80,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 					Value := Value[Params[A_Index]]
 			if(!DetectHidden)
 				DetectHiddenWindows, Off
+			OutputDebug % name " " Value._.Index
 			if(Value != "")
 				return Value
 		}
@@ -95,16 +100,12 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				Loop % this.Items.MaxIndex()
 					if(this.Items[A_Index] = Value)
 					{
-						GuiControl, % this.GUINum ":Choose", % this.ClassNN, % A_Index
-						this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
-						this._.PreviouslySelectedItem := this.SelectedItem
+						GuiControl, % this.GUINum ":Choose", % this.ClassNN, % "|" A_Index ;| will trigger g-label
 					}
 			}
 			else if(Name = "SelectedIndex" && Value >= 1 && Value <= this.Items.MaxIndex())
 			{
-				GuiControl, % this.GUINum ":Choose", % this.ClassNN, % Value
-				this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
-				this._.PreviouslySelectedItem := this.SelectedItem
+				GuiControl, % this.GUINum ":Choose", % this.ClassNN, % "|" Value ;| will trigger g-label
 			}
 			;~ else if(Name = "Items" && !Params[1])
 			;~ {
@@ -199,8 +200,8 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	HandleEvent(Event)
 	{
 		this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
-		this._.PreviouslySelectedItem := this.SelectedItem
 		this.CallEvent("SelectionChanged", this.SelectedItem)
+		this._.PreviouslySelectedItem := this.SelectedItem
 	}
 	/*
 	Class: CChoiceControl.CItems
@@ -252,29 +253,30 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			Selected := Control.SelectedIndex
 			ItemsString := ""
 			Pos := 1
-			Loop % this.MaxIndex()
+			len := !(len := this.MaxIndex())  ? 1 : len + 1
+			if(Position = -1 || Position > len)
+				Position := len
+			Loop % len
 			{
-				ItemsString .= "|" (Position = A_Index ? Text : this[pos].Text)
-				if(Position = A_Index)
-					pos--
-				pos++
+				ItemsString .= (Position = A_Index ? "|" Text : "|" this[pos].Text)
+				if(Position != A_Index)
+					pos++
 			}
-			if(Position = -1)
-				ItemsString .= "|" Text
 			GuiControl, % this._.GUINum ":", % Control.ClassNN, %ItemsString%
-			this._.Insert(Position = -1 ? this.MaxIndex() + 1 : Position, new this.CItems.CItem(Position, this._.GUINum, this.Name)) ;Insert new item object
+			this._.Insert(Position, new this.CItem(Position, this._.GUINum, this._.hwnd)) ;Insert new item object
 			for index, item in this ;Move existing indices
 				item._.Index := index
-			GuiControl, % this._.GUINum ":Choose", % Control.ClassNN, % (Position != -1 && Selected < Position ? Selected : Selected + 1)
+			if(Selected)
+				GuiControl, % this._.GUINum ":Choose", % Control.ClassNN, % (Selected < Position ? Selected : Selected + 1)
 		}
 		/*
-		Function: Remove
-		Removes an item to the list of choices.
+		Function: Delete
+		Deletes an item of the list of choices.
 		
 		Parameters:
 			IndexTextOrItem - The item which should be removed. This can either be an index, the text of the item or the item object stored in the Items array.
 		*/
-		Remove(IndexTextOrItem)
+		Delete(IndexTextOrItem)
 		{
 			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
@@ -291,20 +293,25 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 					if(this[A_Index].Text = IndexTextOrItem)
 						IndexTextOrItem := A_Index
 			}
-			if IndexTextOrItem is Number
+			if(IndexTextOrItem > 0 && IndexTextOrItem <= this.MaxIndex())
 			{
-				if(IndexTextOrItem > 0 && IndexTextOrItem <= this.MaxIndex())
+				Selected := Control.SelectedIndex
+				this._.Remove(IndexTextOrItem)
+				ItemsString := ""
+				Loop % this.MaxIndex()
+					if(A_Index != IndexTextOrItem)
+						ItemsString .= "|" this[A_Index].Text
+				GuiControl, % this._.GUINum ":", % Control.ClassNN, %ItemsString%
+				if(Selected = IndexTextOrItem)
 				{
-					Selected := Control.SelectedIndex
-					this._.Remove(IndexTextOrItem)
-					ItemsString := ""
-					Loop % this.MaxIndex()
-						if(A_Index != IndexTextOrItem)
-							ItemsString .= "|" this[A_Index]
-					GuiControl, % this.GUINum ":Choose", % Control.ClassNN, % (Selected <= IndexTextOrItem ? Selected : Selected - 1)
-					for index, item in this
-						item._.Index := index
+					if(Selected > this.MaxIndex())
+						Selected := this.MaxIndex()
+					GuiControl, % this.GUINum ":Choose", % Control.ClassNN, % "|" Selected ;Select next item. | will trigger g-label
 				}
+				else
+					GuiControl, % this.GUINum ":Choose", % Control.ClassNN, % (Selected < IndexTextOrItem ? Selected : Selected - 1)
+				for index, item in this
+					item._.Index := index
 			}
 		}
 		/*
@@ -395,6 +402,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 					GUI := CGUI.GUIList[this._.GUINum]
 					Control := GUI.Controls[this._.hwnd]
 					SendMessage, 0x147, 0, 0,,% "ahk_id " Control.hwnd
+					ErrorLevel := (ErrorLevel > 0x7FFFFFFF ? -(~ErrorLevel) - 1 : ErrorLevel)
 					Value := (this._.Index = ErrorLevel + 1)
 				}
 				else if(Name = "Controls")
@@ -425,9 +433,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				{
 					GUI := CGUI.GUIList[this._.GUINum]
 					Control := GUI.Controls[this._.hwnd]
-					GuiControl, % this._.GUINum ":Choose", % Control.ClassNN, % this._.Index
-					this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
-					Control._.PreviouslySelectedItem := Control.SelectedItem
+					GuiControl, % this._.GUINum ":Choose", % Control.ClassNN, % "|" this._.Index ;| will trigger g-label
 					return Value
 				}
 			}
