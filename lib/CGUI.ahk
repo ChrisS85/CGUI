@@ -12,7 +12,6 @@ Class CGUI
 	static GUIList := Object()
 	static EventQueue := []
 	static WindowMessageListeners := []
-	_ := {}
 	;~ _ := Object() ;Proxy object
 	/*	
 	Get only:
@@ -53,7 +52,8 @@ Class CGUI
 		;~ global CGUI, CFont
 		if(!CGUI_Assert(IsObject(instance) && !instance.HasKey("hwnd"), "CGUI constructor must not be called!"))
 			return
-		;~ this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set
+		this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set
+		start := 1
 		loop {
 			GUINum := instance.__Class start
 			Gui %GUINum%:+LastFoundExist
@@ -765,7 +765,7 @@ Class CGUI
 				return Value
 		}
 	}
-	__Set(Name, Value)
+	__Set(Name, Params*)
 	{
 		;~ global CGUI
 		DetectHidden := A_DetectHiddenWindows
@@ -773,6 +773,18 @@ Class CGUI
 		Handled := true
 		if(!this.IsDestroyed)
 		{
+			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
+			Value := Params[Params.MaxIndex()]
+			Params.Remove(Params.MaxIndex())
+			if(Params.MaxIndex())
+			{
+				Params.Insert(1, Name)
+				Name :=  Params[Params.MaxIndex()]
+				Params.Remove(Params.MaxIndex())
+				Object := this[Params*]
+				Object[Name] := Value
+				return Value
+			}
 			if Name in AlwaysOnTop,Border,Caption,LastFound,LastFoundExist,MaximizeBox,MaximizeBox,MinimizeBox,Resize,SysMenu
 				Gui, % this.GUINum ":" (Value = 1 ? "+" : "-") Name
 			else if Name in OwnDialogs, Theme, ToolWindow

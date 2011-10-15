@@ -87,11 +87,23 @@ Class CTreeViewControl Extends CControl
 			return Value
 	}
 	
-	__Set(Name, Value)
+	__Set(Name, Params*)
 	{
 		;~ global CGUI
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
+			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
+			Value := Params[Params.MaxIndex()]
+			Params.Remove(Params.MaxIndex())
+			if(Params.MaxIndex())
+			{
+				Params.Insert(1, Name)
+				Name :=  Params[Params.MaxIndex()]
+				Params.Remove(Params.MaxIndex())
+				Object := this[Params*]
+				Object[Name] := Value
+				return Value
+			}
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
 			Handled := true
@@ -151,6 +163,7 @@ Class CTreeViewControl Extends CControl
 	HandleEvent(Event)
 	{
 		;~ global CGUI
+		start := A_TickCount
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		;Handle visibility of controls associated with tree nodees
@@ -168,6 +181,7 @@ Class CTreeViewControl Extends CControl
 			this.CallEvent("FocusLost")
 		if(Event.GUIEvent = "S")			
 			this.PreviouslySelectedItem := SelectedItem
+		OutputDebug % "HandleEvent: " A_TickCount - start
 	}
 	
 	/*
@@ -537,8 +551,18 @@ Class CTreeViewControl Extends CControl
 		__Set(Name, Params*)
 		{
 			;~ global CGUI
+			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
 			Value := Params[Params.MaxIndex()]
 			Params.Remove(Params.MaxIndex())
+			if(Params.MaxIndex())
+			{
+				Params.Insert(1, Name)
+				Name :=  Params[Params.MaxIndex()]
+				Params.Remove(Params.MaxIndex())
+				Object := this[Params*]
+				Object[Name] := Value
+				return Value
+			}
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(!GUI.IsDestroyed)
 			{

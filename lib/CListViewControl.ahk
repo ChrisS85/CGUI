@@ -190,6 +190,7 @@ Class CListViewControl Extends CControl
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
 			Handled := true
+			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
 			Value := Params[Params.MaxIndex()]
 			Params.Remove(Params.MaxIndex())
 			if(Params.MaxIndex())
@@ -518,8 +519,18 @@ Class CListViewControl Extends CControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
+			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
 			Value := Params[Params.MaxIndex()]
 			Params.Remove(Params.MaxIndex())
+			if(Params.MaxIndex())
+			{
+				Params.Insert(1, Name)
+				Name :=  Params[Params.MaxIndex()]
+				Params.Remove(Params.MaxIndex())
+				Object := this[Params*]
+				Object[Name] := Value
+				return Value
+			}
 			if Name is Integer
 			{
 				if(!Params.MaxIndex()) ;Setting a row directly is not allowed
@@ -794,12 +805,24 @@ Class CListViewControl Extends CControl
 						return this._.Controls
 				}
 			}
-			__Set(Name, Value)
+			__Set(Name, Params*)
 			{				
 				;~ global CGUI
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!GUI.IsDestroyed)
 				{
+					;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
+					Value := Params[Params.MaxIndex()]
+					Params.Remove(Params.MaxIndex())
+					if(Params.MaxIndex())
+					{
+						Params.Insert(1, Name)
+						Name :=  Params[Params.MaxIndex()]
+						Params.Remove(Params.MaxIndex())
+						Object := this[Params*]
+						Object[Name] := Value
+						return Value
+					}
 					Control := GUI.Controls[this._.hwnd]
 					if Name is Integer
 					{

@@ -41,8 +41,18 @@ Class CStatusBarControl Extends CControl
 	}
 	__Set(Name, Params*)
 	{
+		;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
 		Value := Params[Params.MaxIndex()]
 		Params.Remove(Params.MaxIndex())
+		if(Params.MaxIndex())
+		{
+			Params.Insert(1, Name)
+			Name :=  Params[Params.MaxIndex()]
+			Params.Remove(Params.MaxIndex())
+			Object := this[Params*]
+			Object[Name] := Value
+			return Value
+		}
 		if(Name = "Text") ;Assign text -> assign text of first part
 		{
 			this._.Parts[1].Text := Value
@@ -149,8 +159,18 @@ Class CStatusBarControl Extends CControl
 		}
 		__Set(Name, Params*)
 		{
+			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
 			Value := Params[Params.MaxIndex()]
 			Params.Remove(Params.MaxIndex())
+			if(Params.MaxIndex())
+			{
+				Params.Insert(1, Name)
+				Name :=  Params[Params.MaxIndex()]
+				Params.Remove(Params.MaxIndex())
+				Object := this[Params*]
+				Object[Name] := Value
+				return Value
+			}
 			if Name is Integer
 			{
 				if(Name <= this._.MaxIndex())
@@ -247,9 +267,21 @@ Class CStatusBarControl Extends CControl
 				if(Name != "_" && this._.HasKey(Name))
 					return this._[Name]
 			}
-			__Set(Name, Value)
+			__Set(Name, Params*)
 			{
 				;~ global CGUI
+				;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
+				Value := Params[Params.MaxIndex()]
+				Params.Remove(Params.MaxIndex())
+				if(Params.MaxIndex())
+				{
+					Params.Insert(1, Name)
+					Name :=  Params[Params.MaxIndex()]
+					Params.Remove(Params.MaxIndex())
+					Object := this[Params*]
+					Object[Name] := Value
+					return Value
+				}
 				Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]
 				if(Name = "Width")
 				{
