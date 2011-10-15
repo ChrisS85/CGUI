@@ -324,18 +324,18 @@ Class CListViewControl Extends CControl
 			if(GUI.IsDestroyed)
 				return
 			Control := GUI.Controls[this._.hwnd]
-			Gui, % Control.GUINum ":Default"
-			Gui, ListView, % Control.ClassNN
+			Gui, % this._.GUINum ":Default"
+			Gui, ListView, % Control.hwnd
 			SortedIndex := LV_Add(Options, Fields*)
-			UnsortedIndex := LV_GetCount()
-			Row := new this.CRow(SortedIndex, UnsortedIndex, this._.GUINum, Control.hwnd)
+			UnsortedIndex := this._.MaxIndex() + 1
+			Row := new this.CRow(SortedIndex, UnsortedIndex, this._.GUINum, this._.hwnd)
 			this._.Insert(UnsortedIndex, Row)
 			if(InStr(Options, "Select"))
 			{
 				if(LV_GetCount("Selected") = 1)
 				{
-					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, Control.SelectedItem)
-					Control._.PreviouslySelectedItem := Control.SelectedItem
+					Control.ProcessSubControlState(Control._.PreviouslySelectedItem, Row)
+					Control._.PreviouslySelectedItem := Row
 				}
 				else
 				{
@@ -405,7 +405,6 @@ Class CListViewControl Extends CControl
 		*/
 		Modify(RowNumberOrItem, Options, Fields*)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return

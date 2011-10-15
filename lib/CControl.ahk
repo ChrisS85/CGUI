@@ -139,10 +139,7 @@ Class CControl ;Never created directly
 		else if(IsFunc(this[Name]))
 			return {Handled : true, Result : this[Name](CGUI.GUIList[this.GUINum], Params*)}
 		else if(IsFunc(`(CGUI.GUIList[this.GUINum])[this.Name "_" Name]))
-		{
-			OutputDebug % call this.Name "_" Name
 			return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)}
-		}
 		else
 			return {Handled : false}
 	}

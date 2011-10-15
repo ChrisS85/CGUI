@@ -53,8 +53,7 @@ Class CGUI
 		;~ global CGUI, CFont
 		if(!CGUI_Assert(IsObject(instance) && !instance.HasKey("hwnd"), "CGUI constructor must not be called!"))
 			return
-		;~ this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set		
-		start := 1
+		;~ this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set
 		loop {
 			GUINum := instance.__Class start
 			Gui %GUINum%:+LastFoundExist
@@ -695,74 +694,76 @@ Class CGUI
 	__Get(Name)
 	{
 		;~ global CGUI	
-			
-		DetectHidden := A_DetectHiddenWindows
-		DetectHiddenWindows, On
-		if(Name = "IsDestroyed" && this.GUINum) ;Extra check in __Get for this property because it might be destroyed through an old-style Gui, Destroy command
+		if Name not in base,_,GUINum
 		{
-			GUI, % this.GUINum ":+LastFoundExist"
-			Value := WinExist() = 0
+			DetectHidden := A_DetectHiddenWindows
+			DetectHiddenWindows, On
+			if(Name = "IsDestroyed" && this.GUINum) ;Extra check in __Get for this property because it might be destroyed through an old-style Gui, Destroy command
+			{
+				GUI, % this.GUINum ":+LastFoundExist"
+				Value := WinExist() = 0
+			}
+			else if(Name != "IsDestroyed" && !this.IsDestroyed)
+			{
+				if Name in x,y,width, height
+				{
+					WinGetPos, x,y,width,height,% "ahk_id " this.hwnd
+					Value := %Name%
+				}
+				else if(Name = "Position")
+				{
+					WinGetPos, x,y,,,% "ahk_id " this.hwnd
+					Value := {x:x,y:y}
+				}
+				else if(Name = "Size")
+				{
+					WinGetPos,,,width,height,% "ahk_id " this.hwnd
+					Value := {width:width, height:height}
+				}
+				else if(Name = "Title")
+					WinGetTitle, Value, % "ahk_id " this.hwnd
+				else if Name in Style,ExStyle, TransColor, Transparent, MinMax
+					WinGet, Value, %Name%, % "ahk_id " this.hwnd
+				else if(Name = "ActiveControl") ;Returns the control object that has keyboard focus
+				{
+					ControlGetFocus, Value, % "ahk_id " this.hwnd
+					ControlGet, Value, Hwnd,, %Value%, % "ahk_id " this.hwnd
+					if(this.Controls.HasKey(Value))
+						Value := this.Controls[Value]
+				}
+				else if(Name="Enabled")
+					Value := !(this.Style & 0x8000000) ;WS_DISABLED
+				else if(Name = "Visible")
+					Value :=  this.Style & 0x10000000
+				else if(Name = "AlwaysOnTop")
+					Value := this.ExStyle & 0x8
+				else if(Name = "Border")
+					Value := this.Style & 0x800000
+				else if(Name = "Caption")
+					Value := this.Style & 0xC00000
+				else if(Name = "MaximizeBox")
+					Value := this.Style & 0x10000
+				else if(Name = "MinimizeBox")
+					Value := this.Style & 0x10000
+				else if(Name = "Resize")
+					Value := this.Style & 0x40000
+				else if(Name = "SysMenu")
+					Value := this.Style & 0x80000
+			}
+			if(Value = "" && Name = "Instances") ;Returns a list of instances of this window class
+			{
+				Value := []
+				for GuiNum,GUI in CGUI.GUIList
+					if(GUI.__Class = this.__Class)
+						Value.Insert(GUI)
+			}
+			else if(Value = "" && CGUI_IndexOf(["MinSize", "MaxSize", "Theme", "ToolWindow", "Owner", "OwnDialogs", "Region", "WindowColor", "ControlColor", "ValidateOnFocusLeave"], Name))
+				Value := this._[Name]
+			if(!DetectHidden)
+				DetectHiddenWindows, Off
+			if(Value != "")
+				return Value
 		}
-		else if(Name != "IsDestroyed" && Name != "GUINum" && !this.IsDestroyed)
-		{
-			if Name in x,y,width, height
-			{
-				WinGetPos, x,y,width,height,% "ahk_id " this.hwnd
-				Value := %Name%
-			}
-			else if(Name = "Position")
-			{
-				WinGetPos, x,y,,,% "ahk_id " this.hwnd
-				Value := {x:x,y:y}
-			}
-			else if(Name = "Size")
-			{
-				WinGetPos,,,width,height,% "ahk_id " this.hwnd
-				Value := {width:width, height:height}
-			}
-			else if(Name = "Title")
-				WinGetTitle, Value, % "ahk_id " this.hwnd
-			else if Name in Style,ExStyle, TransColor, Transparent, MinMax
-				WinGet, Value, %Name%, % "ahk_id " this.hwnd
-			else if(Name = "ActiveControl") ;Returns the control object that has keyboard focus
-			{
-				ControlGetFocus, Value, % "ahk_id " this.hwnd
-				ControlGet, Value, Hwnd,, %Value%, % "ahk_id " this.hwnd
-				if(this.Controls.HasKey(Value))
-					Value := this.Controls[Value]
-			}
-			else if(Name="Enabled")
-				Value := !(this.Style & 0x8000000) ;WS_DISABLED
-			else if(Name = "Visible")
-				Value :=  this.Style & 0x10000000
-			else if(Name = "AlwaysOnTop")
-				Value := this.ExStyle & 0x8
-			else if(Name = "Border")
-				Value := this.Style & 0x800000
-			else if(Name = "Caption")
-				Value := this.Style & 0xC00000
-			else if(Name = "MaximizeBox")
-				Value := this.Style & 0x10000
-			else if(Name = "MinimizeBox")
-				Value := this.Style & 0x10000
-			else if(Name = "Resize")
-				Value := this.Style & 0x40000
-			else if(Name = "SysMenu")
-				Value := this.Style & 0x80000
-		}
-		if(Value = "" && Name = "Instances") ;Returns a list of instances of this window class
-		{
-			Value := []
-			for GuiNum,GUI in CGUI.GUIList
-				if(GUI.__Class = this.__Class)
-					Value.Insert(GUI)
-		}
-		else if(Value = "" && CGUI_IndexOf(["MinSize", "MaxSize", "Theme", "ToolWindow", "Owner", "OwnDialogs", "Region", "WindowColor", "ControlColor", "ValidateOnFocusLeave"], Name))
-			Value := this._[Name]
-		if(!DetectHidden)
-			DetectHiddenWindows, Off
-		if(Value != "")
-			return Value
 	}
 	__Set(Name, Value)
 	{
@@ -937,7 +938,7 @@ Class CGUI
 				if(event.GuiControl = vControl && event.GuiEvent = "I" && Event.ErrorLevel = "S")
 					return
 		CGUI.EventQueue.Insert({"Label" : Label, "Errorlevel" : lErrorlevel, "GUI" : GUINum, "EventInfo" : lEventInfo, "GUIEvent" : lGUIEvent, "GUIControl" : vControl})
-		SetTimer, CGUI_HandleEventTimer, -100
+		SetTimer, CGUI_HandleEventTimer, -1
 	}
 	/*
 	Called by a timer that processes the event queue of all g-label notifications
@@ -1213,6 +1214,10 @@ Class CFont
 				Gui, % this._.GUINum ":Font", %Value%
 			this._[Name] := Value
 			return Value
+		}
+		else if(Name = "Size" && Value > 0)
+		{
+			return (this.Options := "s" Value)
 		}
 		else if(Name = "Font")
 		{
