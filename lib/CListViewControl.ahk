@@ -443,8 +443,8 @@ Class CListViewControl Extends CControl
 			Gui, % Control.GUINum ":Default"
 			Gui, ListView, % Control.ClassNN
 			LV_Delete()
-			Loop % Control._.MaxIndex()
-				Control._.Remove(A_Index, "")
+			Loop % Control.Items._.MaxIndex()
+				Control.Items._.Remove(A_Index, "")
 			Control.ProcessSubControlState(Control._.PreviouslySelectedItem, "")
 			Control._.PreviouslySelectedItem := ""
 		}
@@ -944,11 +944,13 @@ Class CListViewControl Extends CControl
 	*/
 	HandleEvent(Event)
 	{
-		Row := this.IndependentSorting ? this.CItems.CRow.GetUnsortedIndex(Event.EventInfo, this.hwnd) : Event.EventInfo
+		Row := this.Items[this.IndependentSorting ? this.CItems.CRow.GetUnsortedIndex(Event.EventInfo, this.hwnd) : Event.EventInfo]
 		if(Event.GUIEvent == "E")
 			this.CallEvent("EditingStart", Row)
-		else if(EventName := {DoubleClick : "DoubleClick", R : "DoubleRightClick", ColClick : "ColumnClick", e : "EditingEnd", Normal : "Click", RightClick : "RightClick",  A : "ItemActivate", K : "KeyPress"}[Event.GUIEvent])
+		else if(EventName := {DoubleClick : "DoubleClick", R : "DoubleRightClick",e : "EditingEnd", Normal : "Click", RightClick : "RightClick",  A : "ItemActivate"}[Event.GUIEvent])
 			this.CallEvent(EventName, Row)
+		else if(EventName := {K : "KeyPress", ColClick : "ColumnClick"}[Event.GUIEvent])
+			this.CallEvent(EventName, Event.EventInfo)
 		else if(Event.GUIEvent == "F")
 			this.CallEvent("FocusReceived")
 		else if(Event.GUIEvent == "S")
