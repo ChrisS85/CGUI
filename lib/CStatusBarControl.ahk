@@ -60,7 +60,7 @@ Class CStatusBarControl Extends CControl
 		}
 		if(Name = "Parts") ;Assign all parts at once
 		{
-			if(Params[1] >= 1 && Params[1] <= this._.Parts.MaxIndex()) ;Set a single part
+			if(Params[1] >= 1 && Params[1] <= this._.Parts._.MaxIndex()) ;Set a single part
 			{
 				if(IsObject(Value)) ;Set an object
 				{
@@ -70,7 +70,7 @@ Class CStatusBarControl Extends CControl
 					this.RebuildStatusBar()
 				}
 				else ;Just set text directly
-					this._Parts[Params[1]].Text := Value
+					this._.Parts[Params[1]].Text := Value
 				;~ PartNumber := Params[Params.MaxIndex()]
 				;~ Params.Remove(Params.MaxIndex())
 				;~ Part := this._.Parts[PartNumber]
@@ -176,10 +176,7 @@ Class CStatusBarControl Extends CControl
 				if(Name <= this._.MaxIndex())
 				{
 					if(Params.MaxIndex() >= 1) ;Set a property of CPart
-					{
-						Part := this._[Name]
-						Part[Params*] := Value
-					}
+						(this._[Name])[Params*] := Value
 					return Value
 				}
 			}
