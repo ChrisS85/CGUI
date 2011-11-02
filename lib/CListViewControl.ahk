@@ -191,16 +191,12 @@ Class CListViewControl Extends CControl
 			DetectHiddenWindows, On
 			Handled := true
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
-			Value := Params[Params.MaxIndex()]
-			Params.Remove(Params.MaxIndex())
+			Value := Params.Remove()
 			if(Params.MaxIndex())
 			{
 				Params.Insert(1, Name)
-				Name :=  Params[Params.MaxIndex()]
-				Params.Remove(Params.MaxIndex())
-				Object := this[Params*]
-				Object[Name] := Value
-				return Value
+				Name :=  Params.Remove()
+				return (this[Params*])[Name] := Value
 			}
 			if(Name = "SelectedIndices" || Name = "CheckedIndices" || Name = "SelectedItems" || Name = "CheckedItems")
 			{
