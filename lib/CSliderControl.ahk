@@ -20,13 +20,13 @@ Class CSliderControl Extends CControl
 	}	
 	
 	/*
-	Variable: Value
+	Property: Value
 	The value of the Slider control. Relative offsets are possible by adding a sign when assigning it, i.e. Slider.Value := "+10". Slider.Value += 10 is also possible but less efficient.
 	
-	Variable: Min
+	Property: Min
 	The minimum value of the Slider control.
 	
-	Variable: Max
+	Property: Max
 	The maximum value of the Slider control.
 	*/
 	__Get(Name, Params*)

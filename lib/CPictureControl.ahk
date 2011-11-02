@@ -17,14 +17,14 @@ Class CPictureControl Extends CControl
 	}
 	
 	/*
-	Variable: Picture
+	Property: Picture
 	The picture can be changed by assigning a filename to this property.
 	If the picture was set by providing a hBitmap in <SetImageFromHBitmap>, this variable will be empty.
 	
-	Variable: PictureWidth
+	Property: PictureWidth
 	The width of the currently displayed picture in pixels.
 	
-	Variable: PictureHeight
+	Property: PictureHeight
 	The height of the currently displayed picture in pixels.
 	*/
 	__Get(Name) 

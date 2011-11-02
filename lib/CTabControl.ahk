@@ -32,16 +32,16 @@ Class CTabControl Extends CControl
 			this._.Tabs._.Insert(new this.CTabs.CTab(A_LoopField, A_Index, this.GUINum, this.hwnd))
 	}
 	/*
-	Variable: Tabs
+	Property: Tabs
 	A list of all tabs. Each tab contains a list of controls that belong to it. The returned object is of type <CTabControl.CTabs>
 	
-	Variable: Text
+	Property: Text
 	The text of the first tab.
 	
-	Variable: SelectedItem
+	Property: SelectedItem
 	The selected tab item.
 	
-	Variable: SelectedIndex
+	Property: SelectedIndex
 	The index of the selected tab item.
 	*/
 	__Get(Name, Params*)
@@ -149,7 +149,7 @@ Class CTabControl Extends CControl
 			this.hwnd := hwnd
 		}
 		/*
-		Variable: 1,2,3,4,...
+		Property: 1,2,3,4,...
 		Individual tabs can be accessed by their index.
 		*/
 		__Get(Name, Params*)
@@ -282,13 +282,13 @@ Class CTabControl Extends CControl
 					Msgbox Tabs may not be added in a tab container.
 			}
 			/*
-			Variable: Text
+			Property: Text
 			The text of the tab.
 			
-			Variable: Icon
+			Property: Icon
 			The filename of the icon associated with this tab.
 			
-			Variable: IconNumber
+			Property: IconNumber
 			The index of the icon in a multi-icon file.
 			*/
 			__Get(Name, Params*)

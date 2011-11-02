@@ -32,13 +32,13 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		this._.PreviouslySelectedItem := this.SelectedItem
 	}
 	/*
-	Variable: SelectedItem
+	Property: SelectedItem
 	The text of the selected item.
 	
-	Variable: SelectedIndex
+	Property: SelectedIndex
 	The index of the selected item.
 	
-	Variable: Items
+	Property: Items
 	An array containing all items. See <CChoiceControl.CItems>.
 	*/
 	__Get(Name, Params*)
@@ -226,10 +226,10 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		}
 		
 		/*
-		Variable: 1,2,3,4,...
+		Property: 1,2,3,4,...
 		Individual items can be accessed by their index.
 		
-		Variable: Count
+		Property: Count
 		The number of items in this control.
 		*/		
 		__Get(Name)
@@ -404,10 +404,10 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				return Control
 			}
 			/*
-			Variable: Selected
+			Property: Selected
 			If true, the item is selected.
 			
-			Variable: Text
+			Property: Text
 			The text of the list item.
 			*/
 			__Get(Name, Params*)

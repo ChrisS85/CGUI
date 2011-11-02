@@ -3,7 +3,7 @@
    Class: CGUI
    The main GUI class. User created GUIs need to extend this class and call Base.__New() in their constructor before doing anything related to this class.
    
-   Variable: Accessing Controls
+   Property: Accessing Controls
    Controls may be accessed by their name by using GUI.Name or by their window handle by using GUI.Controls[hwnd] (assuming Name is a string and hwnd is a variable).
    The difference between these two methods is that controls which are added as sub-controls to other controls are not accessible by their name through the main GUI object. They can either be accessed by hwnd like described above or by GUI.ParentControl.Controls.SubControlName (again assuming that SubControlName is a string).
 */
@@ -575,120 +575,120 @@ Class CGUI
 		return this.GUIList[GUINum][Name]
 	}
 	/*
-	Variable: GUIList
+	Property: GUIList
 	This static array contains a list of all GUIs created with this library.
 	It is maintained automatically and should not need to be used directly.
 	
-	Variable: IsDestroyed
+	Property: IsDestroyed
 	True if the window has been destroyed and this object is not usable anymore.
 	
-	Variable: x
+	Property: x
 	x-Position of the window.
 	
-	Variable: y
+	Property: y
 	y-Position of the window.
 	
-	Variable: width
+	Property: width
 	Width of the window.
 	
-	Variable: height
+	Property: height
 	Height of the window.
 	
-	Variable: Position
+	Property: Position
 	An object containing the x and y values. They can not be set separately through this object, only both at once.
 	
-	Variable: Size
+	Property: Size
 	An object containing the width and height values. They can not be set separately through this object, only both at once.
 	
-	Variable: Title
+	Property: Title
 	The window title.
 	
-	Variable: Style
+	Property: Style
 	The window style.
 	
-	Variable: ExStyle
+	Property: ExStyle
 	The window extended style.
 	
-	Variable: Transcolor
+	Property: Transcolor
 	A color that will be made invisible/see-through on the window. Values: RGB|ColorName|Off
 	
-	Variable: Transparent
+	Property: Transparent
 	The window style.
 	
-	Variable: MinMax
+	Property: MinMax
 	The window state: -1: minimized / 1: maximized / 0: neither. Can not be set this way.
 	
-	Variable: ActiveControl
+	Property: ActiveControl
 	The control object that is focused. Can also be set.
 	
-	Variable: Enabled
+	Property: Enabled
 	If false, the user can not interact with this window. Used for creating modal windows.
 	
-	Variable: Visible
+	Property: Visible
 	Sets wether the window is visible or hidden.
 	
-	Variable: AlwaysOnTop
+	Property: AlwaysOnTop
 	If true, the window will be in front of other windows.
 	
-	Variable: Border
+	Property: Border
 	Provides a thin border around the window.
 	
-	Variable: Caption
+	Property: Caption
 	Set to false to remove the title bar.
 	
-	Variable: MinimizeBox
+	Property: MinimizeBox
 	Determines if the window has a minimize button in the title bar.
 	
-	Variable: MaximizeBox
+	Property: MaximizeBox
 	Determines if the window has a maximize button in the title bar.
 	
-	Variable: Resize
+	Property: Resize
 	Determines if the window can be resized by the user.
 	
-	Variable: SysMenu
+	Property: SysMenu
 	If true, the window will show a it's program icon in the title bar and show its system menu there.
 	
-	Variable: Instances
+	Property: Instances
 	A list of all instances of the current window class. If you inherit from CGUI you can use this to find all windows of this type.
 	
-	Variable: Menu
+	Property: Menu
 	If this variable contains an instance of <CMenu> and there is no ContextMenu() event handler for this window, this menu will be shown when the user right clicks on an empty window area.
 	
-	Variable: MinSize
+	Property: MinSize
 	Minimum window size when Resize is enabled.
 	
-	Variable: MaxSize
+	Property: MaxSize
 	Maximum window size when Resize is enabled.
 	
-	Variable: Theme
+	Property: Theme
 	
-	Variable: Toolwindow
+	Property: Toolwindow
 	Provides a thin title bar.
 	
-	Variable: Owner
+	Property: Owner
 	Assigning a hwnd to this property makes this window owned by another so it will act like a tool window of said window. Supports any window, not just windows from this process.
 	
-	Variable: OwnerAutoClose
+	Property: OwnerAutoClose
 	By enabling this, an owned window (which has its Owner property set to the window handle of its parent window) will automatically close itself when its parent window closes.
 	The window can use its PreClose() event to decide if it should really be closed, but the owner status will be removed anyway.
 	To archive this behaviour a shell message hook is used. If there is already such a hook present in the script, this library will intercept it and forward any messages to the original callback function.
 	
-	Variable: OwnDialogs
+	Property: OwnDialogs
 	Determines if the dialogs that this window shows will be owned by it.
 	
-	Variable: Region
+	Property: Region
 	
-	Variable: WindowColor
+	Property: WindowColor
 	
-	Variable: ControlColor
+	Property: ControlColor
 	
-	Variable: DestroyOnClose
+	Property: DestroyOnClose
 	If set, the window will be destroyed when it gets closed.
 	
-	Variable: CloseOnEscape
+	Property: CloseOnEscape
 	If set, the window will close itself when escape is pressed.	
 	
-	Variable: ValidateOnFocusLeave
+	Property: ValidateOnFocusLeave
 	If set, <CGUI.Validate> is called each time a text-containing variable loses focus.
 	*/
 	__Get(Name)
@@ -1203,10 +1203,10 @@ Class CFont
 		this._.hwnd := hwnd
 	}
 	/*
-	Variable: Options
+	Property: Options
 	An options string used for describing the font. Syntax is identical to GUI, Font command in AHK.
 	
-	Variable: Font
+	Property: Font
 	The name of the font.
 	*/
 	__Set(Name, Value)
