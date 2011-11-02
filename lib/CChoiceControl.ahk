@@ -253,8 +253,9 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		Parameters:
 			Text - The text of the new item.
 			Position - The position at which the item will be inserted. Items with indices >= this value will be appended.
+			Select - Set to true to select the freshly added item.
 		*/
-		Add(Text, Position = -1)
+		Add(Text, Position = -1, Select = false)
 		{
 			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
@@ -271,12 +272,29 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				if(Position != A_Index)
 					pos++
 			}
-			GuiControl, % this._.GUINum ":", % Control.ClassNN, %ItemsString%
+			GuiControl, % this._.GUINum ":", % Control.hwnd, %ItemsString%
 			this._.Insert(Position, new this.CItem(Position, this._.GUINum, this._.hwnd)) ;Insert new item object
 			for index, item in this ;Move existing indices
 				item._.Index := index
-			if(Selected)
-				GuiControl, % this._.GUINum ":Choose", % Control.ClassNN, % (Selected < Position ? Selected : Selected + 1)
+			if(Select)
+				GuiControl, % this._.GUINum ":Choose", % Control.hwnd, % Select
+			else if(Selected)
+				GuiControl, % this._.GUINum ":Choose", % Control.hwnd, % (Selected < Position ? Selected : Selected + 1)
+		}
+		/*
+		Function: Clear
+		Deletes all items
+		*/
+		Clear()
+		{
+			GUI := CGUI.GUIList[this._.GUINum]
+			Control := GUI.Controls[this.hwnd]
+			Loop % this.MaxIndex()
+				this._.Remove(A_Index, "")
+			GuiControl, % this._.GUINum ":", % Control.hwnd, |
+			;Call selection changed event if there are no more items manually
+			if(!this.MaxIndex())
+				Control.HandleEvent("")
 		}
 		/*
 		Function: Delete
@@ -306,19 +324,22 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			{
 				Selected := Control.SelectedIndex
 				this._.Remove(IndexTextOrItem)
-				ItemsString := ""
+				ItemsString := "|"
 				Loop % this.MaxIndex()
 					if(A_Index != IndexTextOrItem)
-						ItemsString .= "|" this[A_Index].Text
-				GuiControl, % this._.GUINum ":", % Control.ClassNN, %ItemsString%
+						ItemsString .= (A_Index > 1 ? "|" : "") this[A_Index].Text
+				GuiControl, % this._.GUINum ":", % Control.hwnd, %ItemsString%
 				if(Selected = IndexTextOrItem)
 				{
 					if(Selected > this.MaxIndex())
 						Selected := this.MaxIndex()
-					GuiControl, % this.GUINum ":Choose", % Control.ClassNN, % "|" Selected ;Select next item. | will trigger g-label
+					GuiControl, % this.GUINum ":Choose", % Control.hwnd, % "|" Selected ;Select next item. | will trigger g-label
 				}
 				else
 					GuiControl, % this.GUINum ":Choose", % Control.ClassNN, % (Selected < IndexTextOrItem ? Selected : Selected - 1)
+				;Call selection changed event if there are no more items manually
+				if(!this.MaxIndex())
+					Control.HandleEvent("")
 				for index, item in this
 					item._.Index := index
 			}
