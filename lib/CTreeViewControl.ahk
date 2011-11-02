@@ -272,7 +272,7 @@ Class CTreeViewControl Extends CControl
 			for Index, Item in ObjectOrIndex.Parent
 				if(Item = ObjectOrIndex)
 				{
-					ObjectOrIndex.Parent._Remove(A_Index)
+					ObjectOrIndex.Parent._.Remove(A_Index)
 					break
 				}
 			TV_Delete(ObjectOrIndex.ID)

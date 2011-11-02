@@ -94,7 +94,7 @@ Class CTabControl Extends CControl
 					;~ this._.Tabs._.Insert(Params[1], Tab)
 				}
 				else ;Just set text directly
-					this._Tabs[Params[1]].Text := Value
+					this._.Tabs[Params[1]].Text := Value
 			}
 		}
 		else if(Name = "SelectedItem" && CGUI_TypeOf(Value) = "CTabControl.CTabs.CTab")

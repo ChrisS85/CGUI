@@ -294,7 +294,7 @@ Class CListViewControl Extends CControl
 	{
 		__New(GUINum, hwnd)
 		{
-			this._Insert("_", {})
+			this._.Insert("_", {})
 			this._.GUINum := GUINum
 			this._.hwnd := hwnd
 		}
