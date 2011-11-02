@@ -59,9 +59,7 @@ Class CProgressControl Extends CControl
 			{
 				Params.Insert(1, Name)
 				Name := Params.Remove()
-				Object := this[Params*]
-				Object[Name] := Value
-				return Value
+				return (this[Params*])[Name] := Value
 			}
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On

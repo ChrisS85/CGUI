@@ -779,9 +779,7 @@ Class CGUI
 			{
 				Params.Insert(1, Name)
 				Name := Params.Remove()
-				Object := this[Params*]
-				Object[Name] := Value
-				return Value
+				return (this[Params*])[Name] := Value
 			}
 			if Name in AlwaysOnTop,Border,Caption,LastFound,LastFoundExist,MaximizeBox,MaximizeBox,MinimizeBox,Resize,SysMenu
 				Gui, % this.GUINum ":" (Value = 1 ? "+" : "-") Name

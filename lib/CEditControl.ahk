@@ -88,9 +88,7 @@ Class CEditControl Extends CControl
 			{
 				Params.Insert(1, Name)
 				Name := Params.Remove()
-				Object := this[Params*]
-				Object[Name] := Value
-				return Value
+				return (this[Params*])[Name] := Value
 			}
 			if(this._.UpDownHwnd && this._.HasKey({Min : "Min", Max : "Max"}[Name]))
 			{

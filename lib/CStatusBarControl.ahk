@@ -47,9 +47,7 @@ Class CStatusBarControl Extends CControl
 		{
 			Params.Insert(1, Name)
 			Name := Params.Remove()
-			Object := this[Params*]
-			Object[Name] := Value
-			return Value
+			return (this[Params*])[Name] := Value
 		}
 		if(Name = "Text") ;Assign text -> assign text of first part
 		{
@@ -266,9 +264,7 @@ Class CStatusBarControl Extends CControl
 				{
 					Params.Insert(1, Name)
 					Name := Params.Remove()
-					Object := this[Params*]
-					Object[Name] := Value
-					return Value
+					return (this[Params*])[Name] := Value
 				}
 				Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]
 				if(Name = "Width")

@@ -74,9 +74,7 @@ Class CTabControl Extends CControl
 		{
 			Params.Insert(1, Name)
 			Name := Params.Remove()
-			Object := this[Params*]
-			Object[Name] := Value
-			return Value
+			return (this[Params*])[Name] := Value
 		}
 		Handled := true
 		if(Name = "Text") ;Assign text -> assign text of first Tab
@@ -185,9 +183,7 @@ Class CTabControl Extends CControl
 			{
 				Params.Insert(1, Name)
 				Name := Params.Remove()
-				Object := this[Params*]
-				Object[Name] := Value
-				return Value
+				return (this[Params*])[Name] := Value
 			}
 			if Name is Integer
 			{
@@ -306,9 +302,7 @@ Class CTabControl Extends CControl
 				{
 					Params.Insert(1, Name)
 					Name := Params.Remove()
-					Object := this[Params*]
-					Object[Name] := Value
-					return Value
+					return (this[Params*])[Name] := Value
 				}
 				if(Name = "Text")
 				{

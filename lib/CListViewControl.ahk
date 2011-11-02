@@ -521,9 +521,7 @@ Class CListViewControl Extends CControl
 			{
 				Params.Insert(1, Name)
 				Name := Params.Remove()
-				Object := this[Params*]
-				Object[Name] := Value
-				return Value
+				return (this[Params*])[Name] := Value
 			}
 			if Name is Integer
 			{
@@ -811,9 +809,7 @@ Class CListViewControl Extends CControl
 					{
 						Params.Insert(1, Name)
 						Name := Params.Remove()
-						Object := this[Params*]
-						Object[Name] := Value
-						return Value
+						return (this[Params*])[Name] := Value
 					}
 					Control := GUI.Controls[this._.hwnd]
 					if Name is Integer
