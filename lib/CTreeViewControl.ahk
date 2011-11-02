@@ -93,16 +93,12 @@ Class CTreeViewControl Extends CControl
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
-			Value := Params[Params.MaxIndex()]
-			Params.Remove(Params.MaxIndex())
+			Value := Params.Remove()
 			if(Params.MaxIndex())
 			{
 				Params.Insert(1, Name)
-				Name :=  Params[Params.MaxIndex()]
-				Params.Remove(Params.MaxIndex())
-				Object := this[Params*]
-				Object[Name] := Value
-				return Value
+				Name := Params.Remove()
+				return (this[Params*])[Name] := Value
 			}
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
@@ -274,7 +270,7 @@ Class CTreeViewControl Extends CControl
 			for Index, Item in ObjectOrIndex.Parent
 				if(Item = ObjectOrIndex)
 				{
-					ObjectOrIndex.Parent._Remove(A_Index)
+					ObjectOrIndex.Parent._.Remove(A_Index)
 					break
 				}
 			TV_Delete(ObjectOrIndex.ID)
@@ -552,16 +548,12 @@ Class CTreeViewControl Extends CControl
 		{
 			;~ global CGUI
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
-			Value := Params[Params.MaxIndex()]
-			Params.Remove(Params.MaxIndex())
+			Value := Params.Remove()
 			if(Params.MaxIndex())
 			{
 				Params.Insert(1, Name)
-				Name :=  Params[Params.MaxIndex()]
-				Params.Remove(Params.MaxIndex())
-				Object := this[Params*]
-				Object[Name] := Value
-				return Value
+				Name := Params.Remove()
+				return (this[Params*])[Name] := Value
 			}
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(!GUI.IsDestroyed)
