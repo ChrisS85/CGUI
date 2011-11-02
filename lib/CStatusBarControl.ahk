@@ -42,13 +42,11 @@ Class CStatusBarControl Extends CControl
 	__Set(Name, Params*)
 	{
 		;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
-		Value := Params[Params.MaxIndex()]
-		Params.Remove(Params.MaxIndex())
+		Value := Params.Remove()
 		if(Params.MaxIndex())
 		{
 			Params.Insert(1, Name)
-			Name :=  Params[Params.MaxIndex()]
-			Params.Remove(Params.MaxIndex())
+			Name := Params.Remove()
 			Object := this[Params*]
 			Object[Name] := Value
 			return Value
@@ -71,8 +69,7 @@ Class CStatusBarControl Extends CControl
 				}
 				else ;Just set text directly
 					this._.Parts[Params[1]].Text := Value
-				;~ PartNumber := Params[Params.MaxIndex()]
-				;~ Params.Remove(Params.MaxIndex())
+				;~ PartNumber := Params.Remove()
 				;~ Part := this._.Parts[PartNumber]
 				;~ Part := Value ;ASLDIHSVO)UGBOQWFH)=RFZS
 				return Value
@@ -160,13 +157,11 @@ Class CStatusBarControl Extends CControl
 		__Set(Name, Params*)
 		{
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
-			Value := Params[Params.MaxIndex()]
-			Params.Remove(Params.MaxIndex())
+			Value := Params.Remove()
 			if(Params.MaxIndex())
 			{
 				Params.Insert(1, Name)
-				Name :=  Params[Params.MaxIndex()]
-				Params.Remove(Params.MaxIndex())
+				Name := Params.Remove()
 				Object := this[Params*]
 				Object[Name] := Value
 				return Value
@@ -268,13 +263,11 @@ Class CStatusBarControl Extends CControl
 			{
 				;~ global CGUI
 				;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
-				Value := Params[Params.MaxIndex()]
-				Params.Remove(Params.MaxIndex())
+				Value := Params.Remove()
 				if(Params.MaxIndex())
 				{
 					Params.Insert(1, Name)
-					Name :=  Params[Params.MaxIndex()]
-					Params.Remove(Params.MaxIndex())
+					Name := Params.Remove()
 					Object := this[Params*]
 					Object[Name] := Value
 					return Value
