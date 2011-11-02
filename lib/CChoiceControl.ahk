@@ -277,7 +277,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			for index, item in this ;Move existing indices
 				item._.Index := index
 			if(Select)
-				GuiControl, % this._.GUINum ":Choose", % Control.hwnd, % Select
+				GuiControl, % this._.GUINum ":Choose", % Control.hwnd, % Position
 			else if(Selected)
 				GuiControl, % this._.GUINum ":Choose", % Control.hwnd, % (Selected < Position ? Selected : Selected + 1)
 		}
