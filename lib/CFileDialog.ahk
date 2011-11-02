@@ -5,39 +5,39 @@ This class is used for open/save file dialogs.
 Class CFileDialog
 {
 	/*
-	Variable: Mode
+	Property: Mode
 	Possible values:
 	- Open: Shows a dialog to select a file which is opened.
 	- Save: Shows a dialog to select a file which is saved.
 	*/
-	;Variable: Multi
+	;Property: Multi
 	;If true, multiple files can be selected.
 	
-	;Variable: FileMustExist
+	;Property: FileMustExist
 	;If true, the dialog requires that the file exists. Often used to open files.
 	
-	;Variable: PathMustExist
+	;Property: PathMustExist
 	;If true, the dialog requires that the path exists.
 	
-	;Variable: CreateNewFilePrompt
+	;Property: CreateNewFilePrompt
 	;If true, the dialog will ask the user to create a new file if it does not exist.
 	
-	;Variable: OverwriteFilePrompt
+	;Property: OverwriteFilePrompt
 	;If true, the dialog asks the user to overwrite an existing file.
 	
-	;Variable: FollowShortcuts
+	;Property: FollowShortcuts
 	;If true(default), shortcuts are followed. Otherwise the shortcut file itself will be used.
 	
-	;Variable: InitialDirectory
+	;Property: InitialDirectory
 	;Initial directory of the dialog.
 	
-	;Variable: Filename
+	;Property: Filename
 	;Initial filename in the filename edit field. If the dialog was confirmed, this property contains the selected path & filename. If multiple files are selected, this property will be an array.
 	
-	;Variable: Title
+	;Property: Title
 	;Title of the dialog window.
 	
-	;Variable: Filter
+	;Property: Filter
 	;File extension filter. AHK only supports a single user defined entry, but it may have different file extensions. An example would be "Audio files (*.mp3;*.wav)".
 	
 	/*

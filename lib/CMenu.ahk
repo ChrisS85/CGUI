@@ -178,25 +178,25 @@ Class CMenu
 	}
 		
 	/*
-	Variable: Text
+	Property: Text
 	The text under which this menu appears as a submenu in another menu.
 	
-	Variable: Enabled
+	Property: Enabled
 	Sets whether this submenu is enabled/disabled.
 	
-	Variable: Checked
+	Property: Checked
 	Sets whether this submenu has a checkmark.
 	
-	Variable: Default
+	Property: Default
 	Sets whether this submenu is rendered with bold font.
 	
-	Variable: Icon
+	Property: Icon
 	The path to the icon of the menu item.
 	
-	Variable: IconNumber
+	Property: IconNumber
 	The number of the menu item icon in a grouped icon file.
 	
-	Variable: IconWidth
+	Property: IconWidth
 	The width of an icon (>0), a resource identifier (<0) or the actual size of the icon (=0). Use the latter if you have transparency issues.
 	*/
 	__Set(Name, Value)
@@ -288,25 +288,25 @@ Class CMenu
 			Menu, % this.Menu, Icon, % this.Name, %Icon%, %IconNumber%, %IconWidth%
 		}
 		/*
-		Variable: Text
+		Property: Text
 		The text of this menu item.
 		
-		Variable: Enabled
+		Property: Enabled
 		Sets whether this menu item is enabled/disabled.
 		
-		Variable: Checked
+		Property: Checked
 		Sets whether this menu item has a checkmark.
 		
-		Variable: Default
+		Property: Default
 		Sets whether this menu item is rendered with bold font.
 		
-		Variable: Icon
+		Property: Icon
 		The path to the icon of the menu item.
 		
-		Variable: IconNumber
+		Property: IconNumber
 		The number of the menu item icon in a grouped icon file.
 		
-		Variable: IconWidth
+		Property: IconWidth
 		The width of an icon (>0), a resource identifier (<0) or the actual size of the icon (=0). Use the latter if you have transparency issues.
 		*/
 		__Set(Name, Value)

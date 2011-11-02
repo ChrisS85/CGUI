@@ -17,13 +17,13 @@ Class CProgressControl Extends CControl
 	}	
 	
 	/*
-	Variable: Value
+	Property: Value
 	The Value of the progress indicator. Relative offsets are possible by adding a sign when assigning it, i.e. Progress.Value := "+10". Progress.Value += 10 is also possible but less efficient.
 	
-	Variable: Min
+	Property: Min
 	The minimum value of the progress indicator.
 	
-	Variable: Max
+	Property: Max
 	The maximum value of the progress indicator.
 	*/
 	__Get(Name, Params*)

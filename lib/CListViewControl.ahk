@@ -89,40 +89,40 @@ Class CListViewControl Extends CControl
 		LV_DeleteCol(ColumnNumber)
 	}
 	/*
-	Variable: Items
+	Property: Items
 	An array of all ListView rows. See <CListViewControl.CItems>.
 	
-	Variable: SelectedItem
+	Property: SelectedItem
 	Contains the (first) selected row.
 	
-	Variable: SelectedItems
+	Property: SelectedItems
 	Contains all selected rows.
 	
-	Variable: SelectedIndex
+	Property: SelectedIndex
 	Contains the index of the (first) selected row.
 	
-	Variable: SelectedIndices
+	Property: SelectedIndices
 	Contains all indices of the selected rows.
 	
-	Variable: CheckedItem
+	Property: CheckedItem
 	Contains the (first) checked row.
 	
-	Variable: CheckedItems
+	Property: CheckedItems
 	Contains all checked rows.
 	
-	Variable: CheckedIndex
+	Property: CheckedIndex
 	Contains the index of the (first) checked row.
 	
-	Variable: CheckedIndices
+	Property: CheckedIndices
 	Contains all indices of the checked rows.
 	
-	Variable: FocusedItem
+	Property: FocusedItem
 	Contains the focused row.
 	
-	Variable: FocusedIndex
+	Property: FocusedIndex
 	Contains the index of the focused row.
 	
-	Variable: IndependentSorting
+	Property: IndependentSorting
 	This setting is off by default. In this case, indexing the rows behaves like AHK ListViews usually do. 
 	If it is enabled however, the row indexing will be independent of the current sorting. 
 	That means that the first row can actually be displayed as the second, third,... or last row on the GUI. 
@@ -489,10 +489,10 @@ Class CListViewControl Extends CControl
 			}
 		}
 		/*
-		Variable: 1,2,3,4,...
+		Property: 1,2,3,4,...
 		Rows can be accessed by their index, e.g. this.ListView.Items[1][2] accesses the text of the first row and second column.
 		
-		Variable: Count
+		Property: Count
 		The number of rows.
 		*/
 		__Get(Name)
@@ -745,28 +745,28 @@ Class CListViewControl Extends CControl
 			}
 		}
 			/*
-			Variable: 1,2,3,4,...
+			Property: 1,2,3,4,...
 			Columns can be accessed by their index, e.g. this.ListView.Items[1][2] accesses the text of the first row and second column.
 			
-			Variable: Text
+			Property: Text
 			The text of the first column of this row.
 			
-			Variable: Count
+			Property: Count
 			The number of columns.
 			
-			Variable: Checked
+			Property: Checked
 			True if the row is checked.
 			
-			Variable: Selected
+			Property: Selected
 			True if the row is selected.
 			
-			Variable: Focused
+			Property: Focused
 			True if the row is foucsed.
 			
-			Variable: Icon
+			Property: Icon
 			The filename of the file containing the icon for the current row.
 			
-			Variable: IconNumber
+			Property: IconNumber
 			The number of the icon in a multi-icon file.
 			*/
 			__Get(Name)

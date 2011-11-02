@@ -55,7 +55,7 @@
 Class: CSysLinkControl
 A class for displaying hyperlinks in text. 
 
-Variable: Text
+Property: Text
 Simply use <A HREF="URL">URL Text</A> notation inside the text to show a link. This control supports multiple links and regular text as well.
 
 Event: Click(URL)

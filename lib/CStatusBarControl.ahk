@@ -21,10 +21,10 @@ Class CStatusBarControl Extends CControl
 			this._.Parts._.Insert(1, new this.CParts.CPart(Text, 1, "", "", "", "", this.GUINum, this.hwnd))
 	}
 	/*
-	Variable: Parts
+	Property: Parts
 	An array of status bar parts/segments. See <CStatusBarControl.CParts>
 	
-	Variable: Text
+	Property: Text
 	The text of the first part.
 	*/
 	__Get(Name, Params*)
@@ -128,7 +128,7 @@ Class CStatusBarControl Extends CControl
 			this.hwnd := hwnd
 		}
 		/*
-		Variable: 1,2,3,4,...
+		Property: 1,2,3,4,...
 		Individual parts can be accessed by their index. Returns an object of type <CStatusBarControl.CParts.CPart>
 		*/
 		__Get(Name, Params*)
@@ -244,22 +244,22 @@ Class CStatusBarControl Extends CControl
 				this._.hwnd := hwnd
 			}
 			/*
-			Variable: Text
+			Property: Text
 			The text of this part.
 			
-			Variable: PartNumber
+			Property: PartNumber
 			The index of this part.
 			
-			Variable: Width
+			Property: Width
 			The width of this part.
 			
-			Variable: Style
+			Property: Style
 			The style of this part. See AHK docs.
 			
-			Variable: Icon
+			Property: Icon
 			The path to the icon file assigned to this part.
 			
-			Variable: IconNumber
+			Property: IconNumber
 			The index of the icon in a multi-icon file.
 			*/
 			__Get(Name)

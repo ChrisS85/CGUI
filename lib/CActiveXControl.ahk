@@ -4,7 +4,7 @@ An ActiveX control.
 
 This control extends <CControl>. All basic properties and functions are implemented and documented in this class.
 
-Variable: Accessing the properties of the ActiveX object
+Property: Accessing the properties of the ActiveX object
 The specific properties of the ActiveX control can simply be accessed through this control object as if it were the ActiveX object itself.
 However if you need to access the ActiveX object directly you can do so by using Control._.Object .
 */

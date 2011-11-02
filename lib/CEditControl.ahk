@@ -71,10 +71,10 @@ Class CEditControl Extends CControl
 	}
 	
 	/*
-	Variable: Min
+	Property: Min
 	If AddUpDown() has been called befored, the minimum value can be changed here.
 	
-	Variable: Max
+	Property: Max
 	If AddUpDown() has been called befored, the maximum value can be changed here.
 	*/
 	__Set(Name, Params*)
