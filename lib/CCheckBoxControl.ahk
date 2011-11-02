@@ -17,7 +17,7 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 		this._.Insert("Messages", {7 : "KillFocus", 6 : "SetFocus" }) ;Used for automatically registering message callbacks
 	}
 	/*
-	Variable: Checked
+	Property: Checked
 	If true, the control is checked.
 	*/
 	__Get(Name)

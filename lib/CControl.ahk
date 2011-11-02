@@ -173,86 +173,86 @@ Class CControl ;Never created directly
 		return CGUI_IndexOf(["Edit", "ComboBox"], this.Type)
 	}
 	/*
-	Variable: x
+	Property: x
 	x-Position of the control.
 	
-	Variable: y
+	Property: y
 	y-Position of the control.
 	
-	Variable: width
+	Property: width
 	Width of the control.
 	
-	Variable: height
+	Property: height
 	Height of the control.
 	
-	Variable: Position
+	Property: Position
 	An object containing the x and y values. They can not be set separately through this object, only both at once.
 	
-	Variable: Size
+	Property: Size
 	An object containing the width and height values. They can not be set separately through this object, only both at once.
 	
-	Variable: Text
+	Property: Text
 	The text of the control. Some controls don't support this property.
 	
-	Variable: ClassNN
+	Property: ClassNN
 	The control class together with a number identify the control.
 	
-	Variable: Enabled
+	Property: Enabled
 	Determines wether this control can be interacted with.
 	
-	Variable: Visible
+	Property: Visible
 	Determines wether this control is currently visible.
 	
-	Variable: Style
+	Property: Style
 	The style of the control.
 	
-	Variable: ExStyle
+	Property: ExStyle
 	The extended style of the control.
 	
-	Variable: Focused
+	Property: Focused
 	True if the control currently has the focus. It's also possible to focus it by setting this value to true.
 	
-	Variable: Tooltip
+	Property: Tooltip
 	If a text is set for this value, this control will show a tooltip when the mouse hovers over it.
 	Text and Picture controls require that you define a g-label for them to make this work.
 	
-	Variable: Menu
+	Property: Menu
 	If this variable contains an instance of <CMenu> and there is no ContextMenu() event handler for this control, this menu will be shown when the user right clicks on this control or presses the AppsKey while this control has focus.
 	
-	Variable: Left
+	Property: Left
 	The control left-aligns its text. This is the default setting.
 	
-	Variable: Center
+	Property: Center
 	The control center-aligns its text.
 	
-	Variable: Right
+	Property: Right
 	The control right-aligns its text.
 	
-	Variable: TabStop
+	Property: TabStop
 	If set to false, this control will not receive the focus when pressing tab to cycle through all controls.
 	
-	Variable: Wrap
+	Property: Wrap
 	If enabled, the control will use word-wrapping for its text.
 	
-	Variable: HScroll
+	Property: HScroll
 	Provides a horizontal scroll bar for this control if appropriate.
 	
-	Variable: VScroll
+	Property: VScroll
 	Provides a vertical scroll bar for this control if appropriate.
 	
-	Variable: BackgroundTrans
+	Property: BackgroundTrans
 	Uses a transparent background, which allows any control that lies behind a Text, Picture, or GroupBox control to show through.
 	
-	Variable: Background
+	Property: Background
 	If disable, the control uses the standard background color rather than the one set by the CGUI.Color() function.
 	
-	Variable: Border
+	Property: Border
 	Provides a thin-line border around the control.
 	
-	Variable: hParentControl
+	Property: hParentControl
 	If this control is a subcontrol of another control, this variable contains the window handle of the parent control.
 	
-	Variable: DisableNotifications
+	Property: DisableNotifications
 	If true, this control will not call any of its notification functions. This is useful when the controls of a window are first created and change handlers should not be called.
 	*/
 	__Get(Name, Params*) 

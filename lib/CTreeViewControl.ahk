@@ -57,13 +57,13 @@ Class CTreeViewControl Extends CControl
 		
 	}
 	/*
-	Variable: Items
+	Property: Items
 	Contains the nodes of the tree. Each level can be iterated and indexed. A node is of type <CTreeViewControl.CItem>
 	
-	Variable: SelectedItem
+	Property: SelectedItem
 	Contains the node of type <CItem> that is currently selected.
 	
-	Variable: PreviouslySelectedItem
+	Property: PreviouslySelectedItem
 	Contains the node of type <CItem> that was previously selected.
 	*/
 	__Get(Name, Params*)
@@ -422,46 +422,46 @@ Class CTreeViewControl Extends CControl
 		}
 		
 		/*
-		Variable: 1,2,3,4,...
+		Property: 1,2,3,4,...
 		The child nodes of a tree node may be accessed by their index, e.g. this.TreeView1.Items[1][2][3].Text := "AHK"
 		
-		Variable: CheckedItems
+		Property: CheckedItems
 		An array containing all checked child nodes of type <CTreeViewControl.CItem>.
 		
-		Variable: CheckedIndices
+		Property: CheckedIndices
 		An array containing all checked child indices.
 		
-		Variable: Parent
+		Property: Parent
 		The parent node of this node.
 		
-		Variable: ID
+		Property: ID
 		The ID used internally in the TreeView control.
 		
-		Variable: Icon
+		Property: Icon
 		The path of an icon assigned to this node.
 		
-		Variable: IconNumber
+		Property: IconNumber
 		The icon number used when an icon file contains more than one icon.
 		
-		Variable: Count
+		Property: Count
 		The number of child nodes.
 		
-		Variable: HasChildren
+		Property: HasChildren
 		True if there is at least one child node.
 		
-		Variable: Text
+		Property: Text
 		The text of this tree node.
 		
-		Variable: Checked
+		Property: Checked
 		True if the tree node is checked.
 		
-		Variable: Selected
+		Property: Selected
 		True if the tree node is selected.
 		
-		Variable: Expanded
+		Property: Expanded
 		True if the tree node is expanded.
 		
-		Variable: Bold
+		Property: Bold
 		If true, the text of this node is bold.
 		*/
 		__Get(Name, Params*)
