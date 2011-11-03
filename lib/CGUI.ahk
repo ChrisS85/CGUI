@@ -9,13 +9,13 @@
 */
 Class CGUI
 {
-	static GUIList := Object()
+	static GUIList := {}
 	static EventQueue := []
 	static WindowMessageListeners := []
-	;~ _ := Object() ;Proxy object
+	;~ _ := {} ;Proxy object
 	/*	
 	Get only:
-	var Controls := Object()
+	var Controls := {}
 	var hwnd := 0
 	var GUINum := 0
 	MinMax
@@ -66,7 +66,7 @@ Class CGUI
 		}
 		if(!instance.GUINum) ;Should not happen unless instance uses a faulty __Set() mechanism
 			return
-		instance.Controls := Object()
+		instance.Controls := {}
 		instance.Font := new CFont(instance.GUINum)
 		CGUI.GUIList[instance.GUINum] := instance
 		GUI, % instance.GUINum ":+LabelCGUI_ +LastFound"		
@@ -472,26 +472,26 @@ Class CGUI
 		;Some control classes represent multiple controls, those are handled separately here.
 		if(Control = "DropDownList" || Control = "ComboBox" || Control = "ListBox")
 		{
-			Control := object("base", CChoiceControl)
+			Control := {base: CChoiceControl}
 			Control.__New(Name, Options, Text, this.GUINum, type)
 		}
 		else if(Control = "Checkbox" || Control = "Radio" )
 		{
-			Control := object("base", CCheckboxControl)
+			Control := {base: CCheckboxControl}
 			Control.__New(Name, Options, Text, this.GUINum, type)
 		}
 		else if(Control = "Tab" )
 		{
-			Control := object("base", CTabControl)
+			Control := {base: CTabControl}
 			Control.__New(Name, Options, Text, this.GUINum)
 		}
 		else
 		{
-			Control := "C" Control "Control"
+			Control := "C" . Control . "Control"
 			;Make sure that a control of this type exists.
-			if(CGUI_Assert(IsObject(%Control%), "The control " Control " was not found!", -2))
+			if(CGUI_Assert(IsObject(%Control%), "The control " . Control . " was not found!", -2))
 			{
-				Control := object("base", %Control%)
+				Control := {base: %Control%}
 				hControl := Control.__New(Name, Options, Text, this.GUINum)
 				if(!CGUI_Assert(hControl != 0, "Error creating " Type "Control", -2))
 					return
