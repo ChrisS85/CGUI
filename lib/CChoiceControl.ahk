@@ -240,7 +240,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		{
 			;~ global CGUI
 			if Name is Integer
-				return
+				return Value
 		}
 		/*
 		Function: Add

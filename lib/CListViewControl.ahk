@@ -528,10 +528,8 @@ Class CListViewControl Extends CControl
 				if(!Params.MaxIndex()) ;Setting a row directly is not allowed
 					return
 				else ;Set a column or other row property
-				{			
-					Row := this[Name]
-					Row[Params*] := Value
-					return
+				{
+					return (this[Name])[Params*] := Value
 				}
 			}
 		}

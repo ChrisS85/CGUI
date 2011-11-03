@@ -1225,7 +1225,7 @@ Class CFont
 		}
 		else if(Name = "Size" && Value > 0)
 		{
-			return (this.Options := "s" Value)
+			return this.Options := "s" Value
 		}
 		else if(Name = "Font")
 		{

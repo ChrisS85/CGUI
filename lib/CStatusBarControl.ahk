@@ -51,8 +51,7 @@ Class CStatusBarControl Extends CControl
 		}
 		if(Name = "Text") ;Assign text -> assign text of first part
 		{
-			this._.Parts[1].Text := Value
-			return true
+			return this._.Parts[1].Text := Value
 		}
 		if(Name = "Parts") ;Assign all parts at once
 		{
