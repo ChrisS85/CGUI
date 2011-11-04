@@ -140,12 +140,13 @@ Class CGUI
 					OnMessage(Message, "CGUI_WindowMessageHandler")
 				}
 				
+				Listeners := this.WindowMessageListeners[Message]
 				;If this instance isn't already registered for this message, increase listener count for this message
-				if(!this.WindowMessageListeners[Message].Listeners.HasKey(hwnd))
-					this.WindowMessageListeners[Message].ListenerCount++
+				if(!Listeners.Listeners.HasKey(hwnd))
+					Listeners.ListenerCount++
 				
 				;Register the message in the listeners list of the CWindowMessageHandler object associated with the current Message
-				this.WindowMessageListeners[Message].Listeners[hwnd] := FunctionName
+				Listeners.Listeners[hwnd] := FunctionName
 				
 			}
 			CGUI_Assert(IsFunc(GUI[FunctionName]), "Invalid function definition " GUI[FunctionName] ". Function takes 3 parameters, Msg, wParam and lParam.")
@@ -160,10 +161,14 @@ Class CGUI
 			if(GUI)
 			{
 				;Remove one or all registered listeners associated with the window handle
-				Messages := Message ? [Message]  : []
 				if(!Message)
+				{
+					Messages := []
 					for Msg, Handler in this.WindowMessageListeners
 						Messages.Insert(MSG)
+				}
+				Else
+					Messages := [Message]
 				for index, CurrentMessage in Messages ;Process all messages that are affected
 				{
 					/* THIS IS PROBLEMATIC because it would be removed from all windows and not just the current one
@@ -171,19 +176,21 @@ Class CGUI
 					hwnds := Message ? [hwnd] : [0, hwnd]
 					*/
 					hwnd := [hwnd]
-					for index, CurrentHWND in hwnds
+					for index, CurrentHWND in hwnds ;TODO: uninitialized variable "hwnds", likely related to problem above.
 					{
 						;Make sure the window is actually registered right now so it doesn't get unregistered multiple times if this function happens to be called more than once with the same parameters
-						if(this.WindowMessageListeners.HasKey(CurrentMessage) && this.WindowMessageListeners[CurrentMessage].Listeners.HasKey(CurrentHWND))
+						Listeners := this.WindowMessageListeners
+						if(Listeners.HasKey(CurrentMessage) && Listeners[CurrentMessage].Listeners.HasKey(CurrentHWND))
 						{
+							Listeners := Listeners[CurrentMessage]
 							;Remove this window from the listener array
-							this.WindowMessageListeners[CurrentMessage].Listeners.Remove(CurrentHWND, "")
+							Listeners.Listeners.Remove(CurrentHWND, "")
 							
 							;Decrease count of window class instances that listen to this message
-							this.WindowMessageListeners[CurrentMessage].ListenerCount--						
+							Listeners.ListenerCount --
 							
 							;If no more instances listening to a window message, remove the CWindowMessageHandler object from WindowMessageListeners and deactivate the OnMessage callback for the current message				
-							if(this.WindowMessageListeners[CurrentMessage].ListenerCount = 0)
+							if(Listeners.ListenerCount = 0)
 							{
 								this.WindowMessageListeners.Remove(CurrentMessage, "")
 								OnMessage(CurrentMessage, "")
@@ -967,8 +974,8 @@ Class CGUI
 			{
 				func := SubStr(Event.Label, InStr(Event.Label, "_") + 1)				
 				;Call PreClose before closing a window so it can be skipped
-				func := func = "Escape" && GUI.CloseOnEscape ? "PreClose" : func
-				func := func = "Close" ? "PreClose" : func
+				If((func = "Escape" && GUI.CloseOnEscape) || func = "Close")
+					func := "PreClose"
 				if(func != "ContextMenu")
 				{
 					if(IsFunc(GUI[func]))
@@ -1143,13 +1150,13 @@ CGUI_ShellMessage(wParam, lParam, msg, hwnd)
    ;~ global CGUI 
    if(wParam = 2) ;Window Destroyed 
    {
-	  Loop % CGUI.GUIList.MaxIndex() 
+	  For Index, Entry In CGUI.GUIList
 	  { 
-		 if(CGUI.GUIList[A_Index]._.hOwner = lParam && CGUI.GUIList[A_Index]._.OwnerAutoClose)
+		 if(Entry._.hOwner = lParam && Entry._.OwnerAutoClose)
 		 {
-			PostMessage, 0x112, 0xF060,,, % "ahk_id " CGUI.GUIList[A_Index].hwnd  ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE --> this should trigger AHK CGUI_Close label so the GUI class may process the close request
-			CGUI.GUIList[A_Index]._.Remove("hOwner")
-			CGUI.GUIList[A_Index]._.Remove("OwnerAutoClose")
+			PostMessage, 0x112, 0xF060,,, % "ahk_id " Entry.hwnd  ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE --> this should trigger AHK CGUI_Close label so the GUI class may process the close request
+			Entry._.Remove("hOwner")
+			Entry._.Remove("OwnerAutoClose")
 			for GUINum, GUI in CGUI.GUIList
 				if(GUI._.OwnerAutoClose)
 					found := true
@@ -1180,13 +1187,10 @@ CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
 	if(GUI)
 	{
 		;Internal message handlers are processed first.
-		if(CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners.HasKey(0))
-		{
-			internalfunc := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[0]
-			result := `(GUI.base.base)[internalfunc](Msg, wParam, lParam, hwnd)
-		}
-		func := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[GUI.hwnd]
-		result := GUI[func](Msg, wParam, lParam, hwnd)
+		Listeners := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners
+		if(Listeners.HasKey(0))
+			result := (GUI.base.base)[Listeners[0]](Msg, wParam, lParam, hwnd)
+		result := GUI[Listeners[GUI.hwnd]](Msg, wParam, lParam, hwnd)
 		return result
 	}
 }
