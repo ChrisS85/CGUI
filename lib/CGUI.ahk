@@ -487,9 +487,9 @@ Class CGUI
 		}
 		else
 		{
-			Control := "C" . Control . "Control"
+			Control := "C" Control "Control"
 			;Make sure that a control of this type exists.
-			if(CGUI_Assert(IsObject(%Control%), "The control " . Control . " was not found!", -2))
+			if(CGUI_Assert(IsObject(%Control%), "The control " Control " was not found!", -2))
 			{
 				Control := {base: %Control%}
 				hControl := Control.__New(Name, Options, Text, this.GUINum)
