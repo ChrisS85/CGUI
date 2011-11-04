@@ -171,30 +171,22 @@ Class CGUI
 					Messages := [Message]
 				for index, CurrentMessage in Messages ;Process all messages that are affected
 				{
-					/* THIS IS PROBLEMATIC because it would be removed from all windows and not just the current one
-					;If removing all handlers, also remove the internal handlers
-					hwnds := Message ? [hwnd] : [0, hwnd]
-					*/
-					hwnd := [hwnd]
-					for index, CurrentHWND in hwnds ;TODO: uninitialized variable "hwnds", likely related to problem above.
+					;Make sure the window is actually registered right now so it doesn't get unregistered multiple times if this function happens to be called more than once with the same parameters
+					Listeners := this.WindowMessageListeners
+					if(Listeners.HasKey(CurrentMessage) && Listeners[CurrentMessage].Listeners.HasKey(hwnd))
 					{
-						;Make sure the window is actually registered right now so it doesn't get unregistered multiple times if this function happens to be called more than once with the same parameters
-						Listeners := this.WindowMessageListeners
-						if(Listeners.HasKey(CurrentMessage) && Listeners[CurrentMessage].Listeners.HasKey(CurrentHWND))
+						Listeners := Listeners[CurrentMessage]
+						;Remove this window from the listener array
+						Listeners.Listeners.Remove(hwnd, "")
+						
+						;Decrease count of window class instances that listen to this message
+						Listeners.ListenerCount --
+						
+						;If no more instances listening to a window message, remove the CWindowMessageHandler object from WindowMessageListeners and deactivate the OnMessage callback for the current message				
+						if(Listeners.ListenerCount = 0)
 						{
-							Listeners := Listeners[CurrentMessage]
-							;Remove this window from the listener array
-							Listeners.Listeners.Remove(CurrentHWND, "")
-							
-							;Decrease count of window class instances that listen to this message
-							Listeners.ListenerCount --
-							
-							;If no more instances listening to a window message, remove the CWindowMessageHandler object from WindowMessageListeners and deactivate the OnMessage callback for the current message				
-							if(Listeners.ListenerCount = 0)
-							{
-								this.WindowMessageListeners.Remove(CurrentMessage, "")
-								OnMessage(CurrentMessage, "")
-							}
+							this.WindowMessageListeners.Remove(CurrentMessage, "")
+							OnMessage(CurrentMessage, "")
 						}
 					}
 				}
