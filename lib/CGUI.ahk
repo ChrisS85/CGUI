@@ -49,7 +49,6 @@ Class CGUI
 	
 	__New(instance)
 	{
-		;~ global CGUI, CFont
 		if(!CGUI_Assert(IsObject(instance) && !instance.HasKey("hwnd"), "CGUI constructor must not be called!"))
 			return
 		this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set
@@ -118,7 +117,6 @@ Class CGUI
 		*/
 		RegisterListener(Message, hwnd, FunctionName)
 		{
-			;~ global CGUI
 			;Don't allow calling this function on the contained instances
 			if(this.Base.__Class = this.__Class)
 				return
@@ -153,7 +151,6 @@ Class CGUI
 		}
 		UnregisterListener(hwnd, Message = "")
 		{
-			;~ global CGUI
 			;Don't allow calling this function on the contained instances
 			if(this.Base.__Class = this.__Class)
 				return
@@ -224,7 +221,6 @@ Class CGUI
 	*/
 	Destroy()
 	{
-		;~ global CGUI
 		if(this.IsDestroyed)
 			return
 		;Remove it from GUI list
@@ -456,7 +452,6 @@ Class CGUI
 	*/
 	AddControl(Control, Name, Options, Text, ControlList="", ParentControl = "")
 	{
-		;~ global
 		local hControl, type, testHWND, vName, NeedsGLabel
 		if(this.IsDestroyed)
 			return
@@ -692,7 +687,6 @@ Class CGUI
 	*/
 	__Get(Name)
 	{
-		;~ global CGUI	
 		if Name not in base,_,GUINum
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -766,7 +760,6 @@ Class CGUI
 	}
 	__Set(Name, Params*)
 	{
-		;~ global CGUI
 		DetectHidden := A_DetectHiddenWindows
 		DetectHiddenWindows, On
 		Handled := true
@@ -930,7 +923,6 @@ Class CGUI
 	*/
 	HandleEvent()
 	{
-		;~ global CGUI
 		WasCritical := A_IsCritical
 		Critical ;Critical needs to be used to catch all events, especially from ListViews
 		if(this.IsDestroyed)
@@ -958,7 +950,6 @@ Class CGUI
 	*/
 	RerouteEvent(Event)
 	{
-		;~ global CGUI
 		GUI := CGUI.GUIList[Event.GUI]
 		if(IsObject(GUI))
 		{
@@ -1138,8 +1129,7 @@ This library will intercept all ShellMessage calls and forward it to the previou
 This callback function will only be used when there are owned windows which have OwnerAutoClose activated. In all other cases it won't be used and can safely be ignored.
 */
 CGUI_ShellMessage(wParam, lParam, msg, hwnd) 
-{ 
-   ;~ global CGUI 
+{
    if(wParam = 2) ;Window Destroyed 
    {
 	  For Index, Entry In CGUI.GUIList
@@ -1207,7 +1197,6 @@ Class CFont
 	*/
 	__Set(Name, Value)
 	{
-		;~ global CGUI
 		if(Name = "Options")
 		{
 			if(this._.hwnd) ;belonging to a control
