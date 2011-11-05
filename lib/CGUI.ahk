@@ -465,20 +465,11 @@ Class CGUI
 		type := Control
 		;Some control classes represent multiple controls, those are handled separately here.
 		if(Control = "DropDownList" || Control = "ComboBox" || Control = "ListBox")
-		{
-			Control := {base: CChoiceControl}
-			Control.__New(Name, Options, Text, this.GUINum, type)
-		}
+			Control := new CChoiceControl(Name, Options, Text, this.GUINum, type)
 		else if(Control = "Checkbox" || Control = "Radio" )
-		{
-			Control := {base: CCheckboxControl}
-			Control.__New(Name, Options, Text, this.GUINum, type)
-		}
+			Control := new CCheckboxControl(Name, Options, Text, this.GUINum, type)
 		else if(Control = "Tab" )
-		{
-			Control := {base: CTabControl}
-			Control.__New(Name, Options, Text, this.GUINum)
-		}
+			Control := new CTabControl(Name, Options, Text, this.GUINum)
 		else
 		{
 			Control := "C" Control "Control"
