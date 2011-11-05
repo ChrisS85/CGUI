@@ -337,7 +337,7 @@ Class CControl ;Never created directly
 						Style := SubStr(Style, 2)
 					}
 					ControlGet, Result, Style,,,% "ahk_id " this.hwnd
-					Result = Result & Style > 0
+					Result := Result & Style > 0
 					if(Negate)
 						Result := !Result
 				}
@@ -349,7 +349,7 @@ Class CControl ;Never created directly
 						ExStyle := SubStr(ExStyle, 2)
 					}
 					ControlGet, Result, ExStyle,,,% "ahk_id " this.hwnd
-					Result = Result & ExStyle > 0
+					Result := Result & ExStyle > 0
 					if(Negate)
 						Result := !Result
 				}
