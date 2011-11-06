@@ -42,21 +42,16 @@ Class CStatusBarControl Extends CControl
 	__Set(Name, Params*)
 	{
 		;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
-		Value := Params[Params.MaxIndex()]
-		Params.Remove(Params.MaxIndex())
+		Value := Params.Remove()
 		if(Params.MaxIndex())
 		{
 			Params.Insert(1, Name)
-			Name :=  Params[Params.MaxIndex()]
-			Params.Remove(Params.MaxIndex())
-			Object := this[Params*]
-			Object[Name] := Value
-			return Value
+			Name := Params.Remove()
+			return (this[Params*])[Name] := Value
 		}
 		if(Name = "Text") ;Assign text -> assign text of first part
 		{
-			this._.Parts[1].Text := Value
-			return true
+			return this._.Parts[1].Text := Value
 		}
 		if(Name = "Parts") ;Assign all parts at once
 		{
@@ -71,8 +66,7 @@ Class CStatusBarControl Extends CControl
 				}
 				else ;Just set text directly
 					this._.Parts[Params[1]].Text := Value
-				;~ PartNumber := Params[Params.MaxIndex()]
-				;~ Params.Remove(Params.MaxIndex())
+				;~ PartNumber := Params.Remove()
 				;~ Part := this._.Parts[PartNumber]
 				;~ Part := Value ;ASLDIHSVO)UGBOQWFH)=RFZS
 				return Value
@@ -160,16 +154,12 @@ Class CStatusBarControl Extends CControl
 		__Set(Name, Params*)
 		{
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
-			Value := Params[Params.MaxIndex()]
-			Params.Remove(Params.MaxIndex())
+			Value := Params.Remove()
 			if(Params.MaxIndex())
 			{
 				Params.Insert(1, Name)
-				Name :=  Params[Params.MaxIndex()]
-				Params.Remove(Params.MaxIndex())
-				Object := this[Params*]
-				Object[Name] := Value
-				return Value
+				Name := Params.Remove()
+				return (this[Params*])[Name] := Value
 			}
 			if Name is Integer
 			{
@@ -268,16 +258,12 @@ Class CStatusBarControl Extends CControl
 			{
 				;~ global CGUI
 				;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
-				Value := Params[Params.MaxIndex()]
-				Params.Remove(Params.MaxIndex())
+				Value := Params.Remove()
 				if(Params.MaxIndex())
 				{
 					Params.Insert(1, Name)
-					Name :=  Params[Params.MaxIndex()]
-					Params.Remove(Params.MaxIndex())
-					Object := this[Params*]
-					Object[Name] := Value
-					return Value
+					Name := Params.Remove()
+					return (this[Params*])[Name] := Value
 				}
 				Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]
 				if(Name = "Width")

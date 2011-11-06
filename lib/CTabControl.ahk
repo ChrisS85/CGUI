@@ -69,16 +69,12 @@ Class CTabControl Extends CControl
 	__Set(Name, Params*)
 	{
 		;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
-		Value := Params[Params.MaxIndex()]
-		Params.Remove(Params.MaxIndex())
+		Value := Params.Remove()
 		if(Params.MaxIndex())
 		{
 			Params.Insert(1, Name)
-			Name :=  Params[Params.MaxIndex()]
-			Params.Remove(Params.MaxIndex())
-			Object := this[Params*]
-			Object[Name] := Value
-			return Value
+			Name := Params.Remove()
+			return (this[Params*])[Name] := Value
 		}
 		Handled := true
 		if(Name = "Text") ;Assign text -> assign text of first Tab
@@ -96,7 +92,7 @@ Class CTabControl Extends CControl
 					;~ this._.Tabs._.Insert(Params[1], Tab)
 				}
 				else ;Just set text directly
-					this._Tabs[Params[1]].Text := Value
+					this._.Tabs[Params[1]].Text := Value
 			}
 		}
 		else if(Name = "SelectedItem" && CGUI_TypeOf(Value) = "CTabControl.CTabs.CTab")
@@ -182,16 +178,12 @@ Class CTabControl Extends CControl
 		{
 			;~ global CGUI
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
-			Value := Params[Params.MaxIndex()]
-			Params.Remove(Params.MaxIndex())
+			Value := Params.Remove()
 			if(Params.MaxIndex())
 			{
 				Params.Insert(1, Name)
-				Name :=  Params[Params.MaxIndex()]
-				Params.Remove(Params.MaxIndex())
-				Object := this[Params*]
-				Object[Name] := Value
-				return Value
+				Name := Params.Remove()
+				return (this[Params*])[Name] := Value
 			}
 			if Name is Integer
 			{
@@ -305,16 +297,12 @@ Class CTabControl Extends CControl
 			{
 				;~ global CGUI
 				;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
-				Value := Params[Params.MaxIndex()]
-				Params.Remove(Params.MaxIndex())
+				Value := Params.Remove()
 				if(Params.MaxIndex())
 				{
 					Params.Insert(1, Name)
-					Name :=  Params[Params.MaxIndex()]
-					Params.Remove(Params.MaxIndex())
-					Object := this[Params*]
-					Object[Name] := Value
-					return Value
+					Name := Params.Remove()
+					return (this[Params*])[Name] := Value
 				}
 				if(Name = "Text")
 				{

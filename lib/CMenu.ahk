@@ -242,7 +242,7 @@ Class CMenu
 		else if(Name = "Icon")
 			this.SetIcon(Value)
 		else if(Name = "IconNumber")
-			this.SetIcon(this.Icon, Value, this._.HasKey("IconWidth") ? this._IconWidth : 0)
+			this.SetIcon(this.Icon, Value, this._.HasKey("IconWidth") ? this._.IconWidth : 0)
 		else if(Name = "IconWidth")
 			this.SetIcon(this.Icon,  this._.HasKey("IconNumber") ? this._.IconNumber : 1, Value)
 		else
@@ -353,7 +353,7 @@ Class CMenu
 			else if(Name = "Icon")
 				this.SetIcon(Value)
 			else if(Name = "IconNumber")
-				this.SetIcon(this.Icon, Value, this._.HasKey("IconWidth") ? this._IconWidth : 0)
+				this.SetIcon(this.Icon, Value, this._.HasKey("IconWidth") ? this._.IconWidth : 0)
 			else if(Name = "IconWidth")
 				this.SetIcon(this.Icon,  this._.HasKey("IconNumber") ? this._.IconNumber : 1, Value)
 			else
