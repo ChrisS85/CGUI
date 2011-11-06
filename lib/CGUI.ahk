@@ -9,13 +9,13 @@
 */
 Class CGUI
 {
-	static GUIList := Object()
+	static GUIList := {}
 	static EventQueue := []
 	static WindowMessageListeners := []
-	;~ _ := Object() ;Proxy object
+	;~ _ := {} ;Proxy object
 	/*	
 	Get only:
-	var Controls := Object()
+	var Controls := {}
 	var hwnd := 0
 	var GUINum := 0
 	MinMax
@@ -49,7 +49,6 @@ Class CGUI
 	
 	__New(instance)
 	{
-		;~ global CGUI, CFont
 		if(!CGUI_Assert(IsObject(instance) && !instance.HasKey("hwnd"), "CGUI constructor must not be called!"))
 			return
 		this.Insert("_", {}) ;Create proxy object to store some keys in it and still trigger __Get and __Set
@@ -66,7 +65,7 @@ Class CGUI
 		}
 		if(!instance.GUINum) ;Should not happen unless instance uses a faulty __Set() mechanism
 			return
-		instance.Controls := Object()
+		instance.Controls := {}
 		instance.Font := new CFont(instance.GUINum)
 		CGUI.GUIList[instance.GUINum] := instance
 		GUI, % instance.GUINum ":+LabelCGUI_ +LastFound"		
@@ -118,7 +117,6 @@ Class CGUI
 		*/
 		RegisterListener(Message, hwnd, FunctionName)
 		{
-			;~ global CGUI
 			;Don't allow calling this function on the contained instances
 			if(this.Base.__Class = this.__Class)
 				return
@@ -140,19 +138,19 @@ Class CGUI
 					OnMessage(Message, "CGUI_WindowMessageHandler")
 				}
 				
+				Listeners := this.WindowMessageListeners[Message]
 				;If this instance isn't already registered for this message, increase listener count for this message
-				if(!this.WindowMessageListeners[Message].Listeners.HasKey(hwnd))
-					this.WindowMessageListeners[Message].ListenerCount++
+				if(!Listeners.Listeners.HasKey(hwnd))
+					Listeners.ListenerCount++
 				
 				;Register the message in the listeners list of the CWindowMessageHandler object associated with the current Message
-				this.WindowMessageListeners[Message].Listeners[hwnd] := FunctionName
+				Listeners.Listeners[hwnd] := FunctionName
 				
 			}
 			CGUI_Assert(IsFunc(GUI[FunctionName]), "Invalid function definition " GUI[FunctionName] ". Function takes 3 parameters, Msg, wParam and lParam.")
 		}
 		UnregisterListener(hwnd, Message = "")
 		{
-			;~ global CGUI
 			;Don't allow calling this function on the contained instances
 			if(this.Base.__Class = this.__Class)
 				return
@@ -160,34 +158,32 @@ Class CGUI
 			if(GUI)
 			{
 				;Remove one or all registered listeners associated with the window handle
-				Messages := Message ? [Message]  : []
 				if(!Message)
+				{
+					Messages := []
 					for Msg, Handler in this.WindowMessageListeners
 						Messages.Insert(MSG)
+				}
+				Else
+					Messages := [Message]
 				for index, CurrentMessage in Messages ;Process all messages that are affected
 				{
-					/* THIS IS PROBLEMATIC because it would be removed from all windows and not just the current one
-					;If removing all handlers, also remove the internal handlers
-					hwnds := Message ? [hwnd] : [0, hwnd]
-					*/
-					hwnd := [hwnd]
-					for index, CurrentHWND in hwnds
+					;Make sure the window is actually registered right now so it doesn't get unregistered multiple times if this function happens to be called more than once with the same parameters
+					Listeners := this.WindowMessageListeners
+					if(Listeners.HasKey(CurrentMessage) && Listeners[CurrentMessage].Listeners.HasKey(hwnd))
 					{
-						;Make sure the window is actually registered right now so it doesn't get unregistered multiple times if this function happens to be called more than once with the same parameters
-						if(this.WindowMessageListeners.HasKey(CurrentMessage) && this.WindowMessageListeners[CurrentMessage].Listeners.HasKey(CurrentHWND))
+						Listeners := Listeners[CurrentMessage]
+						;Remove this window from the listener array
+						Listeners.Listeners.Remove(hwnd, "")
+						
+						;Decrease count of window class instances that listen to this message
+						Listeners.ListenerCount --
+						
+						;If no more instances listening to a window message, remove the CWindowMessageHandler object from WindowMessageListeners and deactivate the OnMessage callback for the current message				
+						if(Listeners.ListenerCount = 0)
 						{
-							;Remove this window from the listener array
-							this.WindowMessageListeners[CurrentMessage].Listeners.Remove(CurrentHWND, "")
-							
-							;Decrease count of window class instances that listen to this message
-							this.WindowMessageListeners[CurrentMessage].ListenerCount--						
-							
-							;If no more instances listening to a window message, remove the CWindowMessageHandler object from WindowMessageListeners and deactivate the OnMessage callback for the current message				
-							if(this.WindowMessageListeners[CurrentMessage].ListenerCount = 0)
-							{
-								this.WindowMessageListeners.Remove(CurrentMessage, "")
-								OnMessage(CurrentMessage, "")
-							}
+							this.WindowMessageListeners.Remove(CurrentMessage, "")
+							OnMessage(CurrentMessage, "")
 						}
 					}
 				}
@@ -225,7 +221,6 @@ Class CGUI
 	*/
 	Destroy()
 	{
-		;~ global CGUI
 		if(this.IsDestroyed)
 			return
 		;Remove it from GUI list
@@ -457,7 +452,6 @@ Class CGUI
 	*/
 	AddControl(Control, Name, Options, Text, ControlList="", ParentControl = "")
 	{
-		;~ global
 		local hControl, type, testHWND, vName, NeedsGLabel
 		if(this.IsDestroyed)
 			return
@@ -471,27 +465,18 @@ Class CGUI
 		type := Control
 		;Some control classes represent multiple controls, those are handled separately here.
 		if(Control = "DropDownList" || Control = "ComboBox" || Control = "ListBox")
-		{
-			Control := object("base", CChoiceControl)
-			Control.__New(Name, Options, Text, this.GUINum, type)
-		}
+			Control := new CChoiceControl(Name, Options, Text, this.GUINum, type)
 		else if(Control = "Checkbox" || Control = "Radio" )
-		{
-			Control := object("base", CCheckboxControl)
-			Control.__New(Name, Options, Text, this.GUINum, type)
-		}
+			Control := new CCheckboxControl(Name, Options, Text, this.GUINum, type)
 		else if(Control = "Tab" )
-		{
-			Control := object("base", CTabControl)
-			Control.__New(Name, Options, Text, this.GUINum)
-		}
+			Control := new CTabControl(Name, Options, Text, this.GUINum)
 		else
 		{
 			Control := "C" Control "Control"
 			;Make sure that a control of this type exists.
 			if(CGUI_Assert(IsObject(%Control%), "The control " Control " was not found!", -2))
 			{
-				Control := object("base", %Control%)
+				Control := {base: %Control%}
 				hControl := Control.__New(Name, Options, Text, this.GUINum)
 				if(!CGUI_Assert(hControl != 0, "Error creating " Type "Control", -2))
 					return
@@ -693,7 +678,6 @@ Class CGUI
 	*/
 	__Get(Name)
 	{
-		;~ global CGUI	
 		if Name not in base,_,GUINum
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -767,7 +751,6 @@ Class CGUI
 	}
 	__Set(Name, Params*)
 	{
-		;~ global CGUI
 		DetectHidden := A_DetectHiddenWindows
 		DetectHiddenWindows, On
 		Handled := true
@@ -931,7 +914,6 @@ Class CGUI
 	*/
 	HandleEvent()
 	{
-		;~ global CGUI
 		WasCritical := A_IsCritical
 		Critical ;Critical needs to be used to catch all events, especially from ListViews
 		if(this.IsDestroyed)
@@ -959,7 +941,6 @@ Class CGUI
 	*/
 	RerouteEvent(Event)
 	{
-		;~ global CGUI
 		GUI := CGUI.GUIList[Event.GUI]
 		if(IsObject(GUI))
 		{
@@ -967,8 +948,8 @@ Class CGUI
 			{
 				func := SubStr(Event.Label, InStr(Event.Label, "_") + 1)				
 				;Call PreClose before closing a window so it can be skipped
-				func := func = "Escape" && GUI.CloseOnEscape ? "PreClose" : func
-				func := func = "Close" ? "PreClose" : func
+				If((func = "Escape" && GUI.CloseOnEscape) || func = "Close")
+					func := "PreClose"
 				if(func != "ContextMenu")
 				{
 					if(IsFunc(GUI[func]))
@@ -1139,17 +1120,16 @@ This library will intercept all ShellMessage calls and forward it to the previou
 This callback function will only be used when there are owned windows which have OwnerAutoClose activated. In all other cases it won't be used and can safely be ignored.
 */
 CGUI_ShellMessage(wParam, lParam, msg, hwnd) 
-{ 
-   ;~ global CGUI 
+{
    if(wParam = 2) ;Window Destroyed 
    {
-	  Loop % CGUI.GUIList.MaxIndex() 
+	  For Index, Entry In CGUI.GUIList
 	  { 
-		 if(CGUI.GUIList[A_Index]._.hOwner = lParam && CGUI.GUIList[A_Index]._.OwnerAutoClose)
+		 if(Entry._.hOwner = lParam && Entry._.OwnerAutoClose)
 		 {
-			PostMessage, 0x112, 0xF060,,, % "ahk_id " CGUI.GUIList[A_Index].hwnd  ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE --> this should trigger AHK CGUI_Close label so the GUI class may process the close request
-			CGUI.GUIList[A_Index]._.Remove("hOwner")
-			CGUI.GUIList[A_Index]._.Remove("OwnerAutoClose")
+			PostMessage, 0x112, 0xF060,,, % "ahk_id " Entry.hwnd  ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE --> this should trigger AHK CGUI_Close label so the GUI class may process the close request
+			Entry._.Remove("hOwner")
+			Entry._.Remove("OwnerAutoClose")
 			for GUINum, GUI in CGUI.GUIList
 				if(GUI._.OwnerAutoClose)
 					found := true
@@ -1180,13 +1160,10 @@ CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)
 	if(GUI)
 	{
 		;Internal message handlers are processed first.
-		if(CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners.HasKey(0))
-		{
-			internalfunc := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[0]
-			result := `(GUI.base.base)[internalfunc](Msg, wParam, lParam, hwnd)
-		}
-		func := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners[GUI.hwnd]
-		result := GUI[func](Msg, wParam, lParam, hwnd)
+		Listeners := CGUI.WindowMessageHandler.WindowMessageListeners[Msg].Listeners
+		if(Listeners.HasKey(0))
+			result := (GUI.base.base)[Listeners[0]](Msg, wParam, lParam, hwnd)
+		result := GUI[Listeners[GUI.hwnd]](Msg, wParam, lParam, hwnd)
 		return result
 	}
 }
@@ -1211,7 +1188,6 @@ Class CFont
 	*/
 	__Set(Name, Value)
 	{
-		;~ global CGUI
 		if(Name = "Options")
 		{
 			if(this._.hwnd) ;belonging to a control
