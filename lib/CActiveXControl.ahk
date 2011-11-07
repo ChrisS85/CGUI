@@ -97,7 +97,7 @@ Class CActiveXControl Extends CControl
 			{
 				Error := ComObjError()
 					ComObjError(false)
-				`(this._.Object)[Name](Params*)
+				(this._.Object)[Name](Params*)
 					ComObjError(Error)
 			}
 		}
@@ -127,6 +127,6 @@ Class CActiveXControl Extends CControl
 		;~ if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			;~ return
 		;~ if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_ActiveXMoved"]))
-			;~ `(CGUI.GUIList[this.GUINum])[this.Name "_ActiveXMoved"]()
+			;~ (CGUI.GUIList[this.GUINum])[this.Name "_ActiveXMoved"]()
 	;~ }
 }

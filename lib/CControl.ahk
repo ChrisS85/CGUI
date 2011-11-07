@@ -105,7 +105,7 @@ Class CControl ;Never created directly
 		if(FunctionName)
 		{
 			;Make sure function name is valid (or tell the developer about it)
-			if(CGUI_Assert(IsFunc(this[FunctionName]) || IsFunc( `(CGUI.GUIList[this.GUINum])[FunctionName]), "Invalid function name passed to CControl.RegisterEvent()"), -2)
+			if(CGUI_Assert(IsFunc(this[FunctionName]) || IsFunc( (CGUI.GUIList[this.GUINum])[FunctionName]), "Invalid function name passed to CControl.RegisterEvent()"), -2)
 				this._.RegisteredEvents[Type] := FunctionName
 		}
 		else
@@ -126,13 +126,13 @@ Class CControl ;Never created directly
 		{
 			if(IsFunc(this[this._.RegisteredEvents[Name]]))
 				return {Handled : true, Result : this[this._.RegisteredEvents[Name]](CGUI.GUIList[this.GUINum], Params*)}
-			else if(IsFunc( `(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]]))
-				return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)}
+			else if(IsFunc( (CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]]))
+				return {Handled : true, Result : (CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)}
 		}
 		else if(IsFunc(this[Name]))
 			return {Handled : true, Result : this[Name](CGUI.GUIList[this.GUINum], Params*)}
-		else if(IsFunc(`(CGUI.GUIList[this.GUINum])[this.Name "_" Name]))
-			return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)}
+		else if(IsFunc((CGUI.GUIList[this.GUINum])[this.Name "_" Name]))
+			return {Handled : true, Result : (CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)}
 		else
 			return {Handled : false}
 	}

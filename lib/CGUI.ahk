@@ -951,9 +951,9 @@ Class CGUI
 					if(IsFunc(GUI[func]))
 					{
 						if(Event.Label = "CGUI_Size")
-							result := `(GUI)[func](Event.EventInfo)
+							result := (GUI)[func](Event.EventInfo)
 						else
-							result := `(GUI)[func]() ;PreClose can return false to prevent closing the window
+							result := (GUI)[func]() ;PreClose can return false to prevent closing the window
 					}
 				}
 				else
@@ -966,7 +966,7 @@ Class CGUI
 							Gui.ShowMenu(Gui.Controls[hControl].Menu)
 					}
 					else if(IsFunc(GUI[func]))
-						result := `(GUI)[func]()
+						result := (GUI)[func]()
 					else if(CGUI_TypeOf(Gui.Menu) = "CMenu")
 						Gui.ShowMenu(Gui.Menu)
 				}
