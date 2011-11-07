@@ -105,8 +105,8 @@ Class CSysLinkControl extends CControl {
 		 HDEFFONT := DllCall("Gdi32.dll\GetStockObject", "Int", DEFAULT_GUI_FONT) 
 		 INIT := True 
 		} 
-		If !DllCall("User32.dll\IsWindow", "UPtr", HGUI) { 
-		 ErrorLevel := "Invalid parameter HGUI: " . HGUI 
+		If !DllCall("User32.dll\IsWindow", "UPtr", HGUI) {
+		 ErrorLevel := "Invalid parameter HGUI: " HGUI 
 		 Return False 
 		}
 		W := DefaultW 
@@ -132,7 +132,7 @@ Class CSysLinkControl extends CControl {
 		 W := Opts.W 
 		If (Opts.H <> "") 
 		 H := Opts.H 
-		Options := Opts.X . " " . Opts.Y . " " . Opts.W . " " . Opts.H 
+		Options := Opts.X " " Opts.Y " " Opts.W " " Opts.H 
 		Gui, %HGUI%:Add, Text, %Options% hwndHDUMMY, X 
 		GuiControlGet, CP, Pos, %HDUMMY% 
 		HFONT := DllCall("SendMessage", "Ptr", HDUMMY, "Int", WM_GETFONT, "Ptr", 0, "Ptr", 0, "UPtr") 
@@ -148,7 +148,7 @@ Class CSysLinkControl extends CControl {
 					, "Int", X, "Int", Y, "Int", W, "Int", H 
 					, "Ptr", HGUI, "Ptr", IDC_SYSLINK, "Ptr", 0, "Ptr", 0, "Ptr") 
 		If ((ErrorLevel) || !(HSL)) { 
-		 ErrorMsg := "Couldn't create SysLink control!`nErrorLevel: " . ErrorLevel . " - HWND: " . HSL 
+		 ErrorMsg := "Couldn't create SysLink control!`nErrorLevel: " ErrorLevel " - HWND: " HSL 
 		 ErrorLevel := ErrorMsg 
 		 Return False 
 		} 
