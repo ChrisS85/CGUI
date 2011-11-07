@@ -18,7 +18,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			this._.Insert("ControlStyles", {Multi : 0x800, ReadOnly : 0x4000, Sort : 0x2, ToggleSelection : 0x8})
 		this._.Insert("Events", ["SelectionChanged"])
 		if(Type = "ListBox")
-			this._.Insert("Messages", {5 : "KillFocus", 4 : "SetFocus" }) ;Used for automatically registering message callbacks		
+			this._.Insert("Messages", {5 : "KillFocus", 4 : "SetFocus" }) ;Used for automatically registering message callbacks
 		else if(Type = "ComboBox" || Type = "DropDownList")
 			this._.Insert("Messages", {4 : "KillFocus", 3 : "SetFocus" }) ;Used for automatically registering message callbacks
 	}
@@ -72,7 +72,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				;~ ControlGet, List, List,,, % " ahk_id " this.hwnd
 				;~ Value := Array()
 				;~ Loop, Parse, List, `n
-					;~ Value.Insert(A_LoopField)			
+					;~ Value.Insert(A_LoopField)
 			;~ }
 			Loop % Params.MaxIndex()
 				if(IsObject(Value)) ;Fix unlucky multi parameter __GET
@@ -115,7 +115,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				;~ if(!IsObject(Value))
 				;~ {
 					;~ if(InStr(Value, "|") = 1) ;Overwrite current items
-					;~ {						
+					;~ {
 						;~ ;Hide overwritten controls for now (until they can be removed properly).
 						;~ for index, item in this.Items
 							;~ for index2, control in item.Controls
@@ -193,7 +193,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
 	The parameters depend on the event and there may not be params at all in some cases.
 	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
-	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
+	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent().
 	For better readability labels may be chained since they all execute the same code.
 	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
@@ -225,7 +225,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		
 		Property: Count
 		The number of items in this control.
-		*/		
+		*/
 		__Get(Name)
 		{
 			if(this._.HasKey(Name))

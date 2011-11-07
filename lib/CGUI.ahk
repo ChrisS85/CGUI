@@ -13,7 +13,7 @@ Class CGUI
 	static EventQueue := []
 	static WindowMessageListeners := []
 	;~ _ := {} ;Proxy object
-	/*	
+	/*
 	Get only:
 	var Controls := {}
 	var hwnd := 0
@@ -45,7 +45,7 @@ Class CGUI
 	*/
 	
 	;The _Constructor key is never actually assigned (see __Set()). This line simply calls the __New() constructor of CGUI so that window classes deriving from CGUI do not need to call the base constructor.
-	_Constructor := this.base.base.__New(this) 
+	_Constructor := this.base.base.__New(this)
 	
 	__New(instance)
 	{
@@ -68,7 +68,7 @@ Class CGUI
 		instance.Controls := {}
 		instance.Font := new CFont(instance.GUINum)
 		CGUI.GUIList[instance.GUINum] := instance
-		GUI, % instance.GUINum ":+LabelCGUI_ +LastFound"		
+		GUI, % instance.GUINum ":+LabelCGUI_ +LastFound"
 		instance.hwnd := WinExist()
 		
 		/*
@@ -179,7 +179,7 @@ Class CGUI
 						;Decrease count of window class instances that listen to this message
 						Listeners.ListenerCount --
 						
-						;If no more instances listening to a window message, remove the CWindowMessageHandler object from WindowMessageListeners and deactivate the OnMessage callback for the current message				
+						;If no more instances listening to a window message, remove the CWindowMessageHandler object from WindowMessageListeners and deactivate the OnMessage callback for the current message
 						if(Listeners.ListenerCount = 0)
 						{
 							this.WindowMessageListeners.Remove(CurrentMessage, "")
@@ -225,7 +225,7 @@ Class CGUI
 			return
 		;Remove it from GUI list
 		CGUI.GUIList.Remove(this.GUINum) ;make sure not to alter other GUIs here
-		this.IsDestroyed := true		
+		this.IsDestroyed := true
 		this.WindowMessageHandler.UnregisterListener(this.hwnd) ;Unregister all registered window message listener functions
 		;Destroy the GUI
 		Gui, % this.GUINum ":Destroy"
@@ -671,7 +671,7 @@ Class CGUI
 	If set, the window will be destroyed when it gets closed.
 	
 	Property: CloseOnEscape
-	If set, the window will close itself when escape is pressed.	
+	If set, the window will close itself when escape is pressed.
 	
 	Property: ValidateOnFocusLeave
 	If set, <CGUI.Validate> is called each time a text-containing variable loses focus.
@@ -803,8 +803,8 @@ Class CGUI
 				{
 					if(!CGUI._.ShelllHook)
 					{
-						DllCall( "RegisterShellHookWindow", "Ptr", A_ScriptHWND) 
-						CGUI._.ShellHookMsg := DllCall( "RegisterWindowMessage", Str,"SHELLHOOK" ) 
+						DllCall( "RegisterShellHookWindow", "Ptr", A_ScriptHWND)
+						CGUI._.ShellHookMsg := DllCall( "RegisterWindowMessage", Str,"SHELLHOOK" )
 						CGUI._.ShellHook := OnMessage(CGUI._.ShellHookMsg, "CGUI_ShellMessage")
 						if(CGUI._.ShellHook = "CGUI_ShellMessage")
 							CGUI._.ShellHook := 1
@@ -860,7 +860,7 @@ Class CGUI
 			else if(Name = "Enabled")
 				this.Style := (Value ? "-" : "+") 0x8000000 ;WS_DISABLED
 			else if(Name = "Visible")
-				this.Style := (Value ? "+" : "-") 0x10000000 ;WS_VISIBLE			
+				this.Style := (Value ? "+" : "-") 0x10000000 ;WS_VISIBLE
 			else if(Name = "ValidateOnFocusLeave")
 				this._[Name] := Value = 1
 			else if(Name = "_Constructor") ;_Constructor is just a temporary variable name for automatically calling the CGUI constructor
@@ -942,7 +942,7 @@ Class CGUI
 		{
 			if(Event.Label != "CGUI_HandleEvent" && InStr(Event.Label, "CGUI_")) ;Handle default gui events (Close, Escape, DropFiles, ContextMenu)
 			{
-				func := SubStr(Event.Label, InStr(Event.Label, "_") + 1)				
+				func := SubStr(Event.Label, InStr(Event.Label, "_") + 1)
 				;Call PreClose before closing a window so it can be skipped
 				If((func = "Escape" && GUI.CloseOnEscape) || func = "Close")
 					func := "PreClose"
@@ -1080,7 +1080,7 @@ Class CGUI
 						this.Controls[this._.LastHoveredControl].Font.Options := "norm cBlue"
 						DllCall("SetCursor", "Ptr", GUI._.h_old_cursor)
 						this._.Hovering := false
-					}					
+					}
 				}
 			}
 		}
@@ -1104,7 +1104,7 @@ CGUI_HandleEventTimer:
 while(CGUI.EventQueue.MaxIndex())
 {
 	SetTimer, CGUI_HandleEventTimer, Off
-	CGUI.GUIList[CGUI.EventQueue[1].GUI].RerouteEvent(CGUI.EventQueue.Remove(1))	
+	CGUI.GUIList[CGUI.EventQueue[1].GUI].RerouteEvent(CGUI.EventQueue.Remove(1))
 	SetTimer, CGUI_HandleEventTimer, -1
 }
 return
@@ -1115,12 +1115,12 @@ It is still possible to use a shell message hook as usual in your script as long
 This library will intercept all ShellMessage calls and forward it to the previously used ShellMessage callback function.
 This callback function will only be used when there are owned windows which have OwnerAutoClose activated. In all other cases it won't be used and can safely be ignored.
 */
-CGUI_ShellMessage(wParam, lParam, msg, hwnd) 
+CGUI_ShellMessage(wParam, lParam, msg, hwnd)
 {
-   if(wParam = 2) ;Window Destroyed 
+   if(wParam = 2) ;Window Destroyed
    {
 	  For Index, Entry In CGUI.GUIList
-	  { 
+	  {
 		 if(Entry._.hOwner = lParam && Entry._.OwnerAutoClose)
 		 {
 			PostMessage, 0x112, 0xF060,,, % "ahk_id " Entry.hwnd  ; 0x112 = WM_SYSCOMMAND, 0xF060 = SC_CLOSE --> this should trigger AHK CGUI_Close label so the GUI class may process the close request
@@ -1129,22 +1129,22 @@ CGUI_ShellMessage(wParam, lParam, msg, hwnd)
 			for GUINum, GUI in CGUI.GUIList
 				if(GUI._.OwnerAutoClose)
 					found := true
-			if(!found) ;No more tool windows, remove shell hook 
-			{ 
+			if(!found) ;No more tool windows, remove shell hook
+			{
 				OnMessage(CGUI._.ShellHookMsg, (CGUI._.ShellHook && CGUI._.ShellHook != 1) ? CGUI._.ShellHook : "")
 				if(!CGUI._.ShellHook)
 					DllCall("DeRegisterShellHookWindow", "Ptr", A_ScriptHWND)
 				CGUI._.Remove("ShellHook")
-			} 
-			break 
-		 } 
-	  } 
-   } 
-   if(IsFunc(CGUI._.ShellHook)) 
-   { 
-	  ShellHook := CGUI._.ShellHook 
-	  %ShellHook%(wParam, lParam, msg, hwnd) ;This is allowed even if the function uses less parameters 
-   } 
+			}
+			break
+		 }
+	  }
+   }
+   if(IsFunc(CGUI._.ShellHook))
+   {
+	  ShellHook := CGUI._.ShellHook
+	  %ShellHook%(wParam, lParam, msg, hwnd) ;This is allowed even if the function uses less parameters
+   }
 }
 ;Global window message handler for CGUI library that reroutes all registered window messages to the window instances.
 CGUI_WindowMessageHandler(wParam, lParam, msg, hwnd)

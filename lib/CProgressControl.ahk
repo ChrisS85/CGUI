@@ -14,7 +14,7 @@ Class CProgressControl Extends CControl
 		;TODO: Range in options is not parsed but could potentially be set by the user
 		this._.Insert("Min", 0)
 		this._.Insert("Max", 100)
-	}	
+	}
 	
 	/*
 	Property: Value

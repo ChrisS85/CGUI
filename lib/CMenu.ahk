@@ -106,7 +106,7 @@ Class CMenu
 			this.Remove(CGUI_IndexOf(this, Menu))
 		}
 		else if(CGUI_TypeOf(Menu) = "CMenu.CMenuItem")
-		{			
+		{
 			Menu, % this.Name, Delete, % Menu.Text
 			this.Remove(CGUI_IndexOf(this, Menu))
 			Menu.IsDisposed := true
@@ -148,7 +148,7 @@ Class CMenu
 	Parameters:
 	GUINum - The GUI number of the window owning this menu. This is required if the callback functions are contained in a class deriving from CGUI. Leave it empty to use global callback functions
 	X - X position of the menu.
-	Y - Y position of the menu.	
+	Y - Y position of the menu.
 	*/
 	Show(GUINum, X="", Y="")
 	{
@@ -201,13 +201,13 @@ Class CMenu
 	{
 		Handled := true
 		if(Name = "Text")
-		{			
+		{
 			if(CGUI_Assert(CGUI_TypeOf(this.Menus[this.Parent]) = "CMenu", "Can't set Text on a menu object that is no submenu.") && CGUI_Assert(!this.IsDisposed, "This menu is disposed and can not be changed anymore."))
 			{
 				Menu, % this.Parent, Rename, % this.Text, %Value%
 				this.Insert("Text", Value)
 			}
-		}	
+		}
 		else if(Name = "Enabled")
 		{
 			this._.Enabled := Value
@@ -234,7 +234,7 @@ Class CMenu
 						this.Menus[this.Parent][A_Index]._.Default := false
 			}
 			else
-				Menu, % this.Menu, NoDefault				
+				Menu, % this.Menu, NoDefault
 			this._.Insert("Default", Value)
 		}
 		else if(Name = "Icon")
@@ -344,7 +344,7 @@ Class CMenu
 							CMenu.Menus[this.Menu][A_Index]._.Default := false
 				}
 				else
-					Menu, % this.Menu, NoDefault				
+					Menu, % this.Menu, NoDefault
 				this._.Insert("Default", Value)
 			}
 			else if(Name = "Icon")

@@ -100,7 +100,7 @@ Class CActiveXControl Extends CControl
 				`(this._.Object)[Name](Params*)
 					ComObjError(Error)
 			}
-		}	
+		}
 	}
 	/*
 	Function: IsMemberOf
@@ -118,7 +118,7 @@ Class CActiveXControl Extends CControl
 	/*
 	Event: Introduction
 	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
-	The parameters depend on the event and there may not be params at all in some cases. 
+	The parameters depend on the event and there may not be params at all in some cases.
 	You can look up the definitions of the parameters in the documentation of the ActiveX control.
 	ActiveX controls do not require a separate G-label to make the events work.
 	*/

@@ -70,7 +70,7 @@ Class CTreeViewControl Extends CControl
 		if(Name = "Items")
 			Value := this._.Items
 		else if(Name = "SelectedItem")
-		{			
+		{
 			GUI := CGUI.GUIList[this.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -122,7 +122,7 @@ Class CTreeViewControl Extends CControl
 	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
 	The parameters depend on the event and there may not be params at all in some cases.
 	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
-	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
+	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent().
 	For better readability labels may be chained since they all execute the same code.
 	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
@@ -171,7 +171,7 @@ Class CTreeViewControl Extends CControl
 			this.CallEvent("FocusReceived")
 		else if(Event.GUIEvent == "f")
 			this.CallEvent("FocusLost")
-		if(Event.GUIEvent = "S")			
+		if(Event.GUIEvent = "S")
 			this.PreviouslySelectedItem := SelectedItem
 		OutputDebug % "HandleEvent: " A_TickCount - start
 	}
@@ -364,7 +364,7 @@ Class CTreeViewControl Extends CControl
 		}
 		/*
 		Function: MaxIndex
-		Returns the number of child nodes.		
+		Returns the number of child nodes.
 		*/
 		MaxIndex()
 		{
@@ -455,7 +455,7 @@ Class CTreeViewControl Extends CControl
 			{
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!GUI.IsDestroyed)
-				{					
+				{
 					;~ if Name is Integer ;get a child node
 					;~ {
 						;~ if(Name <= this.MaxIndex())
@@ -474,14 +474,14 @@ Class CTreeViewControl Extends CControl
 						Value := []
 						for index, Item in this
 							if(Item.Checked)
-								Value.Insert(Item)				
+								Value.Insert(Item)
 					}
 					else if(Name = "CheckedIndices")
 					{
 						Value := []
 						for index, Item in this
 							if(Item.Checked)
-								Value.Insert(index)				
+								Value.Insert(index)
 					}
 					else if(Name = "Parent")
 					{
@@ -570,7 +570,7 @@ Class CTreeViewControl Extends CControl
 				{
 					Control := GUI.Controls[this._.hwnd]
 					Gui, % this._.GUINum ":Default"
-					Gui, TreeView, % Control.ClassNN				
+					Gui, TreeView, % Control.ClassNN
 					TV_Modify(this._.ID, (Value = 1 ? "+" : "-") Option)
 				}
 				else if(Name = "Icon")
