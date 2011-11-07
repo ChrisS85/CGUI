@@ -22,7 +22,6 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 	*/
 	__Get(Name)
     {
-		;~ global CGUI
 		if(Name != "GUINum" && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -39,7 +38,6 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 	}
 	__Set(Name, Params*)
 	{
-		;~ global CGUI
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
@@ -82,7 +80,6 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 	*/
 	AddControl(type, Name, Options, Text, UseEnabledState = 0)
 	{
-		;~ global CGUI
 		GUI := CGUI.GUIList[this.GUINum]
 		if(!this.Checked)
 			Options .= UseEnabledState ? " Disabled" : " Hidden"
@@ -97,7 +94,6 @@ Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 	*/
 	GetRadioButtonGroup()
 	{
-		;~ global CGUI
 		GUI := CGUI.GUIList[this.GUINum]
 		if(GUI.IsDestroyed)
 			return []

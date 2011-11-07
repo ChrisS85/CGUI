@@ -6,7 +6,6 @@ Class CControl ;Never created directly
 {
 	__New(Name, Options, Text, GUINum) ;Basic constructor for all controls. The control is created in CGUI.AddControl()
 	{
-		;~ global CFont
 		this.Insert("Name", Name)
 		this.Insert("Options", Options)
 		this.Insert("Content", Text)
@@ -25,7 +24,6 @@ Class CControl ;Never created directly
 	*/
 	Show()
 	{
-		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		GuiControl, % this.GUINum ":Show",% this.hwnd
@@ -37,7 +35,6 @@ Class CControl ;Never created directly
 	*/
 	Hide()
 	{
-		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		GuiControl, % this.GUINum ":Hide",% this.hwnd
@@ -67,14 +64,12 @@ Class CControl ;Never created directly
 	*/
 	Focus()
 	{
-		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		ControlFocus,,% "ahk_id " this.hwnd
 	}
 	;~ Font(Options, Font="")
 	;~ {
-		;~ global CGUI
 		;~ if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			;~ return
 		;~ Gui, % this.GUINum ":Font", %Options%, %Font%
@@ -107,7 +102,6 @@ Class CControl ;Never created directly
 	*/
 	RegisterEvent(Type, FunctionName)
 	{
-		;~ global CGUI
 		if(FunctionName)
 		{
 			;Make sure function name is valid (or tell the developer about it)
@@ -124,7 +118,6 @@ Class CControl ;Never created directly
 	*/
 	CallEvent(Name, Params*)
 	{
-		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		if(this.DisableNotifications)
@@ -149,7 +142,6 @@ Class CControl ;Never created directly
 	*/
 	ProcessSubControlState(From, To)
 	{
-		;~ global CGUI
 		if(From != To && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			if(From)
@@ -263,7 +255,6 @@ Class CControl ;Never created directly
 	
 	__GetEx(ByRef Result, Name, Params*)
     {
-		;~ global CGUI
 		Handled := false
 		if Name not in base,_,GUINum
 			if(!CGUI.GUIList[this.GUINum].IsDestroyed)
@@ -365,7 +356,6 @@ Class CControl ;Never created directly
 	
     __Set(Name, Params*)
     {
-		;~ global CGUI
 		if(Name != "_" && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
@@ -501,7 +491,6 @@ Class CControl ;Never created directly
 		}
 		SetIcon(ID, PathOrhBitmap, IconNumber)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			Control := GUI.Controls[this._.hwnd]
 			GUI, % this._.GUINum ":Default"

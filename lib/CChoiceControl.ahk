@@ -43,7 +43,6 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	*/
 	__Get(Name, Params*)
     {
-		;~ global CGUI
 		if(Name != "GUINum" && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -86,7 +85,6 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 	}
 	__Set(Name, Params*)
 	{
-		;~ global CGUI
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
@@ -230,7 +228,6 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		*/		
 		__Get(Name)
 		{
-			;~ global CGUI
 			if(this._.HasKey(Name))
 				return this._[Name]
 			else if(Name = "Count")
@@ -238,7 +235,6 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		}
 		__Set(Name, Value)
 		{
-			;~ global CGUI
 			if Name is Integer
 				return Value
 		}
@@ -253,7 +249,6 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		*/
 		Add(Text, Position = -1, Select = false)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			Control := GUI.Controls[this._.hwnd]
 			Selected := Control.SelectedIndex
@@ -301,7 +296,6 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		*/
 		Delete(IndexTextOrItem)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			Control := GUI.Controls[this.hwnd]
 			if(IsObject(IndexTextOrItem))
@@ -346,7 +340,6 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		*/
 		MaxIndex()
 		{
-			;~ global CGUI
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
 			GUI := CGUI.GUIList[this._.GUINum]
@@ -360,7 +353,6 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 		}
 		_NewEnum()
 		{
-			;~ global CEnumerator
 			return new CEnumerator(this)
 		}
 		/*
@@ -390,7 +382,6 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			*/
 			AddControl(type, Name, Options, Text, UseEnabledState = 0)
 			{
-				;~ global CGUI
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!this.Selected)
 					Options .= UseEnabledState ? " Disabled" : " Hidden"
@@ -408,7 +399,6 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			*/
 			__Get(Name, Params*)
 			{
-				;~ global CGUI
 				DetectHidden := A_DetectHiddenWindows
 				DetectHiddenWindows, On
 				if(Name = "Text")
@@ -442,7 +432,6 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			}
 			__Set(Name, Params*)
 			{
-				;~ global CGUI
 				;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
 				Value := Params.Remove()
 				if(Params.MaxIndex())

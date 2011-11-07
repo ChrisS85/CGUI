@@ -13,7 +13,6 @@ Class CMenu
 	*/
 	__New(Name)
 	{
-		;~ global CGUI
 		this.Name := Name
 		if(!CGUI_Assert(!this.Menus.HasKey(Name), "Menu Name" Name " is not unique! Submenus must have unique names!"))
 			return
@@ -128,7 +127,6 @@ Class CMenu
 	}
 	RouteCallback()
 	{
-		;~ global CGUI
 		Item := this.Menus[A_ThisMenu][A_ThisMenuItemPos]
 		if(IsObject(Item) && Item.HasKey("Callback"))
 		{
@@ -311,7 +309,6 @@ Class CMenu
 		*/
 		__Set(Name, Value)
 		{
-			;~ global CMenu
 			Handled := true
 			if(Name = "Text")
 			{

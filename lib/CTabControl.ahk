@@ -171,12 +171,10 @@ Class CTabControl Extends CControl
 		}
 		_NewEnum()
 		{
-			;~ global CEnumerator
 			return new CEnumerator(this._)
 		}
 		__Set(Name, Params*)
 		{
-			;~ global CGUI
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
 			Value := Params.Remove()
 			if(Params.MaxIndex())
@@ -211,7 +209,6 @@ Class CTabControl Extends CControl
 		*/
 		Add(Text)
 		{
-			;~ global CGUI
 			Tabs := []
 			Loop, Parse, Text, |
 			{
@@ -258,7 +255,6 @@ Class CTabControl Extends CControl
 			*/
 			AddControl(type, Name, Options, Text)
 			{
-				;~ global CGUI
 				if(type != "Tab")
 				{
 					GUI := CGUI.GUIList[this.GUINum]
@@ -295,7 +291,6 @@ Class CTabControl Extends CControl
 			}
 			__Set(Name, Params*)
 			{
-				;~ global CGUI
 				;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
 				Value := Params.Remove()
 				if(Params.MaxIndex())
@@ -340,7 +335,6 @@ Class CTabControl Extends CControl
 			*/
 			SetIcon(Filename, IconNumber = 1)
 			{
-				;~ global CGUI
 				this._.Icon := Filename
 				this._.IconNumber := IconNumber
 				Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]

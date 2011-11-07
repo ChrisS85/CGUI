@@ -41,7 +41,6 @@ Class CActiveXControl Extends CControl
 	*/
 	__GetEx(ByRef Result, Name, Params*)
 	{
-		;~ global CGUI
 		if(!Base.HasKey(Name))
 			If Name not in Base,_,GUINum,
 			{
@@ -67,7 +66,6 @@ Class CActiveXControl Extends CControl
 	}
 	__Set(Name, Value, Params*)
 	{
-		;~ global CGUI
 		;~ If Name not in _,GUINum,Type,Options,Text,x,y,width,height,Position,Size,ClassNN,hwnd,Name,Content,Base,Focused,Tooltip
 		if(!base.__GetEx(Result, Name, Params*))
 			if(!CGUI.GUIList[this.GUINum].IsDestroyed)
@@ -126,7 +124,6 @@ Class CActiveXControl Extends CControl
 	*/
 	;~ HandleEvent(Params*)
 	;~ {
-		;~ global CGUI
 		;~ if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			;~ return
 		;~ if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_ActiveXMoved"]))

@@ -148,7 +148,6 @@ Class CStatusBarControl Extends CControl
 		}
 		_NewEnum()
 		{
-			;~ global CEnumerator
 			return new CEnumerator(this._)
 		}
 		__Set(Name, Params*)
@@ -185,7 +184,6 @@ Class CStatusBarControl Extends CControl
 		*/
 		Add(Text, PartNumber = "", Width = 50, Style = "", Icon = "", IconNumber = "")
 		{
-			;~ global CGUI
 			if(PartNumber)
 				this._.Insert(PartNumber, new this.CPart(Text, PartNumber, Width, Style, Icon, IconNumber, this.GUINum, this.hwnd))
 			else
@@ -203,7 +201,6 @@ Class CStatusBarControl Extends CControl
 		*/
 		Remove(PartNumber)
 		{
-			;~ global CGUI
 			if PartNumber is Integer
 			{
 				this._.Remove(PartNumber)
@@ -256,7 +253,6 @@ Class CStatusBarControl Extends CControl
 			}
 			__Set(Name, Params*)
 			{
-				;~ global CGUI
 				;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
 				Value := Params.Remove()
 				if(Params.MaxIndex())

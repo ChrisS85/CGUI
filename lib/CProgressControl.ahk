@@ -28,7 +28,6 @@ Class CProgressControl Extends CControl
 	*/
 	__Get(Name, Params*)
 	{
-		;~ global CGUI
 		if(Name != "GUINum" && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -50,7 +49,6 @@ Class CProgressControl Extends CControl
 	}
 	__Set(Name, Value, Params*)
 	{
-		;~ global CGUI
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.

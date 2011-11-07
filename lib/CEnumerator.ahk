@@ -4,7 +4,6 @@ Generic enumerator object that can be used for dynamically generated array membe
 To make an object iterable, make sure to define the MaxIndex() function and insert this function in the class definition:
 |_NewEnum()
 |{
-|	global CEnumerator
 |	return new CEnumerator(this)
 |}
 */

@@ -26,7 +26,6 @@ Class CGroupBoxControl Extends CControl
 	*/
 	AddControl(type, Name, Options, Text)
 	{
-		;~ global CGUI
 		GUI := CGUI.GUIList[this.GUINum]
 		Control := GUI.AddControl(type, Name, Options, Text, this._.Controls, this)
 		Control.x := Control.x + this.x

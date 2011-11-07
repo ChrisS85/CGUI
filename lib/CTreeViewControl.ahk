@@ -8,7 +8,6 @@ Class CTreeViewControl Extends CControl
 {
 	__New(Name, ByRef Options, Text, GUINum)
 	{
-		;~ global CGUI
 		Events := ["_Click", "_RightClick", "_EditingStart", "_FocusReceived", "_FocusLost", "_KeyPress", "_ItemExpanded", "_ItemCollapsed"]
 		if(!InStr(Options, "AltSubmit")) ;Automagically add AltSubmit when necessary
 		{
@@ -68,7 +67,6 @@ Class CTreeViewControl Extends CControl
 	*/
 	__Get(Name, Params*)
 	{
-		;~ global CGUI		
 		if(Name = "Items")
 			Value := this._.Items
 		else if(Name = "SelectedItem")
@@ -89,7 +87,6 @@ Class CTreeViewControl Extends CControl
 	
 	__Set(Name, Params*)
 	{
-		;~ global CGUI
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
@@ -158,7 +155,6 @@ Class CTreeViewControl Extends CControl
 	*/
 	HandleEvent(Event)
 	{
-		;~ global CGUI
 		start := A_TickCount
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
@@ -207,7 +203,6 @@ Class CTreeViewControl Extends CControl
 		*/
 		Add(Text, Options = "")
 		{
-			;~ global CGUI, CTreeViewControl
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -234,7 +229,6 @@ Class CTreeViewControl Extends CControl
 		*/
 		AddControl(type, Name, Options, Text, UseEnabledState = 0)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(!this.Selected)
 				Options .= UseEnabledState ? " Disabled" : " Hidden"
@@ -253,7 +247,6 @@ Class CTreeViewControl Extends CControl
 		*/
 		Remove(ObjectOrIndex)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -299,7 +292,6 @@ Class CTreeViewControl Extends CControl
 		*/
 		Move(Position=1, Parent = "")
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -362,7 +354,6 @@ Class CTreeViewControl Extends CControl
 		*/
 		SetIcon(Filename, IconNumberOrTransparencyColor = 1)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -377,7 +368,6 @@ Class CTreeViewControl Extends CControl
 		*/
 		MaxIndex()
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -413,7 +403,6 @@ Class CTreeViewControl Extends CControl
 		}
 		_NewEnum()
 		{
-			;~ global CEnumerator
 			return new CEnumerator(this)
 		}
 		
@@ -462,7 +451,6 @@ Class CTreeViewControl Extends CControl
 		*/
 		__Get(Name, Params*)
 		{
-			;~ global CTreeViewControl, CGUI
 			if(Name != "_")
 			{
 				GUI := CGUI.GUIList[this._.GUINum]
@@ -546,7 +534,6 @@ Class CTreeViewControl Extends CControl
 		}
 		__Set(Name, Params*)
 		{
-			;~ global CGUI
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
 			Value := Params.Remove()
 			if(Params.MaxIndex())
