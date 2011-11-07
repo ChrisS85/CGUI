@@ -6,7 +6,6 @@ Class CControl ;Never created directly
 {
 	__New(Name, Options, Text, GUINum) ;Basic constructor for all controls. The control is created in CGUI.AddControl()
 	{
-		;~ global CFont
 		this.Insert("Name", Name)
 		this.Insert("Options", Options)
 		this.Insert("Content", Text)
@@ -25,7 +24,6 @@ Class CControl ;Never created directly
 	*/
 	Show()
 	{
-		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		GuiControl, % this.GUINum ":Show",% this.hwnd
@@ -37,7 +35,6 @@ Class CControl ;Never created directly
 	*/
 	Hide()
 	{
-		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		GuiControl, % this.GUINum ":Hide",% this.hwnd
@@ -67,14 +64,12 @@ Class CControl ;Never created directly
 	*/
 	Focus()
 	{
-		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		ControlFocus,,% "ahk_id " this.hwnd
 	}
 	;~ Font(Options, Font="")
 	;~ {
-		;~ global CGUI
 		;~ if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			;~ return
 		;~ Gui, % this.GUINum ":Font", %Options%, %Font%
@@ -107,11 +102,10 @@ Class CControl ;Never created directly
 	*/
 	RegisterEvent(Type, FunctionName)
 	{
-		;~ global CGUI
 		if(FunctionName)
 		{
 			;Make sure function name is valid (or tell the developer about it)
-			if(CGUI_Assert(IsFunc(this[FunctionName]) || IsFunc( `(CGUI.GUIList[this.GUINum])[FunctionName]), "Invalid function name passed to CControl.RegisterEvent()"), -2)
+			if(CGUI_Assert(IsFunc(this[FunctionName]) || IsFunc( (CGUI.GUIList[this.GUINum])[FunctionName]), "Invalid function name passed to CControl.RegisterEvent()"), -2)
 				this._.RegisteredEvents[Type] := FunctionName
 		}
 		else
@@ -124,7 +118,6 @@ Class CControl ;Never created directly
 	*/
 	CallEvent(Name, Params*)
 	{
-		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		if(this.DisableNotifications)
@@ -133,13 +126,13 @@ Class CControl ;Never created directly
 		{
 			if(IsFunc(this[this._.RegisteredEvents[Name]]))
 				return {Handled : true, Result : this[this._.RegisteredEvents[Name]](CGUI.GUIList[this.GUINum], Params*)}
-			else if(IsFunc( `(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]]))
-				return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)}
+			else if(IsFunc( (CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]]))
+				return {Handled : true, Result : (CGUI.GUIList[this.GUINum])[this._.RegisteredEvents[Name]](Params*)}
 		}
 		else if(IsFunc(this[Name]))
 			return {Handled : true, Result : this[Name](CGUI.GUIList[this.GUINum], Params*)}
-		else if(IsFunc(`(CGUI.GUIList[this.GUINum])[this.Name "_" Name]))
-			return {Handled : true, Result : `(CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)}
+		else if(IsFunc((CGUI.GUIList[this.GUINum])[this.Name "_" Name]))
+			return {Handled : true, Result : (CGUI.GUIList[this.GUINum])[this.Name "_" Name](Params*)}
 		else
 			return {Handled : false}
 	}
@@ -149,7 +142,6 @@ Class CControl ;Never created directly
 	*/
 	ProcessSubControlState(From, To)
 	{
-		;~ global CGUI
 		if(From != To && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			if(From)
@@ -255,15 +247,14 @@ Class CControl ;Never created directly
 	Property: DisableNotifications
 	If true, this control will not call any of its notification functions. This is useful when the controls of a window are first created and change handlers should not be called.
 	*/
-	__Get(Name, Params*) 
-    { 
+	__Get(Name, Params*)
+    {
         if(this.__GetEx(Result, Name, Params*) )
-            return Result 
+            return Result
     }
 	
 	__GetEx(ByRef Result, Name, Params*)
     {
-		;~ global CGUI
 		Handled := false
 		if Name not in base,_,GUINum
 			if(!CGUI.GUIList[this.GUINum].IsDestroyed)
@@ -299,7 +290,7 @@ Class CControl ;Never created directly
 					{
 						win := DllCall("GetParent", "PTR", this.hwnd, "PTR")
 						WinGet ctrlList, ControlList, ahk_id %win%
-						Loop Parse, ctrlList, `n 
+						Loop Parse, ctrlList, `n
 						{
 							ControlGet hwnd, Hwnd, , %A_LoopField%, ahk_id %win%
 							if(hwnd=this.hwnd)
@@ -365,7 +356,6 @@ Class CControl ;Never created directly
 	
     __Set(Name, Params*)
     {
-		;~ global CGUI
 		if(Name != "_" && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
@@ -435,18 +425,18 @@ Class CControl ;Never created directly
 				}
 				else if(this.type = "ListView")
 					Controlhwnd.Insert(DllCall("SendMessage", "UInt", Controlhwnd[1], "UInt", 0x101f, "PTR", 0, "PTR", 0))
-				; - 'Text' and 'Picture' Controls requires a g-label to be defined. 
-				if(!TThwnd){         
-					; - 'ListView' = ListView + Header       (Get hWnd of the 'Header' control using "ControlGet" command). 
-					TThwnd := CGUI.GUIList[this.GUINum]._.TThwnd := DllCall("CreateWindowEx","Uint",0,"Str","TOOLTIPS_CLASS32","Uint",0,"Uint",2147483648 | 3,"Uint",-2147483648 
-									,"Uint",-2147483648,"Uint",-2147483648,"Uint",-2147483648,"Ptr",GuiHwnd,"Uint",0,"Uint",0,"Uint",0, "PTR") 
-					DllCall("uxtheme\SetWindowTheme","Ptr",TThwnd,"Ptr",0,"UintP",0)   ; TTM_SETWINDOWTHEME 
+				; - 'Text' and 'Picture' Controls requires a g-label to be defined.
+				if(!TThwnd){
+					; - 'ListView' = ListView + Header       (Get hWnd of the 'Header' control using "ControlGet" command).
+					TThwnd := CGUI.GUIList[this.GUINum]._.TThwnd := DllCall("CreateWindowEx","Uint",0,"Str","TOOLTIPS_CLASS32","Uint",0,"Uint",2147483648 | 3,"Uint",-2147483648
+									,"Uint",-2147483648,"Uint",-2147483648,"Uint",-2147483648,"Ptr",GuiHwnd,"Uint",0,"Uint",0,"Uint",0, "PTR")
+					DllCall("uxtheme\SetWindowTheme","Ptr",TThwnd,"Ptr",0,"UintP",0)   ; TTM_SETWINDOWTHEME
 				}
 				for index, chwnd in Controlhwnd
 				{
-					Varsetcapacity(TInfo,44,0), Numput(44,TInfo), Numput(1|16,TInfo,4), Numput(GuiHwnd,TInfo,8), Numput(chwnd,TInfo,12), Numput(&Value,TInfo,36) 
-					!this._.Tooltip   ? (DllCall("SendMessage",Ptr,TThwnd,"Uint",1028,Ptr,0,Ptr,&TInfo,Ptr))         ; TTM_ADDTOOL = 1028 (used to add a tool, and assign it to a control) 
-					. (DllCall("SendMessage",Ptr,TThwnd,"Uint",1048,Ptr,0,Ptr,A_ScreenWidth))      ; TTM_SETMAXTIPWIDTH = 1048 (This one allows the use of multiline tooltips) 
+					Varsetcapacity(TInfo,44,0), Numput(44,TInfo), Numput(1|16,TInfo,4), Numput(GuiHwnd,TInfo,8), Numput(chwnd,TInfo,12), Numput(&Value,TInfo,36)
+					!this._.Tooltip   ? (DllCall("SendMessage",Ptr,TThwnd,"Uint",1028,Ptr,0,Ptr,&TInfo,Ptr))         ; TTM_ADDTOOL = 1028 (used to add a tool, and assign it to a control)
+					. (DllCall("SendMessage",Ptr,TThwnd,"Uint",1048,Ptr,0,Ptr,A_ScreenWidth))      ; TTM_SETMAXTIPWIDTH = 1048 (This one allows the use of multiline tooltips)
 					DllCall("SendMessage",Ptr,TThwnd,"UInt",(A_IsUnicode ? 0x439 : 0x40c),Ptr,0,Ptr,&TInfo,Ptr)   ; TTM_UPDATETIPTEXT (OLD_MSG=1036) (used to adjust the text of a tip)
 				}
 			}
@@ -464,7 +454,7 @@ Class CControl ;Never created directly
 	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
 	The parameters depend on the event and there may not be params at all in some cases.
 	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
-	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
+	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent().
 	For better readability labels may be chained since they all execute the same code.
 	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
@@ -484,7 +474,7 @@ Class CControl ;Never created directly
 	
 	Parameters:
 		Text - The current text of the control that should be validated. The function can return this value if it is valid or another valid value.
-	*/	
+	*/
 	
 	/*
 	Class: CImageListManager
@@ -501,7 +491,6 @@ Class CControl ;Never created directly
 		}
 		SetIcon(ID, PathOrhBitmap, IconNumber)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			Control := GUI.Controls[this._.hwnd]
 			GUI, % this._.GUINum ":Default"
@@ -527,7 +516,7 @@ Class CControl ;Never created directly
 				}
 				else if(Control.Type = "Tab")
 				{
-					SendMessage, 0x1303, 0, this._.IconList.SmallIL_ID, % Control.ClassNN, % "ahk_id " GUI.hwnd  ; 0x1109 is TVM_SETIMAGELIST					
+					SendMessage, 0x1303, 0, this._.IconList.SmallIL_ID, % Control.ClassNN, % "ahk_id " GUI.hwnd  ; 0x1109 is TVM_SETIMAGELIST
 				}
 			}
 			if(FileExist(PathorhBitmap))

@@ -41,7 +41,6 @@ Class CActiveXControl Extends CControl
 	*/
 	__GetEx(ByRef Result, Name, Params*)
 	{
-		;~ global CGUI
 		if(!Base.HasKey(Name))
 			If Name not in Base,_,GUINum,
 			{
@@ -67,7 +66,6 @@ Class CActiveXControl Extends CControl
 	}
 	__Set(Name, Value, Params*)
 	{
-		;~ global CGUI
 		;~ If Name not in _,GUINum,Type,Options,Text,x,y,width,height,Position,Size,ClassNN,hwnd,Name,Content,Base,Focused,Tooltip
 		if(!base.__GetEx(Result, Name, Params*))
 			if(!CGUI.GUIList[this.GUINum].IsDestroyed)
@@ -99,10 +97,10 @@ Class CActiveXControl Extends CControl
 			{
 				Error := ComObjError()
 					ComObjError(false)
-				`(this._.Object)[Name](Params*)
+				(this._.Object)[Name](Params*)
 					ComObjError(Error)
 			}
-		}	
+		}
 	}
 	/*
 	Function: IsMemberOf
@@ -120,16 +118,15 @@ Class CActiveXControl Extends CControl
 	/*
 	Event: Introduction
 	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
-	The parameters depend on the event and there may not be params at all in some cases. 
+	The parameters depend on the event and there may not be params at all in some cases.
 	You can look up the definitions of the parameters in the documentation of the ActiveX control.
 	ActiveX controls do not require a separate G-label to make the events work.
 	*/
 	;~ HandleEvent(Params*)
 	;~ {
-		;~ global CGUI
 		;~ if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			;~ return
 		;~ if(IsFunc(CGUI.GUIList[this.GUINum][this.Name "_ActiveXMoved"]))
-			;~ `(CGUI.GUIList[this.GUINum])[this.Name "_ActiveXMoved"]()
+			;~ (CGUI.GUIList[this.GUINum])[this.Name "_ActiveXMoved"]()
 	;~ }
 }
