@@ -133,7 +133,7 @@ Class CStatusBarControl Extends CControl
 				{
 					if(Params.MaxIndex() >= 1)
 						return this._[Name][Params*]
-					else						
+					else
 						return this._[Name]
 				}
 			}
@@ -148,7 +148,6 @@ Class CStatusBarControl Extends CControl
 		}
 		_NewEnum()
 		{
-			;~ global CEnumerator
 			return new CEnumerator(this._)
 		}
 		__Set(Name, Params*)
@@ -185,7 +184,6 @@ Class CStatusBarControl Extends CControl
 		*/
 		Add(Text, PartNumber = "", Width = 50, Style = "", Icon = "", IconNumber = "")
 		{
-			;~ global CGUI
 			if(PartNumber)
 				this._.Insert(PartNumber, new this.CPart(Text, PartNumber, Width, Style, Icon, IconNumber, this.GUINum, this.hwnd))
 			else
@@ -203,7 +201,6 @@ Class CStatusBarControl Extends CControl
 		*/
 		Remove(PartNumber)
 		{
-			;~ global CGUI
 			if PartNumber is Integer
 			{
 				this._.Remove(PartNumber)
@@ -256,7 +253,6 @@ Class CStatusBarControl Extends CControl
 			}
 			__Set(Name, Params*)
 			{
-				;~ global CGUI
 				;Fix completely weird __Set behavior. If one tries to assign a value to a sub item, it doesn't call __Get for each sub item but __Set with the subitems as parameters.
 				Value := Params.Remove()
 				if(Params.MaxIndex())
@@ -297,7 +293,7 @@ Class CStatusBarControl Extends CControl
 	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
 	The parameters depend on the event and there may not be params at all in some cases.
 	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
-	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
+	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent().
 	For better readability labels may be chained since they all execute the same code.
 	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	

@@ -8,7 +8,6 @@ Class CListViewControl Extends CControl
 {
 	__New(Name, ByRef Options, Text, GUINum)
 	{
-		;~ global CGUI		
 		Events := ["Click", "RightClick", "ItemActivated", "MouseLeave", "EditingStart", "FocusReceived", "FocusLost", "ItemSelected", "ItemDeselected", "ItemFocused", "ItemDefocused", "ItemChecked", " ItemUnChecked", "SelectionChanged", "CheckedChanged", "FocusedChanged", "KeyPress", "Marquee", "ScrollingStart", "ScrollingEnd"]
 		if(!InStr(Options, "AltSubmit")) ;Automagically add AltSubmit when necessary
 		{
@@ -46,7 +45,6 @@ Class CListViewControl Extends CControl
 	*/
 	ModifyCol(Params*)
 	{
-		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		if(!CGUI_Assert(!(Params.MaxIndex() > 3), "ModifyCol: This function accepts no more than 3 parameters."))
@@ -66,7 +64,6 @@ Class CListViewControl Extends CControl
 	*/
 	InsertCol(Params*)
 	{
-		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		if(!CGUI_Assert(!(Params.MaxIndex() > 3), "InsertCol: This function accepts no more than 3 parameters."))
@@ -81,7 +78,6 @@ Class CListViewControl Extends CControl
 	*/
 	DeleteCol(ColumnNumber)
 	{
-		;~ global CGUI
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		Gui, % this.GUINum ":Default"
@@ -123,16 +119,15 @@ Class CListViewControl Extends CControl
 	Contains the index of the focused row.
 	
 	Property: IndependentSorting
-	This setting is off by default. In this case, indexing the rows behaves like AHK ListViews usually do. 
-	If it is enabled however, the row indexing will be independent of the current sorting. 
-	That means that the first row can actually be displayed as the second, third,... or last row on the GUI. 
-	This feature is very useful if you need to synchronize an array with the data in the ListView 
-	because the index of the array can then be directly mapped to the ListView row index. 
+	This setting is off by default. In this case, indexing the rows behaves like AHK ListViews usually do.
+	If it is enabled however, the row indexing will be independent of the current sorting.
+	That means that the first row can actually be displayed as the second, third,... or last row on the GUI.
+	This feature is very useful if you need to synchronize an array with the data in the ListView
+	because the index of the array can then be directly mapped to the ListView row index.
 	This would not be possible if this option was off and the ListView gets sorted differently.
 	*/
 	__Get(Name, Params*)
 	{
-		;~ global CGUI
 		if(Name != "GUINum" && !CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -184,7 +179,6 @@ Class CListViewControl Extends CControl
 	}
 	__Set(Name, Params*)
 	{
-		;~ global CGUI
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
 			DetectHidden := A_DetectHiddenWindows
@@ -300,7 +294,6 @@ Class CListViewControl Extends CControl
 		}
 		_NewEnum()
 		{
-			;~ global CEnumerator
 			return new CEnumerator(this)
 		}
 		/*
@@ -309,7 +302,6 @@ Class CListViewControl Extends CControl
 		*/
 		MaxIndex()
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -330,7 +322,6 @@ Class CListViewControl Extends CControl
 		*/
 		Add(Options, Fields*)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -367,7 +358,6 @@ Class CListViewControl Extends CControl
 		*/
 		Insert(RowNumber, Options, Fields*)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -403,7 +393,7 @@ Class CListViewControl Extends CControl
 					Control._.PreviouslySelectedItem := ""
 				}
 			}
-		}	
+		}
 		
 		/*
 		Function: Modify
@@ -453,7 +443,6 @@ Class CListViewControl Extends CControl
 		*/
 		Delete(RowNumberOrItem)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -493,7 +482,6 @@ Class CListViewControl Extends CControl
 		*/
 		__Get(Name)
 		{
-			;~ global CGUI
 			if(Name != "_")
 			{
 				GUI := CGUI.GUIList[this._.GUINum]
@@ -511,7 +499,6 @@ Class CListViewControl Extends CControl
 		}
 		__Set(Name, Params*)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -543,15 +530,14 @@ Class CListViewControl Extends CControl
 		{
 			__New(SortedIndex, UnsortedIndex, GUINum, hwnd)
 			{
-				;~ global CGUI
-				this.Insert("_", {})				
+				this.Insert("_", {})
 				this._.RowNumber := UnsortedIndex
 				this._.GUINum := GUINum
 				this._.hwnd := hwnd
 				GUI := CGUI.GUIList[GUINum]
 				if(GUI.IsDestroyed)
 					return
-				Control := GUI.Controls[hwnd]				
+				Control := GUI.Controls[hwnd]
 				;Store the real unsorted index in the custom property lParam field of the list view item so it can be reidentified later
 				this.SetUnsortedIndex(SortedIndex, UnsortedIndex, Control.hwnd)
 				this.SetIcon("")
@@ -570,7 +556,6 @@ Class CListViewControl Extends CControl
 			*/
 			AddControl(type, Name, Options, Text, UseEnabledState = 0)
 			{
-				;~ global CGUI
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!this.Selected)
 					Options .= UseEnabledState ? " Disabled" : " Hidden"
@@ -592,16 +577,16 @@ Class CListViewControl Extends CControl
 			  LPARAM lParam;
 			#if (_WIN32_IE >= 0x0300)
 			  int    iIndent;
-			#endif 
+			#endif
 			#if (_WIN32_WINNT >= 0x0501)
 			  int    iGroupId;
 			  UINT   cColumns;
 			  UINT   puColumns;
-			#endif 
+			#endif
 			#if (_WIN32_WINNT >= 0x0600)
 			  int    piColFmt;
 			  int    iGroup;
-			#endif 
+			#endif
 			} LVITEM, *LPLVITEM;
 			*/
 			SetUnsortedIndex(SortedIndex, lParam, hwnd)
@@ -610,8 +595,8 @@ Class CListViewControl Extends CControl
 					;~ return
 				VarSetCapacity(LVITEM, 13*4 + 2 * A_PtrSize, 0)
 				mask := 0x4   ; LVIF_PARAM := 0x4
-				NumPut(mask, LVITEM, 0, "UInt") 
-				NumPut(SortedIndex - 1, LVITEM, 4, "Int")   ; iItem 
+				NumPut(mask, LVITEM, 0, "UInt")
+				NumPut(SortedIndex - 1, LVITEM, 4, "Int")   ; iItem
 				NumPut(lParam, LVITEM, 7*4 + A_PtrSize, "PTR")
 				;~ string := this.hex(LVITEM,  "UINT|INT|INT|UINT|UINT|PTR|INT|INT|PTR|INT|INT|UINT|UINT|INT|INT")
 				SendMessage, (A_IsUnicode ? 0x1000 + 76 : 0x1000 + 6), 0, &LVITEM,, % "ahk_id " hwnd ;LVM_SETITEM
@@ -637,7 +622,7 @@ Class CListViewControl Extends CControl
 				;Create the LVFINDINFO structure
 				VarSetCapacity(LVFINDINFO, 4*4 + 2 * A_PtrSize, 0)
 				mask := 0x1   ; LVFI_PARAM := 0x1
-				NumPut(mask, LVFINDINFO, 0, "UInt") 
+				NumPut(mask, LVFINDINFO, 0, "UInt")
 				NumPut(UnsortedIndex, LVFINDINFO, 4 + A_PtrSize, "PTR")
 				;~ string := hex(LVFINDINFO,  "UINT|INT|INT|UINT|UINT|PTR|INT|INT|PTR|INT|INT|UINT|UINT|INT|INT")
 				SendMessage, (A_IsUnicode ? 0x1000 + 83 : 0x1000 + 13), -1, &LVFINDINFO,, % "ahk_id " hwnd ;LVM_FINDITEM
@@ -651,8 +636,8 @@ Class CListViewControl Extends CControl
 					;~ return SortedIndex
 				VarSetCapacity(LVITEM, 13*4 + 2 * A_PtrSize, 0)
 				mask := 0x4   ; LVIF_PARAM := 0x4
-				NumPut(mask, LVITEM, 0, "UInt") 
-				NumPut(SortedIndex - 1, LVITEM, 4, "Int")   ; iItem 
+				NumPut(mask, LVITEM, 0, "UInt")
+				NumPut(SortedIndex - 1, LVITEM, 4, "Int")   ; iItem
 				;~ NumPut(lParam, LVITEM, 7*4 + A_PtrSize, "PTR")
 				;~ string := this.hex(LVITEM,  "UINT|INT|INT|UINT|UINT|PTR|INT|INT|PTR|INT|INT|UINT|UINT|INT|INT")
 				SendMessage, (A_IsUnicode ? 0x1000 + 75 : 0x1000 + 5), 0, &LVITEM,,% "ahk_id " hwnd ;LVM_GETITEM
@@ -664,7 +649,6 @@ Class CListViewControl Extends CControl
 			}
 			_NewEnum()
 			{
-				;~ global CEnumerator
 				return new CEnumerator(this)
 			}
 			/*
@@ -672,8 +656,7 @@ Class CListViewControl Extends CControl
 			Returns the number of columns.
 			*/
 			MaxIndex()
-			{				
-				;~ global CGUI
+			{
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(GUI.IsDestroyed)
 					return
@@ -692,7 +675,6 @@ Class CListViewControl Extends CControl
 			*/
 			SetIcon(Filename, IconNumberOrTransparencyColor = 1)
 			{
-				;~ global CGUI
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(GUI.IsDestroyed)
 					return
@@ -711,7 +693,6 @@ Class CListViewControl Extends CControl
 		*/
 		Modify(Options, Fields*)
 		{
-			;~ global CGUI
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
 				return
@@ -761,7 +742,6 @@ Class CListViewControl Extends CControl
 			*/
 			__Get(Name)
 			{
-				;~ global CGUI				
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!GUI.IsDestroyed)
 				{
@@ -796,8 +776,7 @@ Class CListViewControl Extends CControl
 				}
 			}
 			__Set(Name, Params*)
-			{				
-				;~ global CGUI
+			{
 				GUI := CGUI.GUIList[this._.GUINum]
 				if(!GUI.IsDestroyed)
 				{
@@ -822,7 +801,7 @@ Class CListViewControl Extends CControl
 						Gui, ListView, % Control.ClassNN
 						LV_Modify(this.GetSortedIndex(this._.RowNumber, Control.hwnd), (Value = 0 ? "-" : "") Key)
 						if(Name = "Selected")
-						{							
+						{
 							if(LV_GetCount("Selected") = 1)
 							{
 								Control.ProcessSubControlState(Control._.PreviouslySelectedItem, Control.SelectedItem)
@@ -858,7 +837,7 @@ Class CListViewControl Extends CControl
 	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
 	The parameters depend on the event and there may not be params at all in some cases.
 	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
-	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent(). 
+	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent().
 	For better readability labels may be chained since they all execute the same code.
 	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
@@ -923,7 +902,7 @@ Class CListViewControl Extends CControl
 	Invoked when the user checks a row.
 	
 	Event: ItemUnchecked(RowItem)
-	Invoked when the user unchecks a row.	
+	Invoked when the user unchecks a row.
 	
 	Event: CheckedChanged(RowItem)
 	Invoked when the checked row(s) has/have changed.
