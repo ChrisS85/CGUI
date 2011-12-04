@@ -81,7 +81,7 @@ Class CGUI
 		*/
 		for key, Value in instance.base
 		{
-			if(Value.HasKey("__Class") && Value.HasKey("Type") && Value.HasKey("Options")	&& Value.HasKey("Text")) ;Look for classes that define a type property
+			if(IsObject(Value) && Value.HasKey("__Class") && Value.HasKey("Type") && Value.HasKey("Options")	&& Value.HasKey("Text")) ;Look for classes that define a type property
 			{
 				;~ if(!CGUI_Assert(Value.Type != "", "Control class definitions must use static properties."))
 					;~ continue
@@ -118,7 +118,7 @@ Class CGUI
 		RegisterListener(Message, hwnd, FunctionName)
 		{
 			;Don't allow calling this function on the contained instances
-			if(this.Base.__Class = this.__Class)
+			if(IsObject(this.base) && this.base.__Class = this.__Class)
 				return
 			if(hwnd > 0)
 				GUI := CGUI.GUIFromHWND(hwnd)
@@ -459,7 +459,7 @@ Class CGUI
 		if(!CGUI_Assert(Name, "GUI.AddControl() : No name specified. Please supply a proper control name.", -2))
 			return
 		;Make sure not to add a control with duplicate name.
-		if(!CGUI_Assert(!IsObject(ControlList[Name]), "GUI.AddControl(): The control " Name " already exists. Please choose another name!", -2))
+		if(!CGUI_Assert(!IsObject(ControlList) || !IsObject(ControlList[Name]), "GUI.AddControl(): The control " Name " already exists. Please choose another name!", -2))
 			return
 		
 		type := Control
@@ -497,12 +497,12 @@ Class CGUI
 				GuiControlGet, testHWND, % this.GUINum ":hwnd", % vName := this.GUINum "_" Control.Name A_Index
 			
 			;If the control that is added here is a subcontrol of a control in a tab control, we need to set the corresponding tab first and unset it after the control has been added
-			if(this.Controls[ParentControl.hParentControl].Type = "Tab")
+			if(IsObject(ParentControl) && IsObject(this.Controls[ParentControl.hParentControl]) && this.Controls[ParentControl.hParentControl].Type = "Tab")
 				Gui, % this.GUINum ":Tab", % ParentControl.TabNumber, % this.Controls[ParentControl.hParentControl]._.TabIndex
 			
 			Gui, % this.GUINum ":Add", % Control.Type, % Control.Options " hwndhControl " (NeedsGLabel ? "gCGUI_HandleEvent " : "") "v" vName, % Control.Content ;Create the control and get its window handle and setup a g-label
 			
-			if(this.Controls[ParentControl.hParentControl].Type = "Tab")
+			if(IsObject(ParentControl) && IsObject(this.Controls[ParentControl.hParentControl]) && this.Controls[ParentControl.hParentControl].Type = "Tab")
 				Gui, % this.GUINum ":Tab"
 		}
 		Control.Insert("hwnd", hControl) ;Window handle is used for all further operations on this control

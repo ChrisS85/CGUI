@@ -152,11 +152,14 @@ Class CControl ;Never created directly
 					else
 						Control.Hide()
 				}
-			for index, Control in To.Controls
-				if(Control._.UseEnabledState)
-					Control.Enable()
-				else
-					Control.Show()
+			if(To)
+			{
+				for index, Control in To.Controls
+					if(Control._.UseEnabledState)
+						Control.Enable()
+					else
+						Control.Show()
+			}
 		}
 	}
 	

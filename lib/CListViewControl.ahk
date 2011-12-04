@@ -700,7 +700,7 @@ Class CListViewControl Extends CControl
 			Control := GUI.Controls[this._.hwnd]
 			Gui, % Control.GUINum ":Default"
 			Gui, ListView, % Control.ClassNN
-			SortedIndex := Control.IndependentSorting ? this.CRow.GetSortedIndex(this._.RowNumber, Control.hwnd) : this._.RowNumber ;If independent sorting is off, the RowNumber parameter of this function is interpreted as sorted index
+			SortedIndex := Control.IndependentSorting ? this.GetSortedIndex(this._.RowNumber, Control.hwnd) : this._.RowNumber ;If independent sorting is off, the RowNumber parameter of this function is interpreted as sorted index
 			LV_Modify(SortedIndex, Options, Fields*)
 			if(InStr(Options, "Select"))
 			{
