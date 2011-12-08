@@ -167,7 +167,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				Loop % this.Items.MaxIndex()
 					if(this.Items[A_Index].Text = Value)
 					{
-						GuiControl, % this.GUINum ":Choose", % this.ClassNN, % A_Index
+						GuiControl, % this.GUINum ":Choose", % this.hwnd, % "|" A_Index
 						this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 						this._.PreviouslySelectedItem := this.SelectedItem
 						found := true
@@ -175,7 +175,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				if(!found && this.type = "ComboBox")
 					ControlSetText, , %Value%, % "ahk_id " this.hwnd
 				;~ {
-					;~ GuiControl, % this.GUINum ":ChooseString", % this.ClassNN, % Value
+					;~ GuiControl, % this.GUINum ":ChooseString", % this.ClassNN, % "|" Value
 					;~ this.ProcessSubControlState(this._.PreviouslySelectedItem, this.SelectedItem)
 					;~ this._.PreviouslySelectedItem := this.SelectedItem
 				;~ }
@@ -268,7 +268,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			for index, item in this ;Move existing indices
 				item._.Index := index
 			if(Select)
-				GuiControl, % this._.GUINum ":Choose", % Control.hwnd, % Position
+				GuiControl, % this._.GUINum ":Choose", % Control.hwnd, % "|" Position
 			else if(Selected)
 				GuiControl, % this._.GUINum ":Choose", % Control.hwnd, % (Selected < Position ? Selected : Selected + 1)
 		}
@@ -343,7 +343,7 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 			DetectHidden := A_DetectHiddenWindows
 			DetectHiddenWindows, On
 			GUI := CGUI.GUIList[this._.GUINum]
-			ControlGet, List, List,,, % " ahk_id " this._.hwnd
+			ControlGet, List, List,,, % "ahk_id " this._.hwnd
 			count := 0
 			Loop, Parse, List, `n
 				count++
@@ -423,6 +423,8 @@ Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and Dro
 				}
 				else if(Name = "Controls")
 					Value := this._.Controls
+				else if(Name = "Index")
+					Value := this._.Index
 				Loop % Params.MaxIndex()
 					if(IsObject(Value)) ;Fix unlucky multi parameter __GET
 						Value := Value[Params[A_Index]]

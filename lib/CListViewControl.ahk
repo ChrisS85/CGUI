@@ -723,6 +723,9 @@ Class CListViewControl Extends CControl
 			Property: Text
 			The text of the first column of this row.
 			
+			Property: Index
+			The index of this row. It obeys the setting of IndependentSorting.
+			
 			Property: Count
 			The number of columns.
 			
@@ -757,6 +760,8 @@ Class CListViewControl Extends CControl
 					}
 					else if(Name = "Text")
 						return this[1]
+					else if(Name = "Index")
+						return Control.IndependentSorting ? this._.RowNumber : this.GetSortedIndex(this._.RowNumber, Control.hwnd)
 					else if(Name = "Count")
 					{
 						Gui, % Control.GUINum ":Default"
@@ -911,6 +916,7 @@ Class CListViewControl Extends CControl
 	HandleEvent(Event)
 	{
 		Row := this.Items[this.IndependentSorting ? this.CItems.CRow.GetUnsortedIndex(Event.EventInfo, this.hwnd) : Event.EventInfo]
+		OutputDebug % Event.GUIEvent ", " Event.ErrorLevel
 		if(Event.GUIEvent == "E")
 			this.CallEvent("EditingStart", Row)
 		else if(EventName := {DoubleClick : "DoubleClick", R : "DoubleRightClick",e : "EditingEnd", Normal : "Click", RightClick : "RightClick",  A : "ItemActivate"}[Event.GUIEvent])
@@ -952,8 +958,13 @@ Class CListViewControl Extends CControl
 						;~ this.Validate()
 				;~ }
 			;~ }
-			if(EventName :=  {S : "SelectionChanged", C : "CheckedChanged", F : "FocusedChanged"}[Event.Errorlevel])
-				this.CallEvent(EventName, Row)
+			;ErrorLevel may contain multiple characters
+			if(InStr(Event.ErrorLevel, "S"))
+				this.CallEvent("SelectionChanged", Row)
+			if(InStr(Event.ErrorLevel, "C"))
+				this.CallEvent("CheckedChanged", Row)
+			if(InStr(Event.ErrorLevel, "F"))
+				this.CallEvent("FocusedChanged", Row)
 			if(InStr(Event.Errorlevel, "S")) ;Process sub control state
 			{
 				if(this.SelectedItems.MaxIndex() = 1)
