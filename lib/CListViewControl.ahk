@@ -921,7 +921,6 @@ Class CListViewControl Extends CControl
 	HandleEvent(Event)
 	{
 		Row := this.Items[this.IndependentSorting ? this.CItems.CRow.GetUnsortedIndex(Event.EventInfo, this.hwnd) : Event.EventInfo]
-		OutputDebug % Event.GUIEvent ", " Event.ErrorLevel
 		if(Event.GUIEvent == "E")
 			this.CallEvent("EditingStart", Row)
 		else if(EventName := {DoubleClick : "DoubleClick", R : "DoubleRightClick",e : "EditingEnd", Normal : "Click", RightClick : "RightClick",  A : "ItemActivate"}[Event.GUIEvent])

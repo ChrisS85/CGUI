@@ -120,8 +120,6 @@ Class CControl ;Never created directly
 	{
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
-		if(this.DisableNotifications)
-			return
 		if(this._.RegisteredEvents.HasKey(Name))
 		{
 			if(IsFunc(this[this._.RegisteredEvents[Name]]))
@@ -392,6 +390,8 @@ Class CControl ;Never created directly
 				Control, Style, %Value%,,,% "ahk_id " this.hwnd
 			else if(Name = "ExStyle")
 				Control, ExStyle, %Value%,,,% "ahk_id " this.hwnd
+			else if(Name = "DisableNotifications")
+				GuiControl, % this.GUINum (Value ? ":-g" : ":+gCGUI_HandleEvent" ), % this.hwnd
 			else if(Name = "_") ;Prohibit setting the proxy object
 				Handled := true
 			else if(this._.HasKey("ControlStyles") && Style := this._.ControlStyles[Name]) ;Generic control styles which are only of boolean type can be handled simply by a list of name<->value assignments. Prepending "-" to a value in such a list inverts the behaviour here.
