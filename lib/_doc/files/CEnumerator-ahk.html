@@ -13,7 +13,6 @@ if (browserType) {document.write("<div class=" + browserType + ">");if (browserV
 
 <div id=Content><div class="CClass"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="CEnumerator"></a>CEnumerator</h1><div class=CBody><p>Generic enumerator object that can be used for dynamically generated array members.&nbsp; It requires that the object defines a MaxIndex() function.&nbsp; To make an object iterable, make sure to define the MaxIndex() function and insert this function in the class definition:</p><blockquote><pre>_NewEnum()
 {
-   global CEnumerator
    return new CEnumerator(this)
 }</pre></blockquote></div></div></div>
 

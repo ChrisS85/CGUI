@@ -53,7 +53,27 @@ Class CTreeViewControl Extends CControl
 			if(result := this.FindItem(ID, Root[A_Index]))
 				return result
 		return 0
-		
+	}
+	
+	/*
+	Function: FindItemWithText
+	Finds an item by its text.
+	
+	Parameters:
+		Text - The text of the item.
+	*/
+	FindItemWithText(Text, Root = "")
+	{
+		if(!Text) ;Root node
+			return this.Items
+		if(!IsObject(Root))
+			Root := this.Items
+		if(Text = Root.Text)
+			return Root
+		Loop % Root.MaxIndex()
+			if(result := this.FindItemWithText(Text, Root[A_Index]))
+				return result
+		return 0
 	}
 	/*
 	Property: Items
@@ -78,6 +98,8 @@ Class CTreeViewControl Extends CControl
 			Gui, TreeView, % this.ClassNN
 			Value := this.FindItem(TV_GetSelection())
 		}
+		else if Name is Number ;Prevent accidentally trying to access the tree items through the control class directly
+			throw Exception("Tree Items can't be accessed through the control directly! Use CTreeViewControl.Items[index] instead!", -1)
 		Loop % Params.MaxIndex()
 			if(IsObject(Value)) ;Fix unlucky multi parameter __GET
 				Value := Value[Params[A_Index]]
@@ -155,7 +177,6 @@ Class CTreeViewControl Extends CControl
 	*/
 	HandleEvent(Event)
 	{
-		start := A_TickCount
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
 		;Handle visibility of controls associated with tree nodees
@@ -173,7 +194,6 @@ Class CTreeViewControl Extends CControl
 			this.CallEvent("FocusLost")
 		if(Event.GUIEvent = "S")
 			this.PreviouslySelectedItem := SelectedItem
-		OutputDebug % "HandleEvent: " A_TickCount - start
 	}
 	
 	/*
@@ -239,13 +259,13 @@ Class CTreeViewControl Extends CControl
 		}
 		
 		/*
-			Function: Remove
-			Removes an item.
+			Function: Delete
+			Deletes an item.
 			
 			Parameters:
 				ObjectOrIndex - The item object or the index of the child item of this.
 		*/
-		Remove(ObjectOrIndex)
+		Delete(ObjectOrIndex)
 		{
 			GUI := CGUI.GUIList[this._.GUINum]
 			if(GUI.IsDestroyed)
@@ -400,6 +420,20 @@ Class CTreeViewControl Extends CControl
 				else if(Item := this[A_Index].ItemByID(ID))
 					return Item
 			}
+		}
+		
+		/*
+		Function: FindItemWithText
+		Finds a child item by its Text.
+		
+		Parameters:
+			Text - The text of the child item
+		*/
+		FindItemWithText(Text)
+		{
+			GUI := CGUI.GUIList[this._.GUINum]
+			Control := GUI.Controls[this._.hwnd]
+			return Control.FindItemWithText(Text, this)
 		}
 		_NewEnum()
 		{
