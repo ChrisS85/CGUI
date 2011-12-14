@@ -3,7 +3,7 @@ Class CCompoundControl
 {
 	Container := {}
 	Name := "Compound Control"
-	Boundaries := {}
+	Boundaries := ""
 	AddContainerControl(GUI, Type, Name, Options, Text)
     {
         this.Container.Insert(Name, GUI.AddControl(Type, "", Options, Text))
@@ -11,12 +11,17 @@ Class CCompoundControl
 	__Get(Key)
 	{
 		if Key in x,y,Width,Height
+		{
+			if(!IsObject(this.Boundaries))
+				this.CalculateBoundaries()
 			return this.Boundaries[Key]
+		}
 	}
 	__Set(Key, Value)
 	{
 		if Key in x,y
 		{
+			this.CalculateBoundaries()
 			if(Key = "X")
 			{
 				DeltaX := Value - this.Boundaries.X
