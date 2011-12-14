@@ -8,8 +8,8 @@ Class CPathPickerControl extends CCompoundControl
 		Parse(Options, "x* y* w*", x, y, w)
 		if(!w)
 			w := 200
-		this.AddContainerControl(GUI, "Edit", "Edit", (x ? "x" x " " : "") (y ? "y" y " " : "") "w" (w-50), InitialPath)
-		this.AddContainerControl(GUI, "Button", "Button", "x+10 w40", "Browse")
+		this.AddContainerControl(GUI, "Edit", "Edit", (x ? "x" x " " : "") (y ? "y" y " " : "") "w" (w-60), InitialPath)
+		this.AddContainerControl(GUI, "Button", "Button", "x+10 w50", "Browse")
 		return Name
 	}
 	__Get(Key)
