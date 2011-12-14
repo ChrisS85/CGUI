@@ -455,14 +455,23 @@ Class CGUI
 		local hControl, type, testHWND, vName, NeedsGLabel
 		if(this.IsDestroyed)
 			return
-		 ;Validate name.
-		if(!CGUI_Assert(Name, "GUI.AddControl() : No name specified. Please supply a proper control name.", -2))
-			return
+		
+		type := Control
+		
+		;Automatically generate a name if the parameter is empty
+		if(!Name)
+		{
+			Name := 1
+			for k, v in this.Controls
+				if(v.Type = Type)
+					Name++
+			Name := Type Name
+		}
+		
 		;Make sure not to add a control with duplicate name.
 		if(!CGUI_Assert(!IsObject(ControlList) || !IsObject(ControlList[Name]), "GUI.AddControl(): The control " Name " already exists. Please choose another name!", -2))
 			return
 		
-		type := Control
 		;Some control classes represent multiple controls, those are handled separately here.
 		if(Control = "DropDownList" || Control = "ComboBox" || Control = "ListBox")
 			Control := new CChoiceControl(Name, Options, Text, this.GUINum, type)
