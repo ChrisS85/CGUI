@@ -11,6 +11,7 @@ Class CEditControl Extends CControl
 		Base.__New(Name, Options, Text, GUINum)
 		this.Type := "Edit"
 		this._.Insert("ControlStyles", {Center : 0x1, LowerCase : 0x10, Number : 0x2000, Multi : 0x4, Password : 0x20, ReadOnly : 0x800, Right : 0x2, Uppercase : 0x8, WantReturn : 0x1000})
+		this._.Insert("ControlMessageStyles", {ReadOnly: {Message: 0xCF, On: {W: 1}, Off: {W: 0}}})
 		this._.Insert("Events", ["TextChanged"])
 		this._.Insert("Messages", {0x200 : "KillFocus", 0x100 : "SetFocus" }) ;Used for automatically registering message callbacks
 	}
