@@ -394,6 +394,11 @@ Class CControl ;Never created directly
 				GuiControl, % this.GUINum (Value ? ":-g" : ":+gCGUI_HandleEvent" ), % this.hwnd
 			else if(Name = "_") ;Prohibit setting the proxy object
 				Handled := true
+			else if(this._.HasKey("ControlMessageStyles") && IsObject(Style := this._.ControlMessageStyles[Name]))
+			{
+				State := Value ? "On" : "Off"
+				SendMessage, % Style.Message, % Style[State].W, % Style[State].L, , % "ahk_id" this.hwnd
+			}
 			else if(this._.HasKey("ControlStyles") && Style := this._.ControlStyles[Name]) ;Generic control styles which are only of boolean type can be handled simply by a list of name<->value assignments. Prepending "-" to a value in such a list inverts the behaviour here.
 			{
 				if(SubStr(Style, 1,1) = "-")
