@@ -71,29 +71,32 @@ Class CGUI
 		GUI, % instance.GUINum ":+LabelCGUI_ +LastFound"
 		instance.hwnd := WinExist()
 		
-		/*
-		Prepare for some HAX!
-		The code below enables the user of this library to create subclasses inside the GUI class that represent controls.
-		It scans through the object and looks for fitting subclasses.
-		Then a an object based on a copy of a subclass is created and a control with the params specified in the subclass is created.
-		The base of the copied subclass is changed to the newly created control object so that the functions in the subclass can access the control object through the this keyword.
-		Event functions are also preferably routed to subclasses.
-		*/
 		for key, Value in instance.base
 		{
-			if(IsObject(Value) && Value.HasKey("__Class") && Value.HasKey("Type") && Value.HasKey("Options")	&& Value.HasKey("Text")) ;Look for classes that define a type property
+			if(IsObject(Value) && Value.HasKey("__Class"))
 			{
-				;~ if(!CGUI_Assert(Value.Type != "", "Control class definitions must use static properties."))
-					;~ continue
-				Name := Value.HasKey("Name") ? Value.Name : SubStr(Value.__Class, InStr(Value.__Class, ".") + 1)
-				control := instance.AddControl(Value.Type, Name, Value.Options, Value.Text)
-				instance[Name] := {base : ObjClone(Value)}
-				instance[Name].base.base := control
-				instance.Controls[instance[Name].hwnd] := instance[Name]
-				if(IsFunc(instance[Name].__New) = 3)
-					instance[Name].__New(instance)
-				else if(IsFunc(instance[Name].__New) = 2)
-					instance[Name].__New()
+				cache_new := ObjRemove(Value, "__new") ; cache and remove the __new function (if present)
+				
+				ctrl := new Value ;initiate instance variables without calling __new
+				if (ctrl.Type != "" && ctrl.Options != "" && ctrl.Text != "") ;HasKey() can return false but it could still exist in base (as a static key)
+				{
+					Name := ctrl.Name != "" ? ctrl.Name : RegExReplace(ctrl.__Class, "^.+\.([^\.]+)$", "$1")
+					ctrl.base.base := instance.AddControl(ctrl.Type, Name, ctrl.Options, ctrl.Text)
+					
+					instance.Controls[ctrl.hwnd] := instance[Name] := ctrl
+					
+					if(IsFunc(cache_new)) ; call __new manually, extra params are discarded
+						cache_new.(ctrl, instance)
+				}
+				else ;whoops not a CControl class apparently
+					ctrl := ""
+				
+				if IsFunc(cache_new) ; add the __new function back to the objects
+                {
+					ObjInsert(Value, "__new", cache_new)
+                    if IsObject(ctrl)
+                        ObjInsert(ctrl.base, "__new", cache_new)
+                }
 			}
 		}
 		
