@@ -27,7 +27,7 @@ Class CTabControl Extends CControl
 		this._.Tabs := new this.CTabs(this.GUINum, this.hwnd)
 		
 		;Add Tabs
-        this.Tabs.Add(this.Content)
+		this.Tabs.Add(this.Content)
 	}
 	/*
 	Property: Tabs
@@ -208,7 +208,7 @@ Class CTabControl Extends CControl
 		Add(Text)
 		{
 			Tabs := []
-            Control := CGUI.GUIList[this.GUINum][this.hwnd]
+			Control := CGUI.GUIList[this.GUINum][this.hwnd]
 			Loop, Parse, Text, |
 			{
 				TabNumber := this._.MaxIndex() ? this._.MaxIndex() + 1 : 1
@@ -238,8 +238,8 @@ Class CTabControl Extends CControl
 				this._.GUINum := GUINum
 				this._.hwnd := hwnd
 				this._.Controls := {}
-                if (CGUI.GUIList[GUINum].Controls.HasKey(hwnd))
-                    GuiControl, %GUINum%:, % CGUI.GUIList[GUINum].Controls[hwnd].ClassNN, %Text%
+				if (CGUI.GUIList[GUINum].Controls.HasKey(hwnd))
+					GuiControl, %GUINum%:, % CGUI.GUIList[GUINum].Controls[hwnd].ClassNN, %Text%
 			}
 			
 			/*
