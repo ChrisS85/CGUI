@@ -208,7 +208,6 @@ Class CTabControl Extends CControl
 		Add(Text)
 		{
 			Tabs := []
-			Control := CGUI.GUIList[this.GUINum][this.hwnd]
 			Loop, Parse, Text, |
 			{
 				TabNumber := this._.MaxIndex() ? this._.MaxIndex() + 1 : 1
