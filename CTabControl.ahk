@@ -26,11 +26,8 @@ Class CTabControl Extends CControl
 		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
 		this._.Tabs := new this.CTabs(this.GUINum, this.hwnd)
 		
-		;Parse Initial tabs
+		;Add Tabs
         this.Tabs.Add(this.Content)
-		; Content := this.Content
-		; Loop, Parse, Content, |
-			; this._.Tabs._.Insert(new this.CTabs.CTab(A_LoopField, A_Index, this.GUINum, this.hwnd))
 	}
 	/*
 	Property: Tabs
