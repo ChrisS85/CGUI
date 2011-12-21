@@ -26,10 +26,8 @@ Class CTabControl Extends CControl
 		this._.Insert("ImageListManager", new this.CImageListManager(this.GUINum, this.hwnd))
 		this._.Tabs := new this.CTabs(this.GUINum, this.hwnd)
 		
-		;Parse Initial tabs
-		Content := this.Content
-		Loop, Parse, Content, |
-			this._.Tabs._.Insert(new this.CTabs.CTab(A_LoopField, A_Index, this.GUINum, this.hwnd))
+		;Add Tabs
+		this.Tabs.Add(this.Content)
 	}
 	/*
 	Property: Tabs
@@ -213,11 +211,9 @@ Class CTabControl Extends CControl
 			Loop, Parse, Text, |
 			{
 				TabNumber := this._.MaxIndex() ? this._.MaxIndex() + 1 : 1
-				Tab := new this.CTab(A_loopField, TabNumber, this.GUINum, this.hwnd)
+				Tab := new this.CTab(A_LoopField, TabNumber, this.GUINum, this.hwnd)
 				this._.Insert(Tab)
 				Tabs.Insert(Tab)
-				Control := CGUI.GUIList[this.GUINum][this.hwnd]
-				GuiControl, % this.GUINum ":", % Control.ClassNN, %A_loopField%
 			}
 			return Tabs.MaxIndex() > 1 ? Tabs : Tabs[1]
 		}
@@ -241,6 +237,8 @@ Class CTabControl Extends CControl
 				this._.GUINum := GUINum
 				this._.hwnd := hwnd
 				this._.Controls := {}
+				if (CGUI.GUIList[GUINum].Controls.HasKey(hwnd))
+					GuiControl, %GUINum%:, % CGUI.GUIList[GUINum].Controls[hwnd].ClassNN, %Text%
 			}
 			
 			/*
