@@ -377,6 +377,8 @@ Class CListViewControl Extends CControl
 				index := LV_GetCount() - A_Index + 1 ;loop backwards
 				sIndex := this.CRow.GetSortedIndex(index, Control.hwnd) - 1
 				this.CRow.SetUnsortedIndex(sIndex, index + 1, Control.hwnd)
+				this._[index + 1] := this._[index] ;Fix up the internally stored indices
+				this._[index + 1]._.RowNumber := index + 1
 			}
 			
 			SortedIndex := LV_Insert(SortedIndex, Options, Fields*)
@@ -457,9 +459,14 @@ Class CListViewControl Extends CControl
 			UnsortedIndex := Control.IndependentSorting ? RowNumberOrItem : this.CRow.GetUnsortedIndex(SortedIndex, Control.hwnd)
 			;Decrease the unsorted indices after the deletion index by one
 			Loop % LV_GetCount() - UnsortedIndex
+			{
 				this.CRow.SetUnsortedIndex(this.CRow.GetSortedIndex(UnsortedIndex + A_Index, Control.hwnd), UnsortedIndex + A_Index - 1, Control.hwnd)
+				this._[UnsortedIndex + A_Index - 1] := this._[UnsortedIndex + A_Index] ;Fix up the internally stored indices
+				this._.Remove(UnsortedIndex + A_Index)
+				this._[UnsortedIndex + A_Index - 1]._.RowNumber := UnsortedIndex + A_Index - 1
+			}
 			result := LV_Delete(SortedIndex)
-			this._.Remove(UnsortedIndex)
+			
 			if(WasSelected)
 			{
 				if(LV_GetCount("Selected") = 1)
@@ -803,13 +810,15 @@ Class CListViewControl Extends CControl
 					}
 					else if(Name = "Text")
 					{
+						Gui, % Control.GUINum ":Default"
+						Gui, ListView, % Control.hwnd
 						LV_Modify(this.GetSortedIndex(this._.RowNumber, Control.hwnd), "Col" 1, Value)
 						return Value
 					}
 					else if(Key := {Checked : "Check", Focused : "Focus", "Selected" : ""}[Name])
 					{
 						Gui, % Control.GUINum ":Default"
-						Gui, ListView, % Control.ClassNN
+						Gui, ListView, % Control.hwnd
 						LV_Modify(this.GetSortedIndex(this._.RowNumber, Control.hwnd), (Value = 0 ? "-" : "") Key)
 						if(Name = "Selected")
 						{
