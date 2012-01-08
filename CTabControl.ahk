@@ -202,10 +202,10 @@ Class CTabControl Extends CControl
 		Adds a tab.
 		
 		Parameters:
-			Text - The text of the new tab.
+			Text - The text of the new tab. If this parameter contains a pipe character (|), multiple tabs will be created and the return value is an array of CTab objects.
 			
 		Returns:
-			An object of type <CTabControl.CTabs.CTab>.
+			An object of type <CTabControl.CTabs.CTab>. If multiple tabs are created, an array of CTab objects is returned.
 		*/
 		Add(Text)
 		{
@@ -213,11 +213,12 @@ Class CTabControl Extends CControl
 			Loop, Parse, Text, |
 			{
 				TabNumber := this._.MaxIndex() ? this._.MaxIndex() + 1 : 1
+				msgbox % tabnumber
 				Tab := new this.CTab(A_loopField, TabNumber, this.GUINum, this.hwnd)
 				this._.Insert(Tab)
 				Tabs.Insert(Tab)
-				Control := CGUI.GUIList[this.GUINum][this.hwnd]
-				GuiControl, % this.GUINum ":", % Control.ClassNN, %A_loopField%
+				Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]
+				GuiControl, % this.GUINum ":", % Control.hwnd, %A_loopField%
 			}
 			return Tabs.MaxIndex() > 1 ? Tabs : Tabs[1]
 		}
