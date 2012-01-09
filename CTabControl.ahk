@@ -209,20 +209,30 @@ Class CTabControl Extends CControl
 		*/
 		Add(Text)
 		{
+			Static TCM_GETITEMCOUNT := 0x1304
+			Static TCM_INSERTITEMA  := 0x1307
+			Static TCM_INSERTITEMW  := 0x133E
+			Static TCM_INSERTITEM := A_IsUnicode ? TCM_INSERTITEMW : TCM_INSERTITEMA
+			Static TCITEMSize := (5 * 4) + (2 * A_PtrSize) + (A_PtrSize - 4)
+			Static TCIF_TEXT := 0x0001
+			Static TEXTPos := (3 * 4) + (A_PtrSize - 4)
 			Tabs := []
 			Loop, Parse, Text, |
 			{
 				TabNumber := this._.MaxIndex() ? this._.MaxIndex() + 1 : 1
-				msgbox % tabnumber
 				Tab := new this.CTab(A_loopField, TabNumber, this.GUINum, this.hwnd)
 				this._.Insert(Tab)
 				Tabs.Insert(Tab)
 				Control := CGUI.GUIList[this.GUINum].Controls[this.hwnd]
-				GuiControl, % this.GUINum ":", % Control.hwnd, %A_loopField%
+				;~ GuiControl, % this.GUINum ":", % Control.hwnd, %A_loopField% ;Doesn't work in current AHK_L
+				VarSetCapacity(TCITEM, TCITEMSize, 0)
+				NumPut(TCIF_TEXT, TCITEM, 0, "UInt")
+				txt := A_LoopField
+				NumPut(&txt, TCITEM, TEXTPos, "Ptr")
+				SendMessage, TCM_INSERTITEM, Control.Tabs.MaxIndex(), &TCITEM,, % "ahk_id " Control.HWND
 			}
 			return Tabs.MaxIndex() > 1 ? Tabs : Tabs[1]
 		}
-		
 		;Removing tabs is unsupported for now because the controls will not be removed
 		;~ Remove(TabNumber)
 		;~ {
