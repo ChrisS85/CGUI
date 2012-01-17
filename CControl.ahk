@@ -576,6 +576,7 @@ Class CControl ;Never created directly
 #include <CCheckboxControl>
 #include <CChoiceControl>
 #include <CListViewControl>
+#include <CLinkControl>
 #include <CPictureControl>
 #include <CGroupBoxControl>
 #include <CStatusBarControl>
@@ -585,4 +586,3 @@ Class CControl ;Never created directly
 #include <CSliderControl>
 #include <CHotkeyControl>
 #include <CActiveXControl>
-#include <CSysLinkControl>
