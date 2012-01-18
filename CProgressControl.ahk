@@ -47,7 +47,7 @@ Class CProgressControl Extends CControl
 				return Value
 		}
 	}
-	__Set(Name, Value, Params*)
+	__Set(Name, Params*)
 	{
 		if(!CGUI.GUIList[this.GUINum].IsDestroyed)
 		{
