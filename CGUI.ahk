@@ -47,6 +47,9 @@ Class CGUI
 	;The _Constructor key is never actually assigned (see __Set()). This line simply calls the __New() constructor of CGUI so that window classes deriving from CGUI do not need to call the base constructor.
 	_Constructor := this.base.base.__New(this)
 	
+	;Used for keeping track of the window size. Until the window is shown for the first time or manual size is set
+	;it will keep updating the size of the (invisible) window when new controls are added.
+	_Initialized := false
 	__New(instance)
 	{
 		if(!CGUI_Assert(IsObject(instance) && !instance.HasKey("hwnd"), "CGUI constructor must not be called!"))
@@ -70,36 +73,35 @@ Class CGUI
 		CGUI.GUIList[instance.GUINum] := instance
 		GUI, % instance.GUINum ":+LabelCGUI_ +LastFound"
 		instance.hwnd := WinExist()
-		
+		/*
+		Prepare for some HAX!
+		The code below enables the user of this library to create subclasses inside the GUI class that represent controls.
+		It scans through the object and looks for fitting subclasses.
+		Then a an object based on a copy of a subclass is created and a control with the params specified in the subclass is created.
+		The base of the copied subclass is changed to the newly created control object so that the functions in the subclass can access the control object through the this keyword.
+		Event functions are also preferably routed to subclasses.
+		*/
 		for key, Value in instance.base
 		{
-			if(IsObject(Value) && Value.HasKey("__Class"))
+			if(IsObject(Value) && Value.HasKey("__Class") && Value.HasKey("Type") && Value.HasKey("Options")	&& Value.HasKey("Text")) ;Look for classes that define a type property
 			{
-				cache_new := ObjRemove(Value, "__new") ; cache and remove the __new function (if present)
-				
-				ctrl := new Value ;initiate instance variables without calling __new
-				if (ctrl.Type != "" && ctrl.Options != "" && ctrl.Text != "") ;HasKey() can return false but it could still exist in base (as a static key)
-				{
-					Name := ctrl.Name != "" ? ctrl.Name : RegExReplace(ctrl.__Class, "^.+\.([^\.]+)$", "$1")
-					ctrl.base.base := instance.AddControl(ctrl.Type, Name, ctrl.Options, ctrl.Text)
-					
-					instance.Controls[ctrl.hwnd] := instance[Name] := ctrl
-					
-					if(IsFunc(cache_new)) ; call __new manually, extra params are discarded
-						cache_new.(ctrl, instance)
-				}
-				else ;whoops not a CControl class apparently
-					ctrl := ""
-				
-				if IsFunc(cache_new) ; add the __new function back to the objects
-                {
-					ObjInsert(Value, "__new", cache_new)
-                    if IsObject(ctrl)
-                        ObjInsert(ctrl.base, "__new", cache_new)
-                }
+				;~ if(!CGUI_Assert(Value.Type != "", "Control class definitions must use static properties."))
+					;~ continue
+				Name := Value.HasKey("Name") ? Value.Name : SubStr(Value.__Class, InStr(Value.__Class, ".") + 1)
+				control := instance.AddControl(Value.Type, Name, Value.Options, Value.Text)
+				instance[Name] := {base : ObjClone(Value)}
+				instance[Name].base.base := control
+				instance.Controls[instance[Name].hwnd] := instance[Name]
+				if(IsFunc(instance[Name].__New) = 3)
+					instance[Name].__New(instance)
+				else if(IsFunc(instance[Name].__New) = 2)
+					instance[Name].__New()
 			}
 		}
 		
+		Gui, % instance.GUINum ":Show", Hide Autosize Center
+		;~ WinGetPos, x, y, w, h, % "ahk_id " instance.hwnd
+		;~ msgbox % "w " w " h " h
 		;Register for WM_COMMAND and WM_NOTIFY messages since they are commonly used for various purposes.
 		;~ instance.OnMessage(WM_COMMAND := 0x111, "HandleInternalMessage")
 		;~ instance.OnMessage(WM_NOTIFY := 0x004E, "HandleInternalMessage")
@@ -250,6 +252,8 @@ Class CGUI
 	{
 		if(this.IsDestroyed)
 			return
+		if(this.HasKey("_Initialized")) ;Prevent recalculating size after it has been shown the first time
+			this.Remove("_Initiliazed")
 		Gui, % this.GUINum ":Show",%Options%, % this.Title
 	}
 	
@@ -458,23 +462,14 @@ Class CGUI
 		local hControl, type, testHWND, vName, NeedsGLabel
 		if(this.IsDestroyed)
 			return
-		
-		type := Control
-		
-		;Automatically generate a name if the parameter is empty
-		if(!Name)
-		{
-			Name := 1
-			for k, v in this.Controls
-				if(v.Type = Type)
-					Name++
-			Name := Type Name
-		}
-		
+		 ;Validate name.
+		if(!CGUI_Assert(Name, "GUI.AddControl() : No name specified. Please supply a proper control name.", -2))
+			return
 		;Make sure not to add a control with duplicate name.
 		if(!CGUI_Assert(!IsObject(ControlList) || !IsObject(ControlList[Name]), "GUI.AddControl(): The control " Name " already exists. Please choose another name!", -2))
 			return
 		
+		type := Control
 		;Some control classes represent multiple controls, those are handled separately here.
 		if(Control = "DropDownList" || Control = "ComboBox" || Control = "ListBox")
 			Control := new CChoiceControl(Name, Options, Text, this.GUINum, type)
@@ -524,6 +519,10 @@ Class CGUI
 		if(ControlList)
 			ControlList[Control.Name] := Control
 		this.Controls[hControl] := Control ;Add to list of controls
+		
+		;This will make sure that the window updates its size each time a new control is added until it is shown for the first time
+		if(this.HasKey("_Initialized") && !this.Visible)
+			Gui, % this.GUINum ":Show", % "Hide Autosize" (this._Initialized ? "" : " Center") ;If _Initialized is true the position was changed manually and mustn't be updated
 		return Control
 	}
 	
@@ -701,7 +700,7 @@ Class CGUI
 			}
 			else if(Name != "IsDestroyed" && !this.IsDestroyed)
 			{
-				if Name in x,y,width, height
+				if Name in x,y,width,height
 				{
 					WinGetPos, x,y,width,height,% "ahk_id " this.hwnd
 					Value := %Name%
@@ -718,7 +717,7 @@ Class CGUI
 				}
 				else if(Name = "Title")
 					WinGetTitle, Value, % "ahk_id " this.hwnd
-				else if Name in Style,ExStyle, TransColor, Transparent, MinMax
+				else if Name in Style,ExStyle,TransColor,Transparent,MinMax
 					WinGet, Value, %Name%, % "ahk_id " this.hwnd
 				else if(Name = "ActiveControl") ;Returns the control object that has keyboard focus
 				{
@@ -778,12 +777,12 @@ Class CGUI
 			}
 			if Name in AlwaysOnTop,Border,Caption,LastFound,LastFoundExist,MaximizeBox,MaximizeBox,MinimizeBox,Resize,SysMenu
 				Gui, % this.GUINum ":" (Value = 1 ? "+" : "-") Name
-			else if Name in OwnDialogs, Theme, ToolWindow
+			else if Name in OwnDialogs,Theme,ToolWindow
 			{
 				Gui, % this.GUINum ":" (Value = 1 ? "+" : "-") Name
 				this._[Name] := Value = 1
 			}
-			else if Name in MinSize, MaxSize
+			else if Name in MinSize,MaxSize
 			{
 				Gui, % this.GUINum ":+" Name Value
 				if(!IsObject(this._[Name]))
@@ -841,19 +840,33 @@ Class CGUI
 					this._.OwnerAutoClose := 0
 				}
 			}
-			else if Name in Style, ExStyle, Transparent, TransColor
+			else if Name in Style,ExStyle,Transparent,TransColor
 				WinSet, %Name%, %Value%, % "ahk_id " this.hwnd
 			else if(Name = "Region")
 			{
 				WinSet, Region, %Value%, % "ahk_id " this.hwnd
 				this._.Region := Value
 			}
-			else if Name in x,y,width, height
+			else if Name in x,y,width,height
+			{
 				WinMove,% "ahk_id " this.hwnd,,% Name = "x" ? Value : "", % Name = "y" ? Value : "", % Name = "width" ? Value : "", % Name = "height" ? Value : ""
+				if(Name = "width" || Name = "height") ;Prevent recalculating size after it has been set manually
+					this.Remove("_Initialized")
+				else if(this.HasKey("_Initialized")) ;Mark that position was changed manually during recalculation phase
+					this._Initialized := true
+			}
 			else if(Name = "Position")
+			{
 				WinMove,% "ahk_id " this.hwnd,,% Value.x, % Value.y
+				if(this.HasKey("_Initialized")) ;Mark that position was changed manually during recalculation phase
+					this._Initialized := true
+			}
 			else if(Name = "Size")
+			{
 				WinMove,% "ahk_id " this.hwnd,,,, % Value.width, % Value.height
+				if(Name = "width" || Name = "height") ;Prevent recalculating size after it has been set manually
+					this.Remove("_Initialized")
+			}
 			else if(Name = "Title")
 				WinSetTitle, % "ahk_id " this.hwnd,,%Value%
 			else if(Name = "WindowColor")
@@ -872,7 +885,11 @@ Class CGUI
 			else if(Name = "Enabled")
 				this.Style := (Value ? "-" : "+") 0x8000000 ;WS_DISABLED
 			else if(Name = "Visible")
+			{
 				this.Style := (Value ? "+" : "-") 0x10000000 ;WS_VISIBLE
+				if(Value) ;Prevent recalculating size after it has been shown the first time
+					this.Remove("_Initialized")
+			}
 			else if(Name = "ValidateOnFocusLeave")
 				this._[Name] := Value = 1
 			else if(Name = "_Constructor") ;_Constructor is just a temporary variable name for automatically calling the CGUI constructor
