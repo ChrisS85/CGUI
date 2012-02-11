@@ -264,24 +264,25 @@ Class CControl ;Never created directly
 				DetectHiddenWindows, On
 				Handled := true
 				if(Name = "Text")
-					GuiControlGet, Result,% this.GuiNum ":", % this.ClassNN
+					GuiControlGet, Result,% this.GuiNum ":", % this.hwnd
 					;~ ControlGetText, Result,, % "ahk_id " this.hwnd
 				else if(Name = "GUI")
 					Result := CGUI.GUIList[this.GUINum]
 				else if(Name = "x" || Name = "y"  || Name = "width" || Name = "height")
 				{
-					ControlGetPos, x,y,width,height,,% "ahk_id " this.hwnd
-					Result := %Name%
+					GuiControlGet, Result, % this.GUINum ":Pos", % this.hwnd
+					Name := {x : "x", y : "y", width : "w", height : "h"}[Name]
+					Result := Result%Name%
 				}
 				else if(Name = "Position")
 				{
-					ControlGetPos, x,y,,,,% "ahk_id " this.hwnd
-					Result := {x:x, y:y}
+					GuiControlGet, Result, % this.GUINum ":Pos", % this.hwnd
+					Result := {x : ResultX, y : ResultY}
 				}
 				else if(Name = "Size")
 				{
-					ControlGetPos,,,width,height,,% "ahk_id " this.hwnd
-					Result := {width:width, height:height}
+					GuiControlGet, Result, % this.GUINum ":Pos", % this.hwnd
+					Result := {width : ResultW, height : ResultH}
 				}
 				else if(Name = "ClassNN")
 				{
@@ -371,13 +372,16 @@ Class CControl ;Never created directly
 			DetectHiddenWindows, On
 			Handled := true
 			if(Name = "Text")
-				GuiControl, % this.GUINum ":",% this.ClassNN, %Value% ;Use GuiControl because of line endings
-			else if(Name = "x" || Name = "y"  || Name = "width" || Name = "height")
-				ControlMove,, % (Name = "x" ? Value : ""),% (Name = "y" ? Value : ""),% (Name = "width" ? Value : ""),% (Name = "height" ? Value : ""),% "ahk_id " this.hwnd
+				GuiControl, % this.GUINum ":",% this.hwnd, %Value% ;Use GuiControl because of line endings
+			else if(Name = "x" || Name = "y" || Name = "width" || Name = "height")
+			{
+				Name := {x : "x", y : "y", width : "w", height : "h"}[Name]
+				GuiControl, % this.GUINum ":Move", % this.hwnd, % Name Value
+			}
 			else if(Name = "Position")
-				ControlMove,, % Value.x,% Value.y,,,% "ahk_id " this.hwnd
+				GuiControl, % this.GUINum ":Move", % this.hwnd, % "x" Value.x " y" Value.y
 			else if(Name = "Size")
-				ControlMove,, % Value.width,% Value.height,% "ahk_id " this.hwnd
+				GuiControl, % this.GUINum ":Move", % this.hwnd, % "w" Value.width " h" Value.height
 			else if(Name = "Enabled" && Value)
 				this.Enable()
 			else if(Name = "Enabled" && !Value)

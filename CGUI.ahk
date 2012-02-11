@@ -702,18 +702,21 @@ Class CGUI
 			{
 				if Name in x,y,width,height
 				{
-					WinGetPos, x,y,width,height,% "ahk_id " this.hwnd
-					Value := %Name%
+					VarSetCapacity(rc, 16)
+					DllCall("GetClientRect", "PTR", this.hwnd, "PTR", &rc, "UINT")
+					Value := NumGet(rc, {x : 0, y : 4, width : 8, height : 12}[Name], "int")
 				}
 				else if(Name = "Position")
 				{
-					WinGetPos, x,y,,,% "ahk_id " this.hwnd
-					Value := {x:x,y:y}
+					VarSetCapacity(rc, 16)
+					DllCall("GetClientRect", "PTR", this.hwnd, "PTRP", rc, "UINT")
+					Value := {x : NumGet(rc, 0, "int"), y : NumGet(rc, 0, "int")}
 				}
 				else if(Name = "Size")
 				{
-					WinGetPos,,,width,height,% "ahk_id " this.hwnd
-					Value := {width:width, height:height}
+					VarSetCapacity(rc, 16)
+					DllCall("GetClientRect", "PTR", this.hwnd, "PTRP", rc, "UINT")
+					Value := {width : NumGet(rc, 0, "int"), height : NumGet(rc, 0, "int")}
 				}
 				else if(Name = "Title")
 					WinGetTitle, Value, % "ahk_id " this.hwnd
