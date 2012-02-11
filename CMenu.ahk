@@ -283,7 +283,7 @@ Class CMenu
 			this._.Icon := Icon
 			this._.IconNumber := IconNumber
 			this._.IconWidth := IconWidth
-			Menu, % this.Menu, Icon, % this.Name, %Icon%, %IconNumber%, %IconWidth%
+			Menu, % this.Menu, Icon, % this.Text, %Icon%, %IconNumber%, %IconWidth%
 		}
 		/*
 		Property: Text
