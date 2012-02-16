@@ -572,88 +572,69 @@ Class CListViewControl Extends CControl
 				Control.hParentControl := this._.hwnd
 				return Control
 			}
+			;Sets the unsorted index of a list item (in its custom data field)
 			/*
 			typedef struct {
-			  UINT   mask;
-			  int    iItem;
-			  int    iSubItem;
-			  UINT   state;
-			  UINT   stateMask;
-			  LPTSTR pszText;
-			  int    cchTextMax;
-			  int    iImage;
-			  LPARAM lParam;
+			  UINT   mask; 4
+			  int    iItem; 4
+			  int    iSubItem; 4
+			  UINT   state; 4
+			  UINT   stateMask; 4 (+4 padding)
+			  LPTSTR pszText; 4-8
+			  int    cchTextMax; 4
+			  int    iImage; 4
+			  LPARAM lParam; 4-8
 			#if (_WIN32_IE >= 0x0300)
-			  int    iIndent;
+			  int    iIndent; 4
 			#endif
 			#if (_WIN32_WINNT >= 0x0501)
-			  int    iGroupId;
-			  UINT   cColumns;
-			  UINT   puColumns;
+			  int    iGroupId; 4
+			  UINT   cColumns; 4
+			  UINT   puColumns; 4
 			#endif
 			#if (_WIN32_WINNT >= 0x0600)
-			  int    piColFmt;
-			  int    iGroup;
+			  int    piColFmt; 4
+			  int    iGroup; 4
 			#endif
 			} LVITEM, *LPLVITEM;
 			*/
-			SetUnsortedIndex(SortedIndex, lParam, hwnd)
+			SetUnsortedIndex(SortedIndex, UnsortedIndex, hwnd)
 			{
-				;~ if(!this.IndependentSorting)
-					;~ return
-				VarSetCapacity(LVITEM, 13*4 + 2 * A_PtrSize, 0)
-				mask := 0x4   ; LVIF_PARAM := 0x4
-				NumPut(mask, LVITEM, 0, "UInt")
+				static LVM_SETITEM := (A_IsUnicode ? 0x1000 + 76 : 0x1000 + 6)
+				VarSetCapacity(LVITEM, 12*4 + 3 * A_PtrSize, 0)
+				NumPut(0x4, LVITEM, 0, "UInt") ; LVIF_PARAM := 0x4
 				NumPut(SortedIndex - 1, LVITEM, 4, "Int")   ; iItem
-				NumPut(lParam, LVITEM, 7*4 + A_PtrSize, "PTR")
-				;~ string := this.hex(LVITEM,  "UINT|INT|INT|UINT|UINT|PTR|INT|INT|PTR|INT|INT|UINT|UINT|INT|INT")
-				SendMessage, (A_IsUnicode ? 0x1000 + 76 : 0x1000 + 6), 0, &LVITEM,, % "ahk_id " hwnd ;LVM_SETITEM
-				;~ result := errorlevel
-				;~ result := DllCall("SendMessage", "PTR", hwnd, "UInt", LVM_SETITEM := (A_IsUnicode ? 0x1000 + 76 : 0x1000 + 6), "PTR", 0, "PTRP", LVITEM, "PTR")
-				;~ lParam2 := this.GetUnsortedIndex(RowNumber, hwnd)
-				return ErrorLevel
+				NumPut(UnsortedIndex, LVITEM, 6*4 + 2*A_PtrSize, "PTR")
+				return DllCall("SendMessage", "PTR", hwnd, "UInt", LVM_SETITEM, "PTR", 0, "PTR", &LVITEM, "PTR")
 			}
 			;Returns the sorted index (by which AHK usually accesses listviews) by searching for a custom index that is independent of sorting
 			/*
 			typedef struct tagLVFINDINFO {
-			  UINT    flags; 4
+			  UINT    flags; 4 (+4 padding)
 			  LPCTSTR psz; 4-8
 			  LPARAM  lParam; 4- 8
 			  POINT   pt; 8
-			  UINT    vkDirection; 4
+			  UINT    vkDirection; 4 (+4 padding)
 			} LVFINDINFO, *LPFINDINFO;
 			*/
 			GetSortedIndex(UnsortedIndex, hwnd)
 			{
-				;~ if(!this.IndependentSorting)
-					;~ return UnsortedIndex
+				static LVM_FINDITEM := (A_IsUnicode ? 0x1000 + 83 : 0x1000 + 13)
 				;Create the LVFINDINFO structure
-				VarSetCapacity(LVFINDINFO, 4*4 + 2 * A_PtrSize, 0)
-				mask := 0x1   ; LVFI_PARAM := 0x1
-				NumPut(mask, LVFINDINFO, 0, "UInt")
-				NumPut(UnsortedIndex, LVFINDINFO, 4 + A_PtrSize, "PTR")
-				;~ string := hex(LVFINDINFO,  "UINT|INT|INT|UINT|UINT|PTR|INT|INT|PTR|INT|INT|UINT|UINT|INT|INT")
-				SendMessage, (A_IsUnicode ? 0x1000 + 83 : 0x1000 + 13), -1, &LVFINDINFO,, % "ahk_id " hwnd ;LVM_FINDITEM
-				;~ MsgReply := ErrorLevel > 0x7FFFFFFF ? -(~ErrorLevel) - 1 : ErrorLevel
-				;~ result := DllCall("SendMessage", "PTR", hwnd, "UInt", LVM_FINDITEM := (A_IsUnicode ? 0x1000 + 83 : 0x1000 + 13), "PTR", -1, "UIntP", LVITEM, "PTR") + 1
-				return ErrorLevel + 1
+				VarSetCapacity(LVFINDINFO, 2*4 + 4 * A_PtrSize, 0)
+				NumPut(0x1, LVFINDINFO, 0, "UInt") ; LVFI_PARAM := 0x1
+				NumPut(UnsortedIndex, LVFINDINFO, 2* A_PtrSize, "PTR")
+				return DllCall("SendMessage", "PTR", hwnd, "uint", LVM_FINDITEM, "PTR", -1, "PTR", &LVFINDINFO, "PTR") + 1
 			}
+			;Gets the unsorted index of a list item from its custom data field
 			GetUnsortedIndex(SortedIndex, hwnd)
 			{
-				;~ if(!this.IndependentSorting)
-					;~ return SortedIndex
-				VarSetCapacity(LVITEM, 13*4 + 2 * A_PtrSize, 0)
-				mask := 0x4   ; LVIF_PARAM := 0x4
-				NumPut(mask, LVITEM, 0, "UInt")
+				static LVM_GETITEM := (A_IsUnicode ? 0x1000 + 75 : 0x1000 + 5)
+				VarSetCapacity(LVITEM, 12*4 + 3 * A_PtrSize, 0)
+				NumPut(0x4, LVITEM, 0, "UInt") ; LVIF_PARAM := 0x4
 				NumPut(SortedIndex - 1, LVITEM, 4, "Int")   ; iItem
-				;~ NumPut(lParam, LVITEM, 7*4 + A_PtrSize, "PTR")
-				;~ string := this.hex(LVITEM,  "UINT|INT|INT|UINT|UINT|PTR|INT|INT|PTR|INT|INT|UINT|UINT|INT|INT")
-				SendMessage, (A_IsUnicode ? 0x1000 + 75 : 0x1000 + 5), 0, &LVITEM,,% "ahk_id " hwnd ;LVM_GETITEM
-				;~ result := errorlevel
-				;~ result := DllCall("SendMessage", "PTR", hwnd, "UInt", LVM_GETITEM := (A_IsUnicode ? 0x1000 + 75 : 0x1000 + 5), "PTR", 0, "PTRP", LVITEM, "PTR")
-				;~ string := this.hex(LVITEM,  "UINT|INT|INT|UINT|UINT|PTR|INT|INT|PTR|INT|INT|UINT|UINT|INT|INT")
-				UnsortedIndex := NumGet(LVITEM, 7*4 + A_PtrSize, "PTR")
-				return UnsortedIndex
+				DllCall("SendMessage", "PTR", hwnd, "UInt", LVM_GETITEM, "PTR", 0, "PTR", &LVITEM, "PTR")
+				return NumGet(LVITEM, 6*4 + 2*A_PtrSize, "PTR")
 			}
 			_NewEnum()
 			{
