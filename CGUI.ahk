@@ -710,13 +710,13 @@ Class CGUI
 				{
 					VarSetCapacity(rc, 16)
 					DllCall("GetClientRect", "PTR", this.hwnd, "PTRP", rc, "UINT")
-					Value := {x : NumGet(rc, 0, "int"), y : NumGet(rc, 0, "int")}
+					Value := {x : NumGet(rc, 0, "int"), y : NumGet(rc, 4, "int")}
 				}
 				else if(Name = "Size")
 				{
 					VarSetCapacity(rc, 16)
 					DllCall("GetClientRect", "PTR", this.hwnd, "PTRP", rc, "UINT")
-					Value := {width : NumGet(rc, 0, "int"), height : NumGet(rc, 0, "int")}
+					Value := {width : NumGet(rc, 8, "int"), height : NumGet(rc, 12, "int")}
 				}
 				else if(Name = "Title")
 					WinGetTitle, Value, % "ahk_id " this.hwnd
