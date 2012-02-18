@@ -709,13 +709,13 @@ Class CGUI
 				else if(Name = "Position")
 				{
 					VarSetCapacity(rc, 16)
-					DllCall("GetClientRect", "PTR", this.hwnd, "PTRP", rc, "UINT")
+					DllCall("GetClientRect", "PTR", this.hwnd, "PTR", &rc, "UINT")
 					Value := {x : NumGet(rc, 0, "int"), y : NumGet(rc, 4, "int")}
 				}
 				else if(Name = "Size")
 				{
 					VarSetCapacity(rc, 16)
-					DllCall("GetClientRect", "PTR", this.hwnd, "PTRP", rc, "UINT")
+					DllCall("GetClientRect", "PTR", this.hwnd, "PTR", &rc, "UINT")
 					Value := {width : NumGet(rc, 8, "int"), height : NumGet(rc, 12, "int")}
 				}
 				else if(Name = "Title")
