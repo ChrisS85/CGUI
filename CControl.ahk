@@ -391,9 +391,9 @@ Class CControl ;Never created directly
 			else if(Name = "Visible" && !Value)
 				this.Hide()
 			else if(Name = "Style")
-				Control, Style, %Value%,,,% "ahk_id " this.hwnd
+				Control, Style, %Value%,,% "ahk_id " this.hwnd
 			else if(Name = "ExStyle")
-				Control, ExStyle, %Value%,,,% "ahk_id " this.hwnd
+				Control, ExStyle, %Value%,,% "ahk_id " this.hwnd
 			else if(Name = "DisableNotifications")
 				GuiControl, % this.GUINum (Value ? ":-g" : ":+gCGUI_HandleEvent" ), % this.hwnd
 			else if(Name = "_") ;Prohibit setting the proxy object
