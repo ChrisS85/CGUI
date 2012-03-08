@@ -40,6 +40,5 @@
 
    __New(){
       this.registeredHandlers := []
-	  msgbox new eventhandler
    }
 }
