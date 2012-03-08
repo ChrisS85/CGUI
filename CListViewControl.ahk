@@ -29,18 +29,9 @@ Class CListViewControl Extends CControl
 	
 	__New(Name, ByRef Options, Text, GUINum)
 	{
-		Events := ["Click", "RightClick", "ItemActivated", "MouseLeave", "EditingStart", "FocusReceived", "FocusLost", "ItemSelected", "ItemDeselected", "ItemFocused", "ItemDefocused", "ItemChecked", " ItemUnChecked", "SelectionChanged", "CheckedChanged", "FocusedChanged", "KeyPress", "Marquee", "ScrollingStart", "ScrollingEnd"]
-		if(!InStr(Options, "AltSubmit")) ;Automagically add AltSubmit when necessary
-		{
-			for index, function in Events
-			{
-				if(IsFunc(CGUI.GUIList[GUINum][Name "_" function]))
-				{
-					Options .= " AltSubmit"
-					break
-				}
-			}
-		}
+		if(!InStr(Options, "AltSubmit")) ;Automagically add AltSubmit
+			Options .= " AltSubmit"
+			
 		base.__New(Name, Options, Text, GUINum)
 		this._.Insert("ControlStyles", {ReadOnly : -0x200, Header : -0x4000, NoSortHdr : 0x8000, AlwaysShowSelection : 0x8, Multi : -0x4, Sort : 0x10, SortDescending : 0x20})
 		this._.Insert("ControlExStyles", {Checked : 0x4, FullRowSelect : 0x20, Grid : 0x1, AllowHeaderReordering : 0x10, HotTrack : 0x8})
@@ -190,6 +181,8 @@ Class CListViewControl Extends CControl
 				if(Name = "FocusedItem")
 					Value := this._.Items[Value] ;new this.CItems.CRow(Value, this.GUINum, this.Name)
 			}
+			else if(Name = "PreviouslySelectedItem")
+				Value := this._.PreviouslySelectedItem
 			Loop % Params.MaxIndex()
 				if(IsObject(Value)) ;Fix unlucky multi parameter __GET
 					Value := Value[Params[A_Index]]
