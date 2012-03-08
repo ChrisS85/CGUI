@@ -46,19 +46,21 @@ Format: 1.4
 # --------------------------------------------------------------------------
 
 
-File: CGUI  (CGUI.ahk)
-File: CControl  (CControl.ahk)
 File: CActiveXControl  (CActiveXControl.ahk)
 File: CButtonControl  (CButtonControl.ahk)
 File: CCheckboxControl  (CCheckBoxControl.ahk)
 File: CChoiceControl  (CChoiceControl.ahk)
+File: CControl  (CControl.ahk)
 File: CEditControl  (CEditControl.ahk)
 File: CEnumerator  (CEnumerator.ahk)
 File: CFileDialog  (CFileDialog.ahk)
 File: CFolderDialog  (CFolderDialog.ahk)
 File: CGroupBoxControl  (CGroupBoxControl.ahk)
+File: CGUI  (CGUI.ahk)
 File: CHotkeyControl  (CHotkeyControl.ahk)
+File: CLinkControl  (CLinkControl.ahk)
 File: CListViewControl  (CListViewControl.ahk)
+File: CMenu  (CMenu.ahk)
 File: CPictureControl  (CPictureControl.ahk)
 File: CProgressControl  (CProgressControl.ahk)
 File: CSliderControl  (CSliderControl.ahk)
@@ -67,8 +69,8 @@ File: CTabControl  (CTabControl.ahk)
 File: CTextControl  (CTextControl.ahk)
 File: CTreeViewControl  (CTreeViewControl.ahk)
 File: gdip.ahk  (gdip.ahk)
-File: CMenu  (CMenu.ahk)
-File: CSysLinkControl  (CSysLinkControl.ahk)
+File: Parse  (Parse.ahk)
+File: SearchPanel  (CGUI_doc\_doc\javascript\main.js)
 
 Group: Index  {
 
@@ -78,5 +80,6 @@ Group: Index  {
    File Index: Files
    Function Index: Functions
    Property Index: Properties
+   Variable Index: Variables
    }  # Group: Index
 
