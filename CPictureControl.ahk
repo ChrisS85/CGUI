@@ -6,6 +6,9 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CPictureControl Extends CControl
 {
+	Click := new EventHandler()
+	DoubleClick := new EventHandler()
+	
 	__New(Name, Options, Text, GUINum)
 	{
 		base.__New(Name, Options, Text, GUINum)

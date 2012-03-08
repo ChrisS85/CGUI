@@ -6,6 +6,27 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CListViewControl Extends CControl
 {
+	EditingStart := new EventHandler()
+	DoubleClick := new EventHandler()
+	DoubleRightClick := new EventHandler()
+	EditingEnd := new EventHandler()
+	Click := new EventHandler()
+	RightClick := new EventHandler()
+	ItemActivate := new EventHandler()
+	KeyPress := new EventHandler()
+	ColumnClick := new EventHandler()
+	FocusReceived := new EventHandler()
+	ScrollingStart := new EventHandler()
+	MouseLeave := new EventHandler()
+	FocusLost := new EventHandler()
+	Marquee := new EventHandler()
+	ScrollingEnd := new EventHandler()
+	ItemChecked := new EventHandler()
+	ItemUnChecked := new EventHandler()
+	SelectionChanged := new EventHandler()
+	CheckedChanged := new EventHandler()
+	FocusedChanged := new EventHandler()
+	
 	__New(Name, ByRef Options, Text, GUINum)
 	{
 		Events := ["Click", "RightClick", "ItemActivated", "MouseLeave", "EditingStart", "FocusReceived", "FocusLost", "ItemSelected", "ItemDeselected", "ItemFocused", "ItemDefocused", "ItemChecked", " ItemUnChecked", "SelectionChanged", "CheckedChanged", "FocusedChanged", "KeyPress", "Marquee", "ScrollingStart", "ScrollingEnd"]
@@ -24,7 +45,7 @@ Class CListViewControl Extends CControl
 		this._.Insert("ControlStyles", {ReadOnly : -0x200, Header : -0x4000, NoSortHdr : 0x8000, AlwaysShowSelection : 0x8, Multi : -0x4, Sort : 0x10, SortDescending : 0x20})
 		this._.Insert("ControlExStyles", {Checked : 0x4, FullRowSelect : 0x20, Grid : 0x1, AllowHeaderReordering : 0x10, HotTrack : 0x8})
 		this._.Insert("Events", ["DoubleClick", "DoubleRightClick", "ColumnClick", "EditingEnd", "Click", "RightClick", "ItemActivate", "EditingStart", "KeyPress", "FocusReceived", "FocusLost", "Marquee", "ScrollingStart", "ScrollingEnd", "ItemSelected", "ItemDeselected", "ItemFocused", "ItemDefocused", "ItemChecked", "ItemUnChecked", "SelectionChanged", "CheckedChanged", "FocusedChanged"])
-		this._.Insert("Messages", {0x004E : "Notify"}) ;This control uses WM_NOTIFY with NM_SETFOCUS and NM_KILLFOCUS
+		;~ this._.Insert("Messages", {0x004E : "Notify"}) ;This control uses WM_NOTIFY with NM_SETFOCUS and NM_KILLFOCUS
 		this.IndependentSorting := false ;Set to skip redundant __Get calls
 		this.Type := "ListView"
 	}
@@ -272,6 +293,8 @@ Class CListViewControl Extends CControl
 			}
 			else if(Name = "Items")
 				Value := 0
+			else if(Name = "Redraw")
+				GuiControl, % this.GUINum ":" (Value = true ? "+" : "-") "Redraw" , this.hwnd
 			else
 				Handled := false
 			if(!DetectHidden)
@@ -659,7 +682,7 @@ Class CListViewControl Extends CControl
 			Sets the icon of a ListView row
 			
 			Parameters:
-				Filename - The filename of the file containing the icon.
+				Filename - The filename of the file containing the icon or a hBitmap.
 				IconNumberOrTransparencyColor - The icon number or the transparency color if the used file has no transparency support.
 			*/
 			SetIcon(Filename, IconNumberOrTransparencyColor = 1)

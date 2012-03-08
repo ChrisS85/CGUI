@@ -96,6 +96,8 @@ Class CGUI
 					instance[Name].__New(instance)
 				else if(IsFunc(instance[Name].__New) = 2)
 					instance[Name].__New()
+				if(IsFunc(instance[Name].__Init))
+					instance[Name].__Init()
 			}
 		}
 		
@@ -484,6 +486,7 @@ Class CGUI
 			if(CGUI_Assert(IsObject(%Control%), "The control " Control " was not found!", -2))
 			{
 				Control := {base: %Control%}
+				Control.__Init()
 				hControl := Control.__New(Name, Options, Text, this.GUINum)
 				if(!CGUI_Assert(hControl != 0, "Error creating " Type "Control", -2))
 					return
@@ -709,13 +712,13 @@ Class CGUI
 				else if(Name = "Position")
 				{
 					VarSetCapacity(rc, 16)
-					DllCall("GetClientRect", "PTR", this.hwnd, "PTR", &rc, "UINT")
+					DllCall("GetClientRect", "PTR", this.hwnd, "PTRP", rc, "UINT")
 					Value := {x : NumGet(rc, 0, "int"), y : NumGet(rc, 4, "int")}
 				}
 				else if(Name = "Size")
 				{
 					VarSetCapacity(rc, 16)
-					DllCall("GetClientRect", "PTR", this.hwnd, "PTR", &rc, "UINT")
+					DllCall("GetClientRect", "PTR", this.hwnd, "PTRP", rc, "UINT")
 					Value := {width : NumGet(rc, 8, "int"), height : NumGet(rc, 12, "int")}
 				}
 				else if(Name = "Title")

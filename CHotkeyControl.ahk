@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CHotkeyControl Extends CControl
 {
+	HotkeyChanged := new EventHandler()
+	
 	__New(Name, Options, Text, GUINum)
 	{
 		Base.__New(Name, Options, Text, GUINum)
@@ -21,9 +23,6 @@ Class CHotkeyControl Extends CControl
 	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent().
 	For better readability labels may be chained since they all execute the same code.
 	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
-	
-	Event:Attention!
-	Hotkey control does not support FocusEnter and FocusLeave events!
 	
 	Event: HotkeyChanged()
 	Invoked when the user clicked on the control.

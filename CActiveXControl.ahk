@@ -14,7 +14,7 @@ Class CActiveXControl Extends CControl
 	{
 		Base.__New(Name, Options, Text, GUINum)
 		this.Insert("Type", "ActiveX")
-		this._.Insert("Messages", {0x004E : "Notify"})
+		; this._.Insert("Messages", {0x004E : "Notify"})
 	}
 	PostCreate()
 	{

@@ -6,6 +6,7 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CEditControl Extends CControl
 {
+	TextChanged := new EventHandler()
 	__New(Name, Options, Text, GUINum)
 	{
 		Base.__New(Name, Options, Text, GUINum)

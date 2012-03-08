@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CSliderControl Extends CControl
 {
+	SliderMoved := new EventHandler()
+	
 	__New(Name, Options, Text, GUINum)
 	{
 		Base.__New(Name, Options, Text, GUINum)
@@ -15,7 +17,7 @@ Class CSliderControl Extends CControl
 		this._.Insert("Min", 0)
 		this._.Insert("Max", 100)
 		this._.Insert("Invert", InStr(Options, "Invert"))
-		this._.Insert("Messages", {0x004E : "Notify"}) ;This control uses WM_NOTIFY with NM_SETFOCUS and NM_KILLFOCUS
+		; this._.Insert("Messages", {0x004E : "Notify"}) ;This control uses WM_NOTIFY with NM_SETFOCUS and NM_KILLFOCUS
 		this._.Insert("Events", ["SliderMoved"])
 	}
 	

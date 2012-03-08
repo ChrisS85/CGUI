@@ -6,6 +6,7 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 {
+	CheckedChanged := new EventHandler()
 	__New(Name, Options, Text, GUINum, Type)
 	{
 		Options .= " +0x4000" ;BS_NOTIFY to allow receiving BN_SETFOCUS and BN_KILLFOCUS notifications in CGUI

@@ -1,9 +1,12 @@
+#include <EventHandler>
+#include <Delegate>
 /*
 Class: CControl
 Basic control class from which all controls extend.
 */
 Class CControl ;Never created directly
 {
+	OnValidate := new EventHandler()
 	__New(Name, Options, Text, GUINum) ;Basic constructor for all controls. The control is created in CGUI.AddControl()
 	{
 		this.Insert("Name", Name)
@@ -79,12 +82,12 @@ Class CControl ;Never created directly
 	
 	
 	/*
-	Validates the text value of this control by calling a <Control.Validate> event function which needs to return the validated (or same) value.
+	Validates the text value of this control by calling a <Control.OnValidate> event function which needs to return the validated (or same) value.
 	This value is then used as text for the control if it differs.
 	*/
 	Validate()
 	{
-		output := this.CallEvent("Validate", this.Text)
+		output := this.CallEvent("OnValidate", this.Text)
 		if(output.Handled && output.Result != this.Text)
 			this.Text := output.result
 	}
@@ -120,6 +123,7 @@ Class CControl ;Never created directly
 	{
 		if(CGUI.GUIList[this.GUINum].IsDestroyed)
 			return
+		this[Name].(this, Params*)
 		if(this._.RegisteredEvents.HasKey(Name))
 		{
 			if(IsFunc(this[this._.RegisteredEvents[Name]]))
@@ -481,7 +485,7 @@ Class CControl ;Never created directly
 	Event: ContextMenu
 	Invoked when the user right clicks on the control or presses the AppsKey while this control has focus. If this event is not handled a static context menu can be shown by setting the Menu variable of this control to an instance of <CMenu>.
 	
-	Event: Validate
+	Event: OnValidate
 	Invoked when the control is asked to validate its (textual) contents. This event is only valid for controls containing text, which are only Edit and ComboBox controls as of now.
 	
 	Parameters:

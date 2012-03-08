@@ -6,6 +6,11 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CStatusBarControl Extends CControl
 {
+	Click := new EventHandler()
+	DoubleClick := new EventHandler()
+	RightClick := new EventHandler()
+	DoubleRightClick := new EventHandler()
+	
 	__New(Name, Options, Text, GUINum)
 	{
 		base.__New(Name, Options, Text, GUINum)

@@ -6,6 +6,7 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and DropDownList
 {
+	SelectionChanged := new EventHandler()
 	__New(Name, Options, Text, GUINum, Type)
 	{
 		Base.__New(Name, Options, Text, GUINum)
