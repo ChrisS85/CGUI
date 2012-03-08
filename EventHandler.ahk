@@ -21,7 +21,6 @@
    __Call(target, params*)
     {
       if(target == ""){
-		msgbox call
          for each, handler in this.registeredHandlers
          {
             handler.(params*)
