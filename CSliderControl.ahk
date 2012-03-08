@@ -113,12 +113,14 @@ Class CSliderControl Extends CControl
 	
 	/*
 	Event: Introduction
-	To handle control events you need to create a function with this naming scheme in your window class: ControlName_EventName(params)
+	There are currently 3 methods to handle control events:
+	1)	Use an event handler. Simply use control.EventName.Handler := "HandlingFunction"
+		Instead of "HandlingFunction" it is also possible to pass a function reference or a Delegate: control.EventName.Handler := new Delegate(Object, "HandlingFunction")
+		If this method is used, the first parameter will contain the control object that sent this event.
+	2)	Create a function with this naming scheme in your window class: ControlName_EventName(params)
+	3)	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
+		This method is deprecated since event handlers are more flexible.
 	The parameters depend on the event and there may not be params at all in some cases.
-	Additionally it is required to create a label with this naming scheme: GUIName_ControlName
-	GUIName is the name of the window class that extends CGUI. The label simply needs to call CGUI.HandleEvent().
-	For better readability labels may be chained since they all execute the same code.
-	Instead of using ControlName_EventName() you may also call <CControl.RegisterEvent> on a control instance to register a different event function name.
 	
 	Event: SliderMoved()
 	Invoked when the user clicked on the control. This control does not implement all the advanced Slider events yet. Should be easy to implement though if there is any demand.
