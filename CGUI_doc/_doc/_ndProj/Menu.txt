@@ -58,6 +58,7 @@ File: CFolderDialog  (CFolderDialog.ahk)
 File: CGroupBoxControl  (CGroupBoxControl.ahk)
 File: CGUI  (CGUI.ahk)
 File: CHotkeyControl  (CHotkeyControl.ahk)
+File: Class _Struct + sizeof&lparen;&rparen; by HotKeyIt  (_Struct.ahk)
 File: CLinkControl  (CLinkControl.ahk)
 File: CListViewControl  (CListViewControl.ahk)
 File: CMenu  (CMenu.ahk)
@@ -71,6 +72,7 @@ File: CTreeViewControl  (CTreeViewControl.ahk)
 File: gdip.ahk  (gdip.ahk)
 File: Parse  (Parse.ahk)
 File: SearchPanel  (CGUI_doc\_doc\javascript\main.js)
+File: sizeof function by HotKeyIt  (sizeof.ahk)
 
 Group: Index  {
 
