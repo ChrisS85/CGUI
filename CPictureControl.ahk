@@ -24,10 +24,8 @@ Class CPictureControl Extends CControl
 	{
 		base.PostCreate()
 		text := this._.Picture
-		outputdebug postcreate %text%
 		if text is number
 		{
-			outputdebug % "set picture" this.hwnd
 			this._.Picture := ""
 			this.SetImageFromHBitmap(text)
 		}

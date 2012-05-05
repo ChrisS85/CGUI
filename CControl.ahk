@@ -102,6 +102,16 @@ Class CControl ;Never created directly
 			return
 		ControlFocus,,% "ahk_id " this.hwnd
 	}
+	/*
+	Function: Redraw
+	Redraws the control. This can sometimes fix drawing issues.
+	*/
+	Redraw()
+	{
+		if(CGUI.GUIList[this.GUINum].IsDestroyed)
+			return
+		GuiControl, % this.GUINum ":MoveDraw",% this.hwnd
+	}
 	;~ Font(Options, Font="")
 	;~ {
 		;~ if(CGUI.GUIList[this.GUINum].IsDestroyed)
