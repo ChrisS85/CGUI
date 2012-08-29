@@ -481,26 +481,62 @@ Class CControl ;Never created directly
 				Controlhwnd := [this.hwnd]
 				if(this.type = "ComboBox") ;'ComboBox' = Drop-Down button + Edit
 				{
-					VarSetCapacity(CBBINFO, 52, 0)
-					NumPut(52, CBBINFO,0, "UINT")
+					/*
+					typedef struct tagCOMBOBOXINFO {
+					  DWORD cbSize;
+					  RECT  rcItem;
+					  RECT  rcButton;
+					  DWORD stateButton;
+					  HWND  hwndCombo;
+					  HWND  hwndItem;
+					  HWND  hwndList;
+					} COMBOBOXINFO, *PCOMBOBOXINFO, *LPCOMBOBOXINFO;
+					*/
+					VarSetCapacity(CBBINFO, 40 + 3 * A_PtrSize, 0)
+					NumPut(40 + 3 * A_PtrSize, CBBINFO, 0, "UINT")
 					result := DllCall("GetComboBoxInfo", "UInt", Controlhwnd[1], "PTR", &CBBINFO)
-					Controlhwnd.Insert(Numget(CBBINFO,44))
+					Controlhwnd.Insert(Numget(CBBINFO, 40 + A_PtrSize))
 				}
 				else if(this.type = "ListView")
 					Controlhwnd.Insert(DllCall("SendMessage", "UInt", Controlhwnd[1], "UInt", 0x101f, "PTR", 0, "PTR", 0))
 				; - 'Text' and 'Picture' Controls requires a g-label to be defined.
 				if(!TThwnd){
 					; - 'ListView' = ListView + Header       (Get hWnd of the 'Header' control using "ControlGet" command).
-					TThwnd := CGUI.GUIList[this.GUINum]._.TThwnd := DllCall("CreateWindowEx","Uint",0,"Str","TOOLTIPS_CLASS32","Uint",0,"Uint",2147483648 | 3,"Uint",-2147483648
-									,"Uint",-2147483648,"Uint",-2147483648,"Uint",-2147483648,"Ptr",GuiHwnd,"Uint",0,"Uint",0,"Uint",0, "PTR")
-					DllCall("uxtheme\SetWindowTheme","Ptr",TThwnd,"Ptr",0,"UintP",0)   ; TTM_SETWINDOWTHEME
+					TThwnd := CGUI.GUIList[this.GUINum]._.TThwnd := DllCall("CreateWindowEx", "Uint", 0, "Str", "TOOLTIPS_CLASS32", "Uint", 0, "Uint", 2147483648 | 3, "Uint", -2147483648
+									, "Uint", -2147483648, "Uint", -2147483648, "Uint", -2147483648, "Ptr", GuiHwnd, "Uint", 0, "Uint", 0,"Uint", 0, "PTR")
+					DllCall("uxtheme\SetWindowTheme", "Ptr", TThwnd, "Ptr", 0, "UintP", 0)   ; TTM_SETWINDOWTHEME
 				}
 				for index, chwnd in Controlhwnd
 				{
-					Varsetcapacity(TInfo,44,0), Numput(44,TInfo), Numput(1|16,TInfo,4), Numput(GuiHwnd,TInfo,8), Numput(chwnd,TInfo,12), Numput(&Value,TInfo,36)
-					!this._.Tooltip   ? (DllCall("SendMessage",Ptr,TThwnd,"Uint",1028,Ptr,0,Ptr,&TInfo,Ptr))         ; TTM_ADDTOOL = 1028 (used to add a tool, and assign it to a control)
-					. (DllCall("SendMessage",Ptr,TThwnd,"Uint",1048,Ptr,0,Ptr,A_ScreenWidth))      ; TTM_SETMAXTIPWIDTH = 1048 (This one allows the use of multiline tooltips)
-					DllCall("SendMessage",Ptr,TThwnd,"UInt",(A_IsUnicode ? 0x439 : 0x40c),Ptr,0,Ptr,&TInfo,Ptr)   ; TTM_UPDATETIPTEXT (OLD_MSG=1036) (used to adjust the text of a tip)
+					/*
+					typedef struct {
+					  UINT      cbSize;
+					  UINT      uFlags;
+					  HWND      hwnd;
+					  UINT_PTR  uId;
+					  RECT      rect;
+					  HINSTANCE hinst;
+					  LPTSTR    lpszText;
+					#if (_WIN32_IE >= 0x0300)
+					  LPARAM    lParam;
+					#endif 
+					#if (_WIN32_WINNT >= Ox0501)
+					  void      *lpReserved;
+					#endif 
+					} TOOLINFO, *PTOOLINFO, *LPTOOLINFO;
+					*/
+					Varsetcapacity(TInfo, 24 + 6 * A_PtrSize, 0)
+					Numput(24 + 6 * A_PtrSize, TInfo, "UINT")
+					Numput(1|16, TInfo, 4, "UINT")
+					Numput(GuiHwnd, TInfo, 8, "PTR")
+					Numput(chwnd, TInfo, 8 + A_PtrSize, "PTR")
+					Numput(&Value, TInfo, 24 + 3 * A_PtrSize, "PTR")
+					if(!this._.Tooltip)
+					{
+						DllCall("SendMessage", "Ptr", TThwnd, "Uint", 1028, "Ptr", 0, Ptr, &TInfo, "Ptr")         ; TTM_ADDTOOL = 1028 (used to add a tool, and assign it to a control)
+						DllCall("SendMessage", "Ptr", TThwnd, "Uint", 1048, "Ptr", 0, Ptr, A_ScreenWidth, "PTR")      ; TTM_SETMAXTIPWIDTH = 1048 (This one allows the use of multiline tooltips)
+					}
+					DllCall("SendMessage", "Ptr", TThwnd, "UInt", (A_IsUnicode ? 0x439 : 0x40c), "Ptr", 0, "Ptr", &TInfo, "Ptr")   ; TTM_UPDATETIPTEXT (OLD_MSG=1036) (used to adjust the text of a tip)
 				}
 			}
 			else
@@ -569,7 +605,25 @@ Class CControl ;Never created directly
 			if(Name = "LargeIcons")
 				return this._.LargeIcons
 		}
-		SetIcon(ID, PathOrhBitmap, IconNumber)
+		Clear()
+		{
+			SmallIL_ID := this._.IconList.SmallIL_ID
+			LargeIL_ID := this._.IconList.LargeIL_ID
+			this._.IconList := {}
+			if(SmallIL_ID)
+			{
+				this._.IconList.SmallIL_ID := IL_Create(5, 5, 0)
+				old := LV_SetImageList(this._.IconList.SmallIL_ID, 0)
+				IL_Destroy(old)
+			}
+			if(LargeIL_ID)
+			{
+				this._.IconList.LargeIL_ID := IL_Create(5, 5, 1)
+				old := LV_SetImageList(this._.IconList.LargeIL_ID, this._.LargeIcons = 1)
+				IL_Destroy(old)
+			}
+		}
+		SetIcon(ID, PathOrhBitmap, IconNumber, SetIcon = true)
 		{
 			GUI := CGUI.GUIList[this._.GUINum]
 			Control := GUI.Controls[this._.hwnd]
@@ -582,10 +636,10 @@ Class CControl ;Never created directly
 			{
 				if(Control.Type = "ListView") ;Listview also has large icons
 				{
-					this._.IconList.LargeIL_ID := IL_Create(5,5,1)
+					this._.IconList.LargeIL_ID := IL_Create(5, 5, 1)
 					LV_SetImageList(this._.IconList.LargeIL_ID, this._.LargeIcons = 1)
 				}
-				this._.IconList.SmallIL_ID := IL_Create(5,5,0)
+				this._.IconList.SmallIL_ID := IL_Create(5, 5, 0)
 				if(Control.Type = "ListView" && !this._.LargeIcons)
 					LV_SetImageList(this._.IconList.SmallIL_ID)
 				else if(Control.Type = "TreeView")
@@ -595,13 +649,12 @@ Class CControl ;Never created directly
 						IL_Destroy(ErrorLevel)
 				}
 				else if(Control.Type = "Tab")
-				{
 					SendMessage, 0x1303, 0, this._.IconList.SmallIL_ID, % Control.ClassNN, % "ahk_id " GUI.hwnd  ; 0x1109 is TVM_SETIMAGELIST
-				}
 			}
 			if(FileExist(PathorhBitmap))
 			{
-				Loop % this._.IconList.MaxIndex() ;IDs and paths and whatnot are identical in both lists so one is enough here
+				;Icon IDs are identical in both lists so it's enough to look it up in one list
+				Loop % this._.IconList.MaxIndex()
 					if(this._.IconList[A_Index].Path = PathorhBitmap && this._.IconList[A_Index].IconNumber = IconNumber)
 					{
 						Icon := this._.IconList[A_Index]
@@ -618,31 +671,41 @@ Class CControl ;Never created directly
 			}
 			else
 			{
-				Loop % this._.IconList.MaxIndex() ;IDs and paths and whatnot are identical in both lists so one is enough here
-					if(this._.IconList[A_Index].Path = PathorhBitmap && this._.IconList[A_Index].IconNumber = IconNumber)
+				;Icon IDs are identical in both lists so it's enough to look it up in one list
+				Loop % this._.IconList.MaxIndex()
+					if(this._.IconList[A_Index].Path = PathorhBitmap)
 					{
 						Icon := this._.IconList[A_Index]
 						break
 					}
 				if(!Icon)
 				{
-					IID := DllCall("ImageList_ReplaceIcon", "Ptr", this._.IconList.SmallIL_ID, Int, -1, "Ptr", PathorhBitmap) + 1
-					if(Control.Type = "ListView")
-						IID := DllCall("ImageList_ReplaceIcon", "Ptr", this._.IconList.LargeIL_ID, Int, -1, "Ptr", PathorhBitmap) + 1
+					if(PathOrhBitmap)
+					{
+						IID := DllCall("ImageList_ReplaceIcon", "Ptr", this._.IconList.SmallIL_ID, Int, -1, "Ptr", PathorhBitmap) + 1
+						if(Control.Type = "ListView")
+							IID := DllCall("ImageList_ReplaceIcon", "Ptr", this._.IconList.LargeIL_ID, Int, -1, "Ptr", PathorhBitmap) + 1
+					}
+					else
+						IID := -1
 					this._.IconList.Insert(Icon := {Path : PathorhBitmap, IconNumber : 1, ID : IID})
 				}
 			}
-			if(Control.Type = "ListView")
-				LV_Modify(ID, "Icon" (Icon ? Icon.ID : -1))
-			else if(Control.Type = "TreeView")
-				TV_Modify(ID, "Icon" (Icon ? Icon.ID : -1))
-			else if(Control.Type = "Tab")
+			if(SetIcon)
 			{
-				VarSetCapacity(TCITEM, 20 + 2 * A_PtrSize, 0)
-				NumPut(2, TCITEM, 0, "UInt") ;State mask TCIF_IMAGE
-				NumPut(Icon.ID - 1, TCITEM, 16 + A_PtrSize, "UInt") ;ID of icon in image list
-				SendMessage, 0x1306, ID-1, &TCITEM, % Control.ClassNN, % "ahk_id " GUI.hwnd ;TCM_SETITEM
+				if(Control.Type = "ListView")
+					LV_Modify(ID, "Icon" (Icon ? Icon.ID : -1))
+				else if(Control.Type = "TreeView")
+					TV_Modify(ID, "Icon" (Icon ? Icon.ID : -1))
+				else if(Control.Type = "Tab")
+				{
+					VarSetCapacity(TCITEM, 20 + 2 * A_PtrSize, 0)
+					NumPut(2, TCITEM, 0, "UInt") ;State mask TCIF_IMAGE
+					NumPut(Icon.ID - 1, TCITEM, 16 + A_PtrSize, "UInt") ;ID of icon in image list
+					SendMessage, 0x1306, ID - 1, &TCITEM, % Control.ClassNN, % "ahk_id " GUI.hwnd ;TCM_SETITEM
+				}
 			}
+			return Icon ? Icon.ID : -1
 		}
 	}
 }
