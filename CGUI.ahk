@@ -490,8 +490,7 @@ Class CGUI
 		type := Control
 		if (CGUI_Assert(CGUI.RegisteredControls.hasKey(Control), "The control " Control " was not found!", -2))
 		{
-			Control := CGUI.RegisteredControls[Control]
-			Control := {base: %Control%}
+			Control := {base: CGUI.RegisteredControls[Control]}
 			Control.__Init()
 			hControl := Control.__New(Name, Options, Text, this.GUINum)
 			if(!CGUI_Assert(hControl != 0, "Error creating " Type "Control", -2))
