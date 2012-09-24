@@ -575,10 +575,24 @@ Class CGUI
 	{
 		return this.GUIList[GUINum][Name]
 	}
+
+	/*
+	Function: RegisterControl
+	Registers a new control for use with <AddControl>.
+	This is typically called from static variable initializations to make the control available to the user on startup.
+	Parameters:
+		name - the name the user can use to create a control, such as "Text"
+		class - the class object implementing the control, such as CTextControl.
+	*/
+	RegisterControl(name, class)
+	{
+		this.RegisteredControls[name] := class
+	}
+
 	/*
 	Property: RegisteredControls
 	This static object contains a mapping of allowed control names and the responsible classes.
-	It is used to register new controls for use with <AddControl>.
+	It is used internally to register new controls for use with <AddControl>.
 
 	Property: GUIList
 	This static array contains a list of all GUIs created with this library.
