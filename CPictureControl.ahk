@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CPictureControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("Picture", CPictureControl)
+
 	Click := new EventHandler()
 	DoubleClick := new EventHandler()
 	

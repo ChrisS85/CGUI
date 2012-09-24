@@ -12,6 +12,8 @@ Class CGUI
 	static GUIList := {}
 	static EventQueue := []
 	static WindowMessageListeners := []
+	static RegisteredControls := {}
+
 	;~ _ := {} ;Proxy object
 	/*
 	Get only:
@@ -486,26 +488,15 @@ Class CGUI
 			return
 		
 		type := Control
-		;Some control classes represent multiple controls, those are handled separately here.
-		if(Control = "DropDownList" || Control = "ComboBox" || Control = "ListBox")
-			Control := new CChoiceControl(Name, Options, Text, this.GUINum, type)
-		else if(Control = "Checkbox" || Control = "Radio" )
-			Control := new CCheckboxControl(Name, Options, Text, this.GUINum, type)
-		else if(Control = "Tab" )
-			Control := new CTabControl(Name, Options, Text, this.GUINum)
-		else
+		if (CGUI_Assert(CGUI.RegisteredControls.hasKey(Control), "The control " Control " was not found!", -2))
 		{
-			Control := "C" Control "Control"
-			;Make sure that a control of this type exists.
-			if(CGUI_Assert(IsObject(%Control%), "The control " Control " was not found!", -2))
-			{
-				Control := {base: %Control%}
-				Control.__Init()
-				hControl := Control.__New(Name, Options, Text, this.GUINum)
-				if(!CGUI_Assert(hControl != 0, "Error creating " Type "Control", -2))
-					return
-			}
+			Control := {base: CGUI.RegisteredControls[Control]}
+			Control.__Init()
+			if (Control.__New.MinParams > 4)
+				hControl := Control.__New(Name, Options, Text, this.GUINum, type)
 			else
+				hControl := Control.__New(Name, Options, Text, this.GUINum)
+			if(!CGUI_Assert(hControl != 0, "Error creating " Type "Control", -2))
 				return
 		}
 		
@@ -587,7 +578,25 @@ Class CGUI
 	{
 		return this.GUIList[GUINum][Name]
 	}
+
 	/*
+	Function: RegisterControl
+	Registers a new control for use with <AddControl>.
+	This is typically called from static variable initializations to make the control available to the user on startup.
+	Parameters:
+		name - the name the user can use to create a control, such as "Text"
+		class - the class object implementing the control, such as CTextControl.
+	*/
+	RegisterControl(name, class)
+	{
+		this.RegisteredControls[name] := class
+	}
+
+	/*
+	Property: RegisteredControls
+	This static object contains a mapping of allowed control names and the responsible classes.
+	It is used internally to register new controls for use with <AddControl>.
+
 	Property: GUIList
 	This static array contains a list of all GUIs created with this library.
 	It is maintained automatically and should not need to be used directly.

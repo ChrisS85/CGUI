@@ -10,6 +10,8 @@ However if you need to access the ActiveX object directly you can do so by using
 */
 Class CActiveXControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("ActiveX", CActiveXControl)
+
 	__New(Name, Options, Text, GUINum)
 	{
 		Base.__New(Name, Options, Text, GUINum)

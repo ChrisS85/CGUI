@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CButtonControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("Button", CButtonControl)
+
 	Click := new EventHandler()
 	__New(Name, Options, Text, GUINum)
 	{

@@ -6,6 +6,10 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CChoiceControl Extends CControl ;This class is a ComboBox, ListBox and DropDownList
 {
+	static registration := CGUI.RegisterControl("DropDownList", CChoiceControl)
+						+ CGUI.RegisterControl("ComboBox", CChoiceControl)
+						+ CGUI.RegisterControl("ListBox", CChoiceControl)
+
 	SelectionChanged := new EventHandler()
 	DoubleClick := new EventHandler()
 	__New(Name, Options, Text, GUINum, Type)

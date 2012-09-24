@@ -7,6 +7,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CLinkControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("Link", CLinkControl)
+
 	Click := new EventHandler()
 	
 	__New(Name, Options, Text, GUINum)

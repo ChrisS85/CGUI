@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CStatusBarControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("StatusBar", CStatusBarControl)
+
 	Click := new EventHandler()
 	DoubleClick := new EventHandler()
 	RightClick := new EventHandler()

@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CSliderControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("Slider", CSliderControl)
+
 	SliderMoved := new EventHandler()
 	
 	__New(Name, Options, Text, GUINum)
