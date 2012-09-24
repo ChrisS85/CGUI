@@ -492,7 +492,10 @@ Class CGUI
 		{
 			Control := {base: CGUI.RegisteredControls[Control]}
 			Control.__Init()
-			hControl := Control.__New(Name, Options, Text, this.GUINum)
+			if (Control.__New.MinParams > 4)
+				hControl := Control.__New(Name, Options, Text, this.GUINum, type)
+			else
+				hControl := Control.__New(Name, Options, Text, this.GUINum)
 			if(!CGUI_Assert(hControl != 0, "Error creating " Type "Control", -2))
 				return
 		}
