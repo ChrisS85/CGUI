@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CProgressControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("Progress", CProgressControl)
+
 	__New(Name, Options, Text, GUINum)
 	{
 		Base.__New(Name, Options, Text, GUINum)

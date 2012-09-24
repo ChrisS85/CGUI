@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CTabControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("Tab", CTabControl)
+
 	Click := new EventHandler()
 	DoubleClick := new EventHandler()
 	RightClick := new EventHandler()

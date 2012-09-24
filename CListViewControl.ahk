@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CListViewControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("ListView", CListViewControl)
+
 	EditingStart := new EventHandler()
 	DoubleClick := new EventHandler()
 	DoubleRightClick := new EventHandler()

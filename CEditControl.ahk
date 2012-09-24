@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CEditControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("Edit", CEditControl)
+
 	TextChanged := new EventHandler()
 	__New(Name, Options, Text, GUINum)
 	{
