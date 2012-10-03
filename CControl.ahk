@@ -1,5 +1,5 @@
-#include <EventHandler>
-#include <Delegate>
+#include EventHandler.ahk
+#include Delegate.ahk
 /*
 Class: CControl
 Basic control class from which all controls extend.
@@ -710,19 +710,19 @@ Class CControl ;Never created directly
 	}
 }
 
-#include <CTextControl>
-#include <CEditControl>
-#include <CButtonControl>
-#include <CCheckboxControl>
-#include <CChoiceControl>
-#include <CListViewControl>
-#include <CLinkControl>
-#include <CPictureControl>
-#include <CGroupBoxControl>
-#include <CStatusBarControl>
-#include <CTreeViewControl>
-#include <CTabControl>
-#include <CProgressControl>
-#include <CSliderControl>
-#include <CHotkeyControl>
-#include <CActiveXControl>
+#include CTextControl.ahk
+#include CEditControl.ahk
+#include CButtonControl.ahk
+#include CCheckboxControl.ahk
+#include CChoiceControl.ahk
+#include CListViewControl.ahk
+#include CLinkControl.ahk
+#include CPictureControl.ahk
+#include CGroupBoxControl.ahk
+#include CStatusBarControl.ahk
+#include CTreeViewControl.ahk
+#include CTabControl.ahk
+#include CProgressControl.ahk
+#include CSliderControl.ahk
+#include CHotkeyControl.ahk
+#include CActiveXControl.ahk
