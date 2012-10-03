@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CTreeViewControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("TreeView", CTreeViewControl)
+
 	EditingStart := new EventHandler()
 	DoubleClick := new EventHandler()
 	EditingEnd := new EventHandler()

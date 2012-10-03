@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CTextControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("Text", CTextControl)
+
 	Click := new EventHandler()
 	DoubleClick := new EventHandler()
 	

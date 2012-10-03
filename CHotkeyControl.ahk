@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CHotkeyControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("Hotkey", CHotkeyControl)
+
 	HotkeyChanged := new EventHandler()
 	
 	__New(Name, Options, Text, GUINum)

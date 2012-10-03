@@ -2,6 +2,8 @@
 #include <CCompoundControl>
 Class CPathPickerControl extends CCompoundControl
 {
+	static registration := CGUI.RegisterControl("PathPicker", CPathPickerControl)
+
 	__New(Name, Options, InitialPath, GUINum)
 	{
 		GUI := CGUI.GUIList[GUINum]

@@ -6,6 +6,8 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CGroupBoxControl Extends CControl
 {
+	static registration := CGUI.RegisterControl("GroupBox", CGroupBoxControl)
+
 	__New(Name, Options, Text, GUINum)
 	{
 		base.__New(Name, Options, Text, GUINum)

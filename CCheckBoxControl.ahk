@@ -6,6 +6,9 @@ This control extends <CControl>. All basic properties and functions are implemen
 */
 Class CCheckBoxControl Extends CControl ;This class is a radio control as well
 {
+	static registration := CGUI.RegisterControl("CheckBox", CCheckBoxControl)
+						+ CGUI.RegisterControl("Radio", CCheckBoxControl)
+
 	CheckedChanged := new EventHandler()
 	__New(Name, Options, Text, GUINum, Type)
 	{
