@@ -6,7 +6,7 @@ Class CCompoundControl
 	Boundaries := ""
 	AddContainerControl(GUI, Type, Name, Options, Text)
     {
-        this.Container.Insert(Name, GUI.AddControl(Type, "", Options, Text))
+        this.Container.Insert(Name, GUI.AddControl(Type, Name, Options, Text))
     }
 	__Get(Key)
 	{
