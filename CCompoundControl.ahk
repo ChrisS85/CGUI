@@ -62,4 +62,16 @@ Class CCompoundControl
 		}
 		this.Boundaries := {x : x, y : y, width : w, height : h}
 	}
+
+	Hide()
+	{
+		for name, ctrl in this.Container
+			ctrl.Hide()
+	}
+
+	Show()
+	{
+		for name, ctrl in this.Container
+			ctrl.Show()
+	}
 }
