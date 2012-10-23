@@ -65,12 +65,14 @@ Class CCompoundControl
 
 	Hide()
 	{
+		this.Visible := false
 		for name, ctrl in this.Container
 			ctrl.Hide()
 	}
 
 	Show()
 	{
+		this.Visible := true
 		for name, ctrl in this.Container
 			ctrl.Show()
 	}
