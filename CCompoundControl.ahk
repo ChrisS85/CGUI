@@ -6,7 +6,7 @@ Class CCompoundControl
 	Boundaries := ""
 	AddContainerControl(GUI, Type, Name, Options, Text)
     {
-        this.Container.Insert(Name, GUI.AddControl(Type, "", Options, Text))
+        this.Container.Insert(Name, GUI.AddControl(Type, Name, Options, Text))
     }
 	__Get(Key)
 	{
@@ -61,5 +61,19 @@ Class CCompoundControl
 				h := Position.h
 		}
 		this.Boundaries := {x : x, y : y, width : w, height : h}
+	}
+
+	Hide()
+	{
+		this.Visible := false
+		for name, ctrl in this.Container
+			ctrl.Hide()
+	}
+
+	Show()
+	{
+		this.Visible := true
+		for name, ctrl in this.Container
+			ctrl.Show()
 	}
 }
